@@ -1,0 +1,123 @@
+
+> finora-frontend@0.0.0 test
+> ng test --watch=false
+
+[33mÔØ»[39m Building...
+[32mÔ£ö[39m Building...
+[1mInitial chunk files[22m                                     [2m | [22m[1mNames[22m                                                [2m | [22m [1mRaw size[22m
+[32mstyles.css[39m                                              [2m | [22m[2mstyles[22m                                               [2m | [22m[36m278.13 kB[39m[2m | [22m
+[32mchunk-FD7BIZR6.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m [36m13.59 kB[39m[2m | [22m
+[32mchunk-TAZLCZ2F.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m [36m10.04 kB[39m[2m | [22m
+[32mchunk-2LIXLFNT.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m  [36m9.27 kB[39m[2m | [22m
+[32mchunk-QVQ5C7SE.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m  [36m7.23 kB[39m[2m | [22m
+[32mspec-app-components-navbar-navbar.js[39m                    [2m | [22m[2mspec-app-components-navbar-navbar[22m                    [2m | [22m  [36m6.67 kB[39m[2m | [22m
+[32mspec-app-app.js[39m                                         [2m | [22m[2mspec-app-app[22m                                         [2m | [22m  [36m6.58 kB[39m[2m | [22m
+[32mchunk-CGZBV6BD.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m  [36m4.07 kB[39m[2m | [22m
+[32mchunk-AOAJPXVU.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m  [36m3.46 kB[39m[2m | [22m
+[32mspec-app-app.routes.js[39m                                  [2m | [22m[2mspec-app-app.routes[22m                                  [2m | [22m  [36m3.10 kB[39m[2m | [22m
+[32mchunk-3FUZQ6Q2.js[39m                                       [2m | [22m[2m-[22m                                                    [2m | [22m  [36m2.85 kB[39m[2m | [22m
+[32mspec-app-views-dashboard-dashboard.js[39m                   [2m | [22m[2mspec-app-views-dashboard-dashboard[22m                   [2m | [22m  [36m1.72 kB[39m[2m | [22m
+[32minit-testbed.js[39m                                         [2m | [22m[2minit-testbed[22m                                         [2m | [22m  [36m1.21 kB[39m[2m | [22m
+[32mvitest-mock-patch.js[39m                                    [2m | [22m[2mvitest-mock-patch[22m                                    [2m | [22m[36m969 bytes[39m[2m | [22m
+[32mspec-app-components-tabela-principal-tabela-principal.js[39m[2m | [22m[2mspec-app-components-tabela-principal-tabela-principal[22m[2m | [22m[36m695 bytes[39m[2m | [22m
+[32mspec-app-components-filtros-filtros.js[39m                  [2m | [22m[2mspec-app-components-filtros-filtros[22m                  [2m | [22m[36m627 bytes[39m[2m | [22m
+[32mspec-app-components-gauge-gauge.js[39m                      [2m | [22m[2mspec-app-components-gauge-gauge[22m                      [2m | [22m[36m611 bytes[39m[2m | [22m
+[32mspec-app-components-kpi-kpi.js[39m                          [2m | [22m[2mspec-app-components-kpi-kpi[22m                          [2m | [22m[36m595 bytes[39m[2m | [22m
+
+[1m [22m                                                       [2m | [22m[1mInitial total[22m                                        [2m | [22m[1m351.43 kB[22m
+
+Application bundle generation complete. [2.545 seconds] - 2026-04-16T00:06:40.042Z
+
+Ôû▓ [WARNING] NG8113: RouterLinkActive is not used within the template of Navbar [plugin angular-compiler]
+
+    src/app/components/navbar/navbar.ts:6:24:
+      6 Ôöé   imports: [RouterLink, RouterLinkActive],
+        ÔòÁ                         ~~~~~~~~~~~~~~~~
+
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.4 [39m[90mC:/Git/testes/finora-frontend[39m
+
+ [32mÔ£ô[39m [30m[46m finora-frontend [49m[39m src/app/views/dashboard/dashboard.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 81[2mms[22m[39m
+ [32mÔ£ô[39m [30m[46m finora-frontend [49m[39m src/app/components/tabela-principal/tabela-principal.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 152[2mms[22m[39m
+stderr | src/app/components/kpi/kpi.spec.ts > Kpi > should create
+ERROR RuntimeError: NG0950: Input "title" is required but no value is available yet. Find more at https://v21.angular.dev/errors/NG0950
+    at _Kpi.inputValueFn [as title] (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/core.mjs:48:13)
+    at Kpi_Template (C:/Git/testes/finora-frontend/chunk-AOAJPXVU.js:29:69)
+    at executeTemplate (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5081:5)
+    at refreshView (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5751:7)
+    at detectChangesInView (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5891:5)
+    at detectChangesInViewIfAttached (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5874:3)
+    at detectChangesInComponent (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5865:5)
+    at detectChangesInChildComponents (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5913:5)
+    at refreshView (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5793:7)
+    at detectChangesInView (file:///C:/Git/testes/finora-frontend/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:5891:5) {
+  code: -950
+}
+
+ [31mÔØ»[39m [30m[46m finora-frontend [49m[39m src/app/components/kpi/kpi.spec.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 172[2mms[22m[39m
+[31m     [31m├ù[31m should create[39m[32m 170[2mms[22m[39m
+ [32mÔ£ô[39m [30m[46m finora-frontend [49m[39m src/app/components/gauge/gauge.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32mÔ£ô[39m [30m[46m finora-frontend [49m[39m src/app/components/filtros/filtros.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 175[2mms[22m[39m
+ [31mÔØ»[39m [30m[46m finora-frontend [49m[39m src/app/components/navbar/navbar.spec.ts [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 166[2mms[22m[39m
+[31m     [31m├ù[31m renders the polished shell structure with branding, links and profile placeholder[39m[32m 133[2mms[22m[39m
+[31m     [31m├ù[31m keeps exactly one section link active by class and aria-current for direct and fallback paths[39m[32m 16[2mms[22m[39m
+[31m     [31m├ù[31m navigates back to /dashboard when clicking the Finora brand link[39m[32m 14[2mms[22m[39m
+ [31mÔØ»[39m [30m[46m finora-frontend [49m[39m src/app/app.spec.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 295[2mms[22m[39m
+[31m     [31m├ù[31m keeps shell composition and correct active nav semantics across sections and fallback[39m[32m 243[2mms[22m[39m
+[31m     [31m├ù[31m returns to dashboard via brand link from the last section while preserving shell wrappers[39m[32m 50[2mms[22m[39m
+ [31mÔØ»[39m [30m[46m finora-frontend [49m[39m src/app/app.routes.spec.ts [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 404[2mms[22m[39m
+[31m     [31m├ù[31m redirects empty path to /dashboard and renders dashboard surface[39m[32m 231[2mms[22m[39m
+[31m     [31m├ù[31m renders /dashboard with the expected section markers[39m[32m 52[2mms[22m[39m
+[31m     [31m├ù[31m renders /gastos with the expected section markers[39m[32m 33[2mms[22m[39m
+[31m     [31m├ù[31m renders /categorias with the expected section markers[39m[32m 35[2mms[22m[39m
+[31m     [31m├ù[31m renders /enviar-extrato with the expected section markers[39m[32m 26[2mms[22m[39m
+[31m     [31m├ù[31m redirects unknown paths to /dashboard and keeps dashboard markers[39m[32m 23[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 12 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > redirects empty path to /dashboard and renders dashboard surface
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > renders /dashboard with the expected section markers
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > renders /gastos with the expected section markers
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > renders /categorias with the expected section markers
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > renders /enviar-extrato with the expected section markers
+ FAIL   finora-frontend  src/app/app.routes.spec.ts > App routing contract > redirects unknown paths to /dashboard and keeps dashboard markers
+ FAIL   finora-frontend  src/app/app.spec.ts > App shell > keeps shell composition and correct active nav semantics across sections and fallback
+ FAIL   finora-frontend  src/app/app.spec.ts > App shell > returns to dashboard via brand link from the last section while preserving shell wrappers
+ FAIL   finora-frontend  src/app/components/navbar/navbar.spec.ts > Navbar > renders the polished shell structure with branding, links and profile placeholder
+ FAIL   finora-frontend  src/app/components/navbar/navbar.spec.ts > Navbar > keeps exactly one section link active by class and aria-current for direct and fallback paths
+ FAIL   finora-frontend  src/app/components/navbar/navbar.spec.ts > Navbar > navigates back to /dashboard when clicking the Finora brand link
+Error: NG04016: Detected possible infinite redirect when redirecting from '/dashboard' to '/dashboard'.
+This is currently a dev mode only error but will become a call stack size exceeded error in production in a future major version.
+ ÔØ» Recognizer.expandSegmentAgainstRouteUsingRedirect ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:343:16
+ ÔØ» expandSegmentAgainstRouteUsingRedirect ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:310:18
+ ÔØ» processSegmentAgainstRoute ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:246:26
+ ÔØ» Recognizer.processSegmentGroup ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:168:18
+ ÔØ» Recognizer.processChildren ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:212:29
+ ÔØ» Recognizer.match ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:136:23
+ ÔØ» Recognizer.recognize ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/recognize.ts:100:37
+ ÔØ» ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/router/src/operators/recognize.ts:29:61
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/12]ÔÄ»
+
+ FAIL   finora-frontend  src/app/components/kpi/kpi.spec.ts > Kpi > should create
+Error: NG0950: Input "title" is required but no value is available yet. Find more at https://v21.angular.dev/errors/NG0950
+ ÔØ» _Kpi.inputValueFn [as title] ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/authoring/input/input_signal.ts:137:12
+ ÔØ» Kpi_Template chunk-AOAJPXVU.js:29:69
+ ÔØ» templateFn ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/shared.ts:109:4
+ ÔØ» executeTemplate ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:232:6
+ ÔØ» refreshView ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:497:4
+ ÔØ» detectChangesInView ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:445:2
+ ÔØ» detectChangesInViewIfAttached ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:430:4
+ ÔØ» detectChangesInComponent ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:526:4
+ ÔØ» detectChangesInChildComponents ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:297:6
+ ÔØ» refreshView ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/change_detection.ts:497:4
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/12]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (8)[39m
+[2m      Tests [22m [1m[31m12 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (16)[39m
+[2m   Start at [22m 21:06:40
+[2m   Duration [22m 4.54s[2m (transform 724ms, setup 4.93s, import 1.08s, tests 1.62s, environment 11.51s)[22m
+

@@ -1,0 +1,71 @@
+:root {
+  --painel-bg: #e9eff6;
+  --painel-surface: #ffffff;
+  --painel-surface-soft: #f5f8fc;
+  --painel-text: #16263f;
+  --painel-text-strong: #0f1c30;
+  --painel-muted: #5a6e89;
+  --painel-primary: #1f4f86;
+  --painel-primary-strong: #153a64;
+  --painel-border: #d3deeb;
+  --painel-shadow: 0 12px 28px rgb(16 32 55 / 10%);
+  --painel-shadow-soft: 0 4px 14px rgb(16 32 55 / 8%);
+
+  --status-ok: #2f8f5b;
+  --status-ok-strong: #20613d;
+  --status-ok-soft: #e8f4ed;
+  --status-warning: #c7911a;
+  --status-warning-strong: #825d05;
+  --status-warning-soft: #fdf4df;
+  --status-warning-alt: #b98312;
+  --status-danger: #c94848;
+  --status-danger-strong: #872a2a;
+  --status-danger-soft: #fdeceb;
+  --status-nodata: #8a95a6;
+  --status-nodata-strong: #616b79;
+  --status-nodata-soft: #eef1f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 4% 0%, rgb(31 79 134 / 8%) 0, rgb(31 79 134 / 0%) 40%),
+    radial-gradient(circle at 97% 0%, rgb(47 143 91 / 7%) 0, rgb(47 143 91 / 0%) 32%),
+    var(--painel-bg);
+  color: var(--painel-text);
+  font-family: 'Inter', sans-serif;
+  text-rendering: optimizelegibility;
+}
+
+.card {
+  border-color: var(--painel-border);
+  box-shadow: var(--painel-shadow-soft);
+}
+
+.form-control,
+.form-select {
+  border-color: #c5d5ea;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6e94be;
+  box-shadow: 0 0 0 0.25rem rgb(31 79 134 / 14%);
+}
+
+.table {
+  --bs-table-color: #1f2b41;
+}
+
+::selection {
+  background: rgb(15 94 168 / 22%);
+}

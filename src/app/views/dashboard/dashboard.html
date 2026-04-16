@@ -1,0 +1,350 @@
+<section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
+  <h1 id="heading-dashboard" data-testid="heading-dashboard" class="visually-hidden">Dashboard</h1>
+
+  <div class="row g-4">
+    <section id="secao-kpis" class="col-12" aria-label="Indicadores de CNPJ">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+        <div class="col">
+          <app-kpi
+            title="Total de Lojas"
+            [value]="dashboardMockData.kpis.totalStores"
+            [previousValue]="dashboardMockData.previousKpis.totalStores"
+          ></app-kpi>
+        </div>
+        <div class="col">
+          <app-kpi
+            title="Quantidade de Lojas OK"
+            [value]="dashboardMockData.kpis.okStores"
+            tone="success"
+            badge="OK"
+            [previousValue]="dashboardMockData.previousKpis.okStores"
+          ></app-kpi>
+        </div>
+        <div class="col">
+          <app-kpi
+            title="Quantidade de Lojas Divergentes"
+            [value]="dashboardMockData.kpis.divergentStores"
+            tone="danger"
+            badge="Alerta"
+            [previousValue]="dashboardMockData.previousKpis.divergentStores"
+            [invertTrend]="true"
+          ></app-kpi>
+        </div>
+        <div class="col">
+          <app-kpi
+            title="Quantidade de Lojas Sem Dados"
+            [value]="dashboardMockData.kpis.storesWithoutData"
+            tone="nodata"
+            [previousValue]="dashboardMockData.previousKpis.storesWithoutData"
+            [invertTrend]="true"
+            badge="Sem dados"
+          ></app-kpi>
+        </div>
+      </div>
+    </section>
+
+    <section id="secao-indicador" class="col-12" aria-label="Indicador de lojas">
+      <div class="row g-3 align-items-stretch">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <app-gauge
+            class="d-block h-100"
+            [totalStores]="dashboardMockData.gauge.totalStores"
+            [okStores]="dashboardMockData.statuses.ok"
+          ></app-gauge>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-9">
+          <article class="card status-chart-card h-100" role="group" aria-label="Status das lojas">
+            <div class="card-body">
+              <p class="status-chart__title mb-3">Status das lojas</p>
+
+              <div class="d-flex flex-column gap-3">
+                @for (item of statusBarItems; track item.label) {
+                  <div [class]="item.itemClass">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+                      <span class="status-chart__label">
+                        <span class="status-chart__dot" aria-hidden="true"></span>
+                        {{ item.label }}
+                      </span>
+                      <span class="status-chart__value"
+                        >{{ item.value }} ({{ item.percent }}%)</span
+                      >
+                    </div>
+
+                    <div
+                      class="progress status-chart__progress"
+                      role="img"
+                      [attr.aria-label]="item.label + ': ' + item.percent + '% do total de lojas'"
+                    >
+                      <div [class]="item.barClass" [style.width.%]="item.percent"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="secao-lojas-monitoradas" class="col-12" aria-label="Lista de lojas monitoradas">
+      <article
+        class="card delayed-stores-card"
+        role="group"
+        aria-label="Lista de lojas monitoradas"
+      >
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+            <p class="delayed-stores__title mb-0">Lojas monitoradas</p>
+            <span class="delayed-stores__count"
+              >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows.length }} lojas</span
+            >
+          </div>
+
+          <div class="delayed-stores__filters-panel mb-3">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+              <p class="delayed-stores__filters-title mb-0">Filtros</p>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                [disabled]="!hasActiveFilters()"
+                (click)="clearFilters()"
+              >
+                Limpar filtros
+              </button>
+            </div>
+
+            <div class="row g-2 delayed-stores__filters">
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1">Cód Assoc.</label>
+                <details
+                  class="delayed-stores__dropdown"
+                  [open]="isMultiFilterOpen('associationCode')"
+                  (toggle)="onMultiFilterToggle('associationCode', $event)"
+                >
+                  <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                    {{ multiFilterSummary('associationCode') }}
+                  </summary>
+                  <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                    <input
+                      type="text"
+                      class="form-control form-control-sm mb-2"
+                      placeholder="Digite para buscar"
+                      [value]="multiFilterSearch().associationCode"
+                      (input)="onMultiFilterSearch('associationCode', $event)"
+                    />
+                    <div class="delayed-stores__checklist">
+                      @if (filteredAssociationCodeOptions().length === 0) {
+                        <small class="text-body-secondary d-block">Nenhum código encontrado.</small>
+                      } @else {
+                        @for (
+                          associationCode of filteredAssociationCodeOptions();
+                          track associationCode
+                        ) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isMultiSelected('associationCode', associationCode)"
+                              (change)="
+                                onMultiCheckboxFilter('associationCode', associationCode, $event)
+                              "
+                            />
+                            <span class="form-check-label">{{ associationCode }}</span>
+                          </label>
+                        }
+                      }
+                    </div>
+                  </div>
+                </details>
+              </div>
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1">Cód. Farma</label>
+                <details
+                  class="delayed-stores__dropdown"
+                  [open]="isMultiFilterOpen('farmaCode')"
+                  (toggle)="onMultiFilterToggle('farmaCode', $event)"
+                >
+                  <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                    {{ multiFilterSummary('farmaCode') }}
+                  </summary>
+                  <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                    <input
+                      type="text"
+                      class="form-control form-control-sm mb-2"
+                      placeholder="Digite para buscar"
+                      [value]="multiFilterSearch().farmaCode"
+                      (input)="onMultiFilterSearch('farmaCode', $event)"
+                    />
+                    <div class="delayed-stores__checklist">
+                      @if (filteredFarmaCodeOptions().length === 0) {
+                        <small class="text-body-secondary d-block">Nenhum código encontrado.</small>
+                      } @else {
+                        @for (farmaCode of filteredFarmaCodeOptions(); track farmaCode) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isMultiSelected('farmaCode', farmaCode)"
+                              (change)="onMultiCheckboxFilter('farmaCode', farmaCode, $event)"
+                            />
+                            <span class="form-check-label">{{ farmaCode }}</span>
+                          </label>
+                        }
+                      }
+                    </div>
+                  </div>
+                </details>
+              </div>
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1">CNPJ</label>
+                <details
+                  class="delayed-stores__dropdown"
+                  [open]="isMultiFilterOpen('cnpj')"
+                  (toggle)="onMultiFilterToggle('cnpj', $event)"
+                >
+                  <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                    {{ multiFilterSummary('cnpj') }}
+                  </summary>
+                  <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                    <input
+                      type="text"
+                      class="form-control form-control-sm mb-2"
+                      placeholder="Digite CNPJ ou nome"
+                      [value]="multiFilterSearch().cnpj"
+                      (input)="onMultiFilterSearch('cnpj', $event)"
+                    />
+                    <div class="delayed-stores__checklist">
+                      @if (filteredCnpjOptions().length === 0) {
+                        <small class="text-body-secondary d-block">Nenhum CNPJ encontrado.</small>
+                      } @else {
+                        @for (cnpjOption of filteredCnpjOptions(); track cnpjOption.cnpj) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isMultiSelected('cnpj', cnpjOption.cnpj)"
+                              (change)="onMultiCheckboxFilter('cnpj', cnpjOption.cnpj, $event)"
+                            />
+                            <span class="form-check-label d-block">{{ cnpjOption.cnpj }}</span>
+                            <small class="text-body-secondary delayed-stores__option-sub">{{
+                              cnpjOption.pharmacyName
+                            }}</small>
+                          </label>
+                        }
+                      }
+                    </div>
+                  </div>
+                </details>
+              </div>
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1">Nome</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  placeholder="Ex.: Farma Centro"
+                  [value]="pharmacyNameFilter()"
+                  (input)="onPharmacyNameFilter($event)"
+                />
+              </div>
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1"
+                  >Camada com atraso</label
+                >
+                <select
+                  class="form-select form-select-sm"
+                  [value]="problemLayerFilter()"
+                  (change)="onProblemLayerFilter($event)"
+                >
+                  <option value="all">Todas</option>
+                  @for (layer of delayedLayerOptions; track layer) {
+                    <option [value]="layer">{{ layer }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12 col-sm-6 col-xl-2">
+                <label class="form-label delayed-stores__filter-label mb-1">Status</label>
+                <select
+                  class="form-select form-select-sm"
+                  [value]="storeStatusFilter()"
+                  (change)="onStoreStatusFilter($event)"
+                >
+                  <option value="all">Todos</option>
+                  @for (status of storeStatusOptions; track status) {
+                    <option [value]="status">{{ status }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-12">
+                <small class="text-body-secondary"
+                  >Nos filtros de lista, marque os itens desejados.</small
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive delayed-stores__table-wrap" (scroll)="onTableScroll($event)">
+            <table class="table delayed-stores__table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">Cód Assoc.</th>
+                  <th scope="col">Cód. Farma</th>
+                  <th scope="col">CNPJ</th>
+                  <th scope="col">Camada com atraso</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (filteredDelayedStoreCount() === 0) {
+                  <tr>
+                    <td class="delayed-stores__empty text-center py-3" colspan="4">
+                      Nenhuma loja encontrada com os filtros selecionados.
+                    </td>
+                  </tr>
+                } @else {
+                  @for (store of visibleDelayedStoreRows(); track store.id) {
+                    <tr>
+                      <td>{{ store.associationCode }}</td>
+                      <td>{{ store.farmaCode }}</td>
+                      <td>
+                        <span class="d-block">{{ store.cnpj }}</span>
+                        <small class="text-body-secondary delayed-stores__store-sub">{{
+                          store.pharmacyName
+                        }}</small>
+                      </td>
+                      <td>
+                        <div class="d-flex flex-wrap align-items-center gap-1">
+                          <div class="d-flex flex-wrap gap-1">
+                            @for (layer of store.layerItems; track layer.label) {
+                              <span [class]="layer.className">{{ layer.label }}</span>
+                            }
+                          </div>
+                          <span
+                            class="delayed-stores__layer-info"
+                            tabindex="0"
+                            [attr.aria-label]="store.layerTooltip"
+                          >
+                            <i class="bi bi-info-circle"></i>
+                            <span class="delayed-stores__layer-popover" role="tooltip">{{
+                              store.layerTooltip
+                            }}</span>
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                  @if (hasMoreRows()) {
+                    <tr>
+                      <td class="text-body-secondary text-center py-2" colspan="4">
+                        Role para carregar mais lojas...
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+  </div>
+</section>

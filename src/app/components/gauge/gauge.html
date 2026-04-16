@@ -1,0 +1,26 @@
+<article [class]="gaugeCardClass()" role="group" aria-label="Status de lojas OK">
+  <div
+    class="card-body d-flex flex-column align-items-center justify-content-center gap-3 text-center"
+  >
+    <div
+      class="gauge__ring"
+      role="img"
+      [style.--gauge-value]="okStoresPercent() + '%'"
+      [style.--gauge-color]="gaugeColor()"
+      [style.--gauge-percent-color]="gaugePercentColor()"
+      [attr.aria-label]="okStoresPercent() + '% de lojas OK'"
+    >
+      <div class="gauge__inner">
+        <span class="gauge__percent">{{ okStoresPercent() }}%</span>
+        <span class="gauge__caption">de lojas OK</span>
+      </div>
+    </div>
+
+    <span class="gauge__status">{{ gaugeSignalLabel() }}</span>
+
+    <div class="gauge__details">
+      <span class="gauge__label d-block">Lojas com dados atrasados</span>
+      <span class="gauge__value gauge__value--danger d-block">{{ nonOkStores() }}</span>
+    </div>
+  </div>
+</article>

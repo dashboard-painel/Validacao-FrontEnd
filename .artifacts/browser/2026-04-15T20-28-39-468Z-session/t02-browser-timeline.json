@@ -1,0 +1,80 @@
+{
+  "entries": [
+    {
+      "id": 1,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 1156,
+      "beforeUrl": "about:blank",
+      "afterUrl": "http://127.0.0.1:4200/dashboard",
+      "line": "#1 | browser_navigate | success | 1156ms | url=\"http://127.0.0.1:4200/dashboard\" | URL changed to http://127.0.0.1:4200/dashboard; title changed to FinoraFrontend; landmarks 0→3; links 0→5"
+    },
+    {
+      "id": 2,
+      "tool": "browser_batch",
+      "status": "success",
+      "durationMs": 416,
+      "beforeUrl": "http://127.0.0.1:4200/dashboard",
+      "afterUrl": "http://127.0.0.1:4200/enviar-extrato",
+      "line": "#2 | browser_batch | success | 416ms | finalSummaryOnly=true, steps=[9], stopOnFailure=true | URL changed to http://127.0.0.1:4200/enviar-extrato; focus changed; headings changed; visible text changed"
+    },
+    {
+      "id": 3,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 957,
+      "beforeUrl": "http://127.0.0.1:4200/enviar-extrato",
+      "afterUrl": "http://127.0.0.1:4200/gastos",
+      "line": "#3 | browser_navigate | success | 957ms | url=\"http://127.0.0.1:4200/gastos\" | URL changed to http://127.0.0.1:4200/gastos; focus changed; headings changed; visible text changed"
+    },
+    {
+      "id": 4,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 953,
+      "beforeUrl": "http://127.0.0.1:4200/gastos",
+      "afterUrl": "http://127.0.0.1:4200/categorias",
+      "line": "#4 | browser_navigate | success | 953ms | url=\"http://127.0.0.1:4200/categorias\" | URL changed to http://127.0.0.1:4200/categorias; headings changed; visible text changed"
+    },
+    {
+      "id": 5,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 946,
+      "beforeUrl": "http://127.0.0.1:4200/categorias",
+      "afterUrl": "http://127.0.0.1:4200/enviar-extrato",
+      "line": "#5 | browser_navigate | success | 946ms | url=\"http://127.0.0.1:4200/enviar-extrato\" | URL changed to http://127.0.0.1:4200/enviar-extrato; headings changed; visible text changed"
+    },
+    {
+      "id": 6,
+      "tool": "browser_click",
+      "status": "success",
+      "durationMs": 134,
+      "beforeUrl": "http://127.0.0.1:4200/enviar-extrato",
+      "afterUrl": "http://127.0.0.1:4200/dashboard",
+      "line": "#6 | browser_click | success | 134ms | selector=\"[data-testid=\\\"brand-link\\\"]\" | PASS (url_changed) | URL changed to http://127.0.0.1:4200/dashboard; focus changed; headings changed; visible text changed"
+    },
+    {
+      "id": 7,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 955,
+      "beforeUrl": "http://127.0.0.1:4200/dashboard",
+      "afterUrl": "http://127.0.0.1:4200/dashboard",
+      "line": "#7 | browser_navigate | success | 955ms | url=\"http://127.0.0.1:4200/rota-invalida\" | focus changed"
+    },
+    {
+      "id": 8,
+      "tool": "browser_navigate",
+      "status": "success",
+      "durationMs": 946,
+      "beforeUrl": "http://127.0.0.1:4200/dashboard",
+      "afterUrl": "http://127.0.0.1:4200/enviar-extrato",
+      "line": "#8 | browser_navigate | success | 946ms | url=\"http://127.0.0.1:4200/enviar-extrato\" | URL changed to http://127.0.0.1:4200/enviar-extrato; headings changed; visible text changed"
+    }
+  ],
+  "retained": 8,
+  "totalRecorded": 8,
+  "bounded": false,
+  "summary": "Timeline: 8 browser actions recorded."
+}
