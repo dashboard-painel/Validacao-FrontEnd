@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
-import { DASHBOARD_MOCK_DATA, type DashboardMockData } from '../../mocks/dashboard.mock';
+import { CnpjPipe } from '../../pipes/cnpj.pipe';
+import { type DashboardMockData } from '../../mocks/dashboard.mock';
+import { type FarmaciaHistorico } from '../../models/farmacia.model';
+import { HistoricoService } from '../../services/historico.service';
 
 type StatusBarItem = {
   label: string;
@@ -33,15 +36,19 @@ type DelayedStoreRow = DelayedStoreItem & {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Kpi, GaugeComponent],
+  imports: [Kpi, GaugeComponent, CnpjPipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   private readonly pageSize = 60;
+  private readonly historicoService = inject(HistoricoService);
 
-  readonly dashboardMockData = DASHBOARD_MOCK_DATA;
+  readonly apiStores = signal<FarmaciaHistorico[]>([]);
+  readonly isLoading = signal(true);
+  readonly loadError = signal<string | null>(null);
+
   readonly selectedMultiFilters = signal<Record<MultiFilterKey, string[]>>({
     associationCode: [],
     farmaCode: [],
@@ -57,71 +64,79 @@ export class Dashboard {
   readonly problemLayerFilter = signal<'all' | ProblemLayer>('all');
   readonly storeStatusFilter = signal<'all' | StoreStatus>('all');
 
-  readonly statusBarItems: StatusBarItem[] = [
-    {
-      label: 'OK',
-      value: this.dashboardMockData.statuses.ok,
-      percent: this.toPercent(this.dashboardMockData.statuses.ok),
-      barClass: 'progress-bar bg-success',
-      itemClass: 'status-chart__item status-chart__item--ok',
-    },
-    {
-      label: 'CAMADA GOLD ATRASADA',
-      value: this.dashboardMockData.statuses.goldDelayed,
-      percent: this.toPercent(this.dashboardMockData.statuses.goldDelayed),
-      barClass: 'progress-bar bg-warning text-dark',
-      itemClass: 'status-chart__item status-chart__item--warning',
-    },
-    {
-      label: 'CAMADA SILVER ATRASADA',
-      value: this.dashboardMockData.statuses.silverDelayed,
-      percent: this.toPercent(this.dashboardMockData.statuses.silverDelayed),
-      barClass: 'progress-bar bg-info text-dark',
-      itemClass: 'status-chart__item status-chart__item--warning-alt',
-    },
-    {
-      label: 'API ATRASADA',
-      value: this.dashboardMockData.statuses.apiDelayed,
-      percent: this.toPercent(this.dashboardMockData.statuses.apiDelayed),
-      barClass: 'progress-bar bg-danger',
-      itemClass: 'status-chart__item status-chart__item--danger',
-    },
-    {
-      label: 'SEM DADOS',
-      value: this.dashboardMockData.statuses.noData,
-      percent: this.toPercent(this.dashboardMockData.statuses.noData),
-      barClass: 'progress-bar bg-secondary',
-      itemClass: 'status-chart__item status-chart__item--nodata',
-    },
-  ];
+  readonly dashboardData = computed(() => this.mapToDashboardData(this.apiStores()));
+
+  readonly statusBarItems = computed((): StatusBarItem[] => {
+    const data = this.dashboardData();
+    const total = data.kpis.totalStores;
+    return [
+      {
+        label: 'OK',
+        value: data.statuses.ok,
+        percent: this.toPercent(data.statuses.ok, total),
+        barClass: 'progress-bar bg-success',
+        itemClass: 'status-chart__item status-chart__item--ok',
+      },
+      {
+        label: 'CAMADA GOLD ATRASADA',
+        value: data.statuses.goldDelayed,
+        percent: this.toPercent(data.statuses.goldDelayed, total),
+        barClass: 'progress-bar bg-warning text-dark',
+        itemClass: 'status-chart__item status-chart__item--warning',
+      },
+      {
+        label: 'CAMADA SILVER ATRASADA',
+        value: data.statuses.silverDelayed,
+        percent: this.toPercent(data.statuses.silverDelayed, total),
+        barClass: 'progress-bar bg-info text-dark',
+        itemClass: 'status-chart__item status-chart__item--warning-alt',
+      },
+      {
+        label: 'API ATRASADA',
+        value: data.statuses.apiDelayed,
+        percent: this.toPercent(data.statuses.apiDelayed, total),
+        barClass: 'progress-bar bg-danger',
+        itemClass: 'status-chart__item status-chart__item--danger',
+      },
+      {
+        label: 'SEM DADOS',
+        value: data.statuses.noData,
+        percent: this.toPercent(data.statuses.noData, total),
+        barClass: 'progress-bar bg-secondary',
+        itemClass: 'status-chart__item status-chart__item--nodata',
+      },
+    ];
+  });
 
   readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API', 'Sem dados'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
-  readonly associationCodeOptions = this.uniqueSortedOptions('associationCode');
-  readonly farmaCodeOptions = this.uniqueSortedOptions('farmaCode');
-  readonly cnpjOptions = this.uniqueCnpjOptions();
+  readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
+  readonly farmaCodeOptions = computed(() => this.uniqueSortedOptions('farmaCode'));
+  readonly cnpjOptions = computed(() => this.uniqueCnpjOptions());
   readonly filteredAssociationCodeOptions = computed(() =>
-    this.filterOptionsBySearch('associationCode', this.associationCodeOptions),
+    this.filterOptionsBySearch('associationCode', this.associationCodeOptions()),
   );
   readonly filteredFarmaCodeOptions = computed(() =>
-    this.filterOptionsBySearch('farmaCode', this.farmaCodeOptions),
+    this.filterOptionsBySearch('farmaCode', this.farmaCodeOptions()),
   );
-  readonly filteredCnpjOptions = computed(() => this.filterCnpjOptionsBySearch(this.cnpjOptions));
+  readonly filteredCnpjOptions = computed(() => this.filterCnpjOptionsBySearch(this.cnpjOptions()));
 
-  readonly delayedStoreRows: DelayedStoreRow[] = [...this.dashboardMockData.delayedStores]
-    .sort((a, b) => b.delayHours - a.delayHours)
-    .map((store) => ({
-      ...store,
-      layerTooltip: this.toLayerTooltip(store),
-      status: this.toStoreStatus(store),
-      layerItems:
-        store.problemLayers.length === 0
-          ? [{ label: 'Sem atraso', className: this.toLayerClass('Sem atraso') }]
-          : store.problemLayers.map((layer) => ({
-              label: layer,
-              className: this.toLayerClass(layer),
-            })),
-    }));
+  readonly delayedStoreRows = computed((): DelayedStoreRow[] =>
+    [...this.dashboardData().delayedStores]
+      .sort((a, b) => b.delayHours - a.delayHours)
+      .map((store) => ({
+        ...store,
+        layerTooltip: this.toLayerTooltip(store),
+        status: this.toStoreStatus(store),
+        layerItems:
+          store.problemLayers.length === 0
+            ? [{ label: 'Sem atraso' as LayerBadge, className: this.toLayerClass('Sem atraso') }]
+            : store.problemLayers.map((layer) => ({
+                label: layer,
+                className: this.toLayerClass(layer),
+              })),
+      })),
+  );
 
   readonly filteredDelayedStoreRows = computed(() => {
     const selectedFilters = this.selectedMultiFilters();
@@ -129,7 +144,7 @@ export class Dashboard {
     const layerQuery = this.problemLayerFilter();
     const statusQuery = this.storeStatusFilter();
 
-    return this.delayedStoreRows.filter((store) => {
+    return this.delayedStoreRows().filter((store) => {
       if (
         selectedFilters.associationCode.length > 0 &&
         !selectedFilters.associationCode.includes(store.associationCode)
@@ -192,14 +207,25 @@ export class Dashboard {
 
       this.renderedRowsCount.set(this.pageSize);
     });
+
+    this.historicoService.getHistorico().subscribe({
+      next: (data) => {
+        this.apiStores.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.loadError.set('Erro ao carregar dados da API. Tente novamente.');
+        this.isLoading.set(false);
+      },
+    });
   }
 
-  private toPercent(value: number): number {
-    if (this.dashboardMockData.kpis.totalStores === 0) {
+  private toPercent(value: number, total: number): number {
+    if (total === 0) {
       return 0;
     }
 
-    return Math.round((value / this.dashboardMockData.kpis.totalStores) * 100);
+    return Math.round((value / total) * 100);
   }
 
   onMultiCheckboxFilter(key: MultiFilterKey, value: string, event: Event): void {
@@ -374,7 +400,7 @@ export class Dashboard {
   }
 
   private uniqueSortedOptions(key: MultiFilterKey): string[] {
-    return [...new Set(this.dashboardMockData.delayedStores.map((store) => store[key]))].sort((a, b) =>
+    return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort((a, b) =>
       a.localeCompare(b),
     );
   }
@@ -382,7 +408,7 @@ export class Dashboard {
   private uniqueCnpjOptions(): CnpjOption[] {
     const map = new Map<string, string>();
 
-    for (const store of this.dashboardMockData.delayedStores) {
+    for (const store of this.dashboardData().delayedStores) {
       if (!map.has(store.cnpj)) {
         map.set(store.cnpj, store.pharmacyName);
       }
@@ -435,5 +461,72 @@ export class Dashboard {
 
   private readDetailsElement(event: Event): HTMLDetailsElement | null {
     return event.target as HTMLDetailsElement | null;
+  }
+
+  private mapToDashboardData(farmacias: FarmaciaHistorico[]): DashboardMockData {
+    const stores = farmacias.map((f) => this.mapFarmaciaToDashboard(f));
+    const totalStores = stores.length;
+    const okStores = stores.filter((s) => s.problemLayers.length === 0).length;
+    const storesWithoutData = stores.filter((s) => s.problemLayers.includes('Sem dados')).length;
+    const divergentStores = stores.filter(
+      (s) => s.problemLayers.length > 0 && !s.problemLayers.every((l) => l === 'Sem dados'),
+    ).length;
+
+    return {
+      kpis: { totalStores, okStores, divergentStores, storesWithoutData },
+      previousKpis: { totalStores, okStores, divergentStores, storesWithoutData },
+      statuses: {
+        ok: okStores,
+        goldDelayed: stores.filter((s) => s.problemLayers.includes('Gold')).length,
+        silverDelayed: stores.filter((s) => s.problemLayers.includes('Silver')).length,
+        apiDelayed: stores.filter((s) => s.problemLayers.includes('API')).length,
+        noData: storesWithoutData,
+      },
+      gauge: { totalStores, okStores },
+      delayedStores: stores,
+    };
+  }
+
+  private mapFarmaciaToDashboard(f: FarmaciaHistorico): DashboardMockData['delayedStores'][number] {
+    const problemLayers: ('Gold' | 'Silver' | 'API' | 'Sem dados')[] = [];
+
+    if (!f.ultima_venda_GoldVendas && !f.ultima_venda_SilverSTGN_Dedup) {
+      problemLayers.push('Sem dados');
+    } else {
+      switch (f.tipo_divergencia) {
+        case 'data_diferente':
+          problemLayers.push('Gold', 'Silver');
+          break;
+        case 'apenas_gold_vendas':
+          // present only in Gold → Silver is missing
+          problemLayers.push('Silver');
+          break;
+        case 'apenas_silver_stgn_dedup':
+          // present only in Silver → Gold is missing
+          problemLayers.push('Gold');
+          break;
+      }
+    }
+
+    if (f.coletor_novo && f.coletor_novo !== 'OK, sem registro') {
+      problemLayers.push('API');
+    }
+
+    const lastSalesByLayer: Partial<Record<'Gold' | 'Silver' | 'API' | 'Sem dados', string>> = {};
+    if (f.ultima_hora_venda_GoldVendas) lastSalesByLayer['Gold'] = f.ultima_hora_venda_GoldVendas;
+    if (f.ultima_hora_venda_SilverSTGN_Dedup) lastSalesByLayer['Silver'] = f.ultima_hora_venda_SilverSTGN_Dedup;
+    if (problemLayers.includes('Sem dados')) lastSalesByLayer['Sem dados'] = 'Sem recebimento de vendas';
+
+    return {
+      id: `${f.associacao}-${f.cod_farmacia}`,
+      associationCode: f.associacao,
+      farmaCode: f.cod_farmacia,
+      cnpj: f.cnpj ?? '',
+      pharmacyName: f.nome_farmacia ?? '-',
+      lastUpdatedAt: f.ultima_hora_venda_GoldVendas ?? f.ultima_hora_venda_SilverSTGN_Dedup ?? '-',
+      delayHours: 0,
+      problemLayers,
+      lastSalesByLayer,
+    };
   }
 }

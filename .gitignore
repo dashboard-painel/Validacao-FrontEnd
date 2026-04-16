@@ -69,3 +69,5 @@ vendor/
 coverage/
 .cache/
 tmp/
+.planning/
+.github/
