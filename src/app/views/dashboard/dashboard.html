@@ -1,41 +1,50 @@
 <section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
   <h1 id="heading-dashboard" data-testid="heading-dashboard" class="visually-hidden">Dashboard</h1>
 
+  @if (isLoading()) {
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+  } @else if (loadError()) {
+    <div class="alert alert-danger" role="alert">{{ loadError() }}</div>
+  } @else {
   <div class="row g-4">
     <section id="secao-kpis" class="col-12" aria-label="Indicadores de CNPJ">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
         <div class="col">
           <app-kpi
             title="Total de Lojas"
-            [value]="dashboardMockData.kpis.totalStores"
-            [previousValue]="dashboardMockData.previousKpis.totalStores"
+            [value]="dashboardData().kpis.totalStores"
+            [previousValue]="dashboardData().previousKpis.totalStores"
           ></app-kpi>
         </div>
         <div class="col">
           <app-kpi
             title="Quantidade de Lojas OK"
-            [value]="dashboardMockData.kpis.okStores"
+            [value]="dashboardData().kpis.okStores"
             tone="success"
             badge="OK"
-            [previousValue]="dashboardMockData.previousKpis.okStores"
+            [previousValue]="dashboardData().previousKpis.okStores"
           ></app-kpi>
         </div>
         <div class="col">
           <app-kpi
             title="Quantidade de Lojas Divergentes"
-            [value]="dashboardMockData.kpis.divergentStores"
+            [value]="dashboardData().kpis.divergentStores"
             tone="danger"
             badge="Alerta"
-            [previousValue]="dashboardMockData.previousKpis.divergentStores"
+            [previousValue]="dashboardData().previousKpis.divergentStores"
             [invertTrend]="true"
           ></app-kpi>
         </div>
         <div class="col">
           <app-kpi
             title="Quantidade de Lojas Sem Dados"
-            [value]="dashboardMockData.kpis.storesWithoutData"
+            [value]="dashboardData().kpis.storesWithoutData"
             tone="nodata"
-            [previousValue]="dashboardMockData.previousKpis.storesWithoutData"
+            [previousValue]="dashboardData().previousKpis.storesWithoutData"
             [invertTrend]="true"
             badge="Sem dados"
           ></app-kpi>
@@ -48,8 +57,8 @@
         <div class="col-12 col-sm-6 col-xl-3">
           <app-gauge
             class="d-block h-100"
-            [totalStores]="dashboardMockData.gauge.totalStores"
-            [okStores]="dashboardMockData.statuses.ok"
+            [totalStores]="dashboardData().gauge.totalStores"
+            [okStores]="dashboardData().statuses.ok"
           ></app-gauge>
         </div>
 
@@ -59,7 +68,7 @@
               <p class="status-chart__title mb-3">Status das lojas</p>
 
               <div class="d-flex flex-column gap-3">
-                @for (item of statusBarItems; track item.label) {
+                @for (item of statusBarItems(); track item.label) {
                   <div [class]="item.itemClass">
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
                       <span class="status-chart__label">
@@ -97,7 +106,7 @@
           <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
             <p class="delayed-stores__title mb-0">Lojas monitoradas</p>
             <span class="delayed-stores__count"
-              >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows.length }} lojas</span
+              >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows().length }} lojas</span
             >
           </div>
 
@@ -226,7 +235,7 @@
                               [checked]="isMultiSelected('cnpj', cnpjOption.cnpj)"
                               (change)="onMultiCheckboxFilter('cnpj', cnpjOption.cnpj, $event)"
                             />
-                            <span class="form-check-label d-block">{{ cnpjOption.cnpj }}</span>
+                            <span class="form-check-label d-block">{{ cnpjOption.cnpj | cnpj }}</span>
                             <small class="text-body-secondary delayed-stores__option-sub">{{
                               cnpjOption.pharmacyName
                             }}</small>
@@ -306,7 +315,7 @@
                       <td>{{ store.associationCode }}</td>
                       <td>{{ store.farmaCode }}</td>
                       <td>
-                        <span class="d-block">{{ store.cnpj }}</span>
+                        <span class="d-block">{{ store.cnpj | cnpj }}</span>
                         <small class="text-body-secondary delayed-stores__store-sub">{{
                           store.pharmacyName
                         }}</small>
@@ -347,4 +356,5 @@
       </article>
     </section>
   </div>
+  }
 </section>
