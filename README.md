@@ -56,14 +56,23 @@ src/
 │   │   └── historico.service  # Integração com a API
 │   ├── views/
 │   │   └── dashboard/   # Página principal do dashboard
-│   ├── mocks/           # Dados mockados para desenvolvimento/testes
 │   ├── app.routes.ts    # Definição de rotas
 │   └── app.config.ts    # Configuração da aplicação
 ├── styles.scss          # Estilos globais
 └── main.ts              # Ponto de entrada da aplicação
 ```
 
-## Rotas
+## Funcionalidades
+
+- **Dashboard em tempo real** — dados atualizados automaticamente a cada 30 segundos sem recarregar a página
+- **KPIs** — total de lojas, lojas OK, divergentes e sem dados, com comparativo em relação à última sessão
+- **Gauge de status** — visualização circular da proporção de lojas em dia
+- **Tabela de lojas com atraso** — ordenada por código de associação, com coluna de atraso (em horas ou dias) e camadas problemáticas destacadas
+  - Atrasos acima de 48h são exibidos em dias
+- **Filtros** — por código de associação, código Farma, CNPJ, nome da farmácia, camada problemática e status
+- **Sidebar colapsável** — recolhe para ícones em telas grandes; exibe data da última atualização do backend
+
+
 
 | Rota | Componente |
 |---|---|
@@ -77,8 +86,6 @@ A aplicação consome os seguintes endpoints do backend (`http://localhost:8000`
 | Método | Endpoint | Descrição |
 |---|---|---|
 | `GET` | `/historico` | Lista o histórico de todas as farmácias |
-| `GET` | `/historico/:associacao` | Histórico filtrado por associação |
-| `POST` | `/comparar` | Dispara uma nova comparação |
 | `GET` | `/ultima-atualizacao` | Retorna `{ atualizado_em: "..." }` com a data da última atualização |
 
 ## Tecnologias
