@@ -15,4 +15,5 @@ export type FarmaciaHistorico = {
   ultima_hora_venda_SilverSTGN_Dedup: string | null;
   coletor_novo: string | null;
   tipo_divergencia: TipoDivergencia;
+  camadas_atrasadas: string[] | null;
 };

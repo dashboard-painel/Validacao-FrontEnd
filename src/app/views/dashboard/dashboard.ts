@@ -1,11 +1,55 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
 import { CnpjPipe } from '../../pipes/cnpj.pipe';
-import { type DashboardMockData } from '../../mocks/dashboard.mock';
-import { type FarmaciaHistorico } from '../../models/farmacia.model';
+import { type FarmaciaHistorico } from '../../models/shared/farmacia.model';
 import { HistoricoService } from '../../services/historico.service';
+
+type DashboardData = {
+  kpis: {
+    totalStores: number;
+    okStores: number;
+    divergentStores: number;
+    storesWithoutData: number;
+  };
+  previousKpis: {
+    totalStores: number;
+    okStores: number;
+    divergentStores: number;
+    storesWithoutData: number;
+  };
+  statuses: {
+    ok: number;
+    goldDelayed: number;
+    silverDelayed: number;
+    apiDelayed: number;
+    noData: number;
+  };
+  gauge: {
+    totalStores: number;
+    okStores: number;
+  };
+  delayedStores: {
+    id: string;
+    associationCode: string;
+    farmaCode: string;
+    cnpj: string;
+    pharmacyName: string;
+    lastUpdatedAt: string;
+    delayHours: number;
+    problemLayers: ProblemLayer[];
+    lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
+  }[];
+};
 
 type StatusBarItem = {
   label: string;
@@ -15,8 +59,8 @@ type StatusBarItem = {
   itemClass: string;
 };
 
-type DelayedStoreItem = DashboardMockData['delayedStores'][number];
-type ProblemLayer = DelayedStoreItem['problemLayers'][number];
+type DelayedStoreItem = DashboardData['delayedStores'][number];
+type ProblemLayer = 'Gold' | 'Silver' | 'API' | 'Sem dados';
 type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
 type LayerBadge = ProblemLayer | 'Sem atraso';
 type StoreStatus = 'Com atraso' | 'Sem atraso' | 'Sem dados';
@@ -44,10 +88,12 @@ type DelayedStoreRow = DelayedStoreItem & {
 export class Dashboard {
   private readonly pageSize = 60;
   private readonly historicoService = inject(HistoricoService);
+  private readonly kpisStorageKey = 'dashboard-kpis';
 
   readonly apiStores = signal<FarmaciaHistorico[]>([]);
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
+  private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
 
   readonly selectedMultiFilters = signal<Record<MultiFilterKey, string[]>>({
     associationCode: [],
@@ -152,7 +198,10 @@ export class Dashboard {
         return false;
       }
 
-      if (selectedFilters.farmaCode.length > 0 && !selectedFilters.farmaCode.includes(store.farmaCode)) {
+      if (
+        selectedFilters.farmaCode.length > 0 &&
+        !selectedFilters.farmaCode.includes(store.farmaCode)
+      ) {
         return false;
       }
 
@@ -198,6 +247,24 @@ export class Dashboard {
   });
 
   constructor() {
+    const stored = localStorage.getItem(this.kpisStorageKey);
+    if (stored) {
+      try {
+        this.previousKpisStore.set(JSON.parse(stored) as DashboardData['kpis']);
+      } catch { /* ignore */ }
+    }
+
+    // Only update the KPI baseline when a new browser session starts (new tab / browser restart).
+    // F5 reloads keep the same sessionStorage, so arrows stay visible across refreshes.
+    const isNewSession = !sessionStorage.getItem('dashboard-session-active');
+    sessionStorage.setItem('dashboard-session-active', '1');
+    if (isNewSession) {
+      effect(() => {
+        if (this.isLoading()) return;
+        localStorage.setItem(this.kpisStorageKey, JSON.stringify(this.dashboardData().kpis));
+      });
+    }
+
     effect(() => {
       this.selectedMultiFilters();
       this.multiFilterSearch();
@@ -379,14 +446,10 @@ export class Dashboard {
   }
 
   private toLayerTooltip(store: DelayedStoreItem): string {
-    if (store.problemLayers.length === 0) {
-      return 'Sem atraso de venda nas camadas monitoradas.';
-    }
-
-    return store.problemLayers
+    return (['Gold', 'Silver', 'API'] as const)
       .map((layer) => {
-        const latestSale = store.lastSalesByLayer?.[layer] ?? store.lastUpdatedAt;
-        return `Último dado de venda (${layer}): ${latestSale}`;
+        const date = store.lastSalesByLayer?.[layer] ?? 'Sem dados';
+        return `Último dado de venda (${layer}): ${date}`;
       })
       .join('\n');
   }
@@ -400,8 +463,8 @@ export class Dashboard {
   }
 
   private uniqueSortedOptions(key: MultiFilterKey): string[] {
-    return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort((a, b) =>
-      a.localeCompare(b),
+    return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort(
+      (a, b) => a.localeCompare(b),
     );
   }
 
@@ -463,7 +526,7 @@ export class Dashboard {
     return event.target as HTMLDetailsElement | null;
   }
 
-  private mapToDashboardData(farmacias: FarmaciaHistorico[]): DashboardMockData {
+  private mapToDashboardData(farmacias: FarmaciaHistorico[]): DashboardData {
     const stores = farmacias.map((f) => this.mapFarmaciaToDashboard(f));
     const totalStores = stores.length;
     const okStores = stores.filter((s) => s.problemLayers.length === 0).length;
@@ -472,9 +535,12 @@ export class Dashboard {
       (s) => s.problemLayers.length > 0 && !s.problemLayers.every((l) => l === 'Sem dados'),
     ).length;
 
+    const kpis = { totalStores, okStores, divergentStores, storesWithoutData };
+    const previousKpis = this.previousKpisStore() ?? kpis;
+
     return {
-      kpis: { totalStores, okStores, divergentStores, storesWithoutData },
-      previousKpis: { totalStores, okStores, divergentStores, storesWithoutData },
+      kpis,
+      previousKpis,
       statuses: {
         ok: okStores,
         goldDelayed: stores.filter((s) => s.problemLayers.includes('Gold')).length,
@@ -487,35 +553,33 @@ export class Dashboard {
     };
   }
 
-  private mapFarmaciaToDashboard(f: FarmaciaHistorico): DashboardMockData['delayedStores'][number] {
-    const problemLayers: ('Gold' | 'Silver' | 'API' | 'Sem dados')[] = [];
+  private mapFarmaciaToDashboard(f: FarmaciaHistorico): DashboardData['delayedStores'][number] {
+    const problemLayers: ProblemLayer[] = [];
 
     if (!f.ultima_venda_GoldVendas && !f.ultima_venda_SilverSTGN_Dedup) {
       problemLayers.push('Sem dados');
-    } else {
-      switch (f.tipo_divergencia) {
-        case 'data_diferente':
-          problemLayers.push('Gold', 'Silver');
-          break;
-        case 'apenas_gold_vendas':
-          // present only in Gold → Silver is missing
-          problemLayers.push('Silver');
-          break;
-        case 'apenas_silver_stgn_dedup':
-          // present only in Silver → Gold is missing
-          problemLayers.push('Gold');
-          break;
+    } else if (f.camadas_atrasadas) {
+      for (const camada of f.camadas_atrasadas) {
+        if (camada === 'GoldVendas') problemLayers.push('Gold');
+        else if (camada === 'SilverSTGN_Dedup') problemLayers.push('Silver');
+        else if (camada === 'API') problemLayers.push('API');
       }
     }
 
-    if (f.coletor_novo && f.coletor_novo !== 'OK, sem registro') {
-      problemLayers.push('API');
-    }
+    const goldDatetime = this.formatDatetime(f.ultima_hora_venda_GoldVendas);
+    const silverDatetime = this.formatDatetime(
+      f.ultima_venda_SilverSTGN_Dedup && f.ultima_hora_venda_SilverSTGN_Dedup
+        ? `${f.ultima_venda_SilverSTGN_Dedup} ${f.ultima_hora_venda_SilverSTGN_Dedup}`
+        : null,
+    );
+    const apiDatetime = this.formatDatetime(f.coletor_novo);
 
-    const lastSalesByLayer: Partial<Record<'Gold' | 'Silver' | 'API' | 'Sem dados', string>> = {};
-    if (f.ultima_hora_venda_GoldVendas) lastSalesByLayer['Gold'] = f.ultima_hora_venda_GoldVendas;
-    if (f.ultima_hora_venda_SilverSTGN_Dedup) lastSalesByLayer['Silver'] = f.ultima_hora_venda_SilverSTGN_Dedup;
-    if (problemLayers.includes('Sem dados')) lastSalesByLayer['Sem dados'] = 'Sem recebimento de vendas';
+    const lastSalesByLayer: Partial<Record<ProblemLayer, string>> = {};
+    if (goldDatetime) lastSalesByLayer['Gold'] = goldDatetime;
+    if (silverDatetime) lastSalesByLayer['Silver'] = silverDatetime;
+    if (apiDatetime) lastSalesByLayer['API'] = apiDatetime;
+    if (problemLayers.includes('Sem dados'))
+      lastSalesByLayer['Sem dados'] = 'Sem recebimento de vendas';
 
     return {
       id: `${f.associacao}-${f.cod_farmacia}`,
@@ -523,10 +587,21 @@ export class Dashboard {
       farmaCode: f.cod_farmacia,
       cnpj: f.cnpj ?? '',
       pharmacyName: f.nome_farmacia ?? '-',
-      lastUpdatedAt: f.ultima_hora_venda_GoldVendas ?? f.ultima_hora_venda_SilverSTGN_Dedup ?? '-',
+      lastUpdatedAt: goldDatetime ?? silverDatetime ?? '-',
       delayHours: 0,
       problemLayers,
       lastSalesByLayer,
     };
+  }
+
+  private formatDatetime(datetime: string | null): string | null {
+    if (!datetime) return null;
+    const cleaned = datetime.replace(/\.\d+/, '').trim();
+    const match = cleaned.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2}:\d{2})$/);
+    if (match) {
+      const [, year, month, day, time] = match;
+      return `${day}/${month}/${year} ${time}`;
+    }
+    return cleaned;
   }
 }
