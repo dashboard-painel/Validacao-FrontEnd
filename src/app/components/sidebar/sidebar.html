@@ -1,0 +1,90 @@
+<header class="sidebar-topbar d-flex d-lg-none" aria-label="Barra de navegação mobile">
+  <a class="sidebar-topbar__brand" routerLink="/dashboard" (click)="closeMobile()">
+    <i class="bi bi-bar-chart-fill" aria-hidden="true"></i>
+    <span>Painel</span>
+  </a>
+  <button
+    class="sidebar-topbar__toggle"
+    type="button"
+    (click)="toggleMobile()"
+    [attr.aria-expanded]="mobileOpen()"
+    aria-label="Abrir menu de navegação"
+  >
+    <i
+      class="bi"
+      [class.bi-list]="!mobileOpen()"
+      [class.bi-x-lg]="mobileOpen()"
+      aria-hidden="true"
+    ></i>
+  </button>
+</header>
+
+@if (mobileOpen()) {
+  <div class="sidebar-overlay d-lg-none" (click)="closeMobile()" aria-hidden="true"></div>
+}
+
+<aside
+  class="sidebar"
+  [class.sidebar--open]="mobileOpen()"
+  [class.sidebar--collapsed]="collapsed()"
+  aria-label="Navegação lateral"
+>
+  <div class="sidebar__brand">
+    <a
+      class="sidebar__brand-link"
+      data-testid="brand-link"
+      routerLink="/dashboard"
+      (click)="closeMobile()"
+    >
+      <i class="bi bi-bar-chart-fill" aria-hidden="true"></i>
+      <span class="sidebar__label">Painel</span>
+    </a>
+    <button
+      class="sidebar__collapse-btn d-none d-lg-flex"
+      type="button"
+      (click)="toggleCollapse()"
+      [attr.aria-label]="collapsed() ? 'Expandir menu' : 'Recolher menu'"
+    >
+      <i
+        class="bi"
+        [class.bi-chevron-double-left]="!collapsed()"
+        [class.bi-chevron-double-right]="collapsed()"
+        aria-hidden="true"
+      ></i>
+    </button>
+  </div>
+
+  <nav class="sidebar__nav" aria-label="Links de navegação">
+    <ul class="sidebar__links list-unstyled m-0">
+      <li>
+        <a
+          class="sidebar__link"
+          data-testid="nav-link-dashboard"
+          routerLink="/dashboard"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          #dashboardLink="routerLinkActive"
+          [attr.aria-current]="dashboardLink.isActive ? 'page' : null"
+          [attr.title]="collapsed() ? 'Dashboard' : null"
+          (click)="closeMobile()"
+        >
+          <i class="bi bi-speedometer2" aria-hidden="true"></i>
+          <span class="sidebar__label">Dashboard</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar__footer py-2">
+    <span
+      class="update-badge"
+      [attr.title]="collapsed() ? (ultimaAtualizacao() | date: 'dd/MM/yyyy HH:mm') || '—' : null"
+    >
+      <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+      <span class="sidebar__label">Última atualização:</span>
+      <strong class="sidebar__label">{{
+        (ultimaAtualizacao() | date: 'dd/MM/yyyy HH:mm') || '—'
+      }}</strong>
+    </span>
+  </div>
+</aside>

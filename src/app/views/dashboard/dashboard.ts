@@ -446,14 +446,10 @@ export class Dashboard {
   }
 
   private toLayerTooltip(store: DelayedStoreItem): string {
-    if (store.problemLayers.length === 0) {
-      return 'Sem atraso de venda nas camadas monitoradas.';
-    }
-
-    return store.problemLayers
+    return (['Gold', 'Silver', 'API'] as const)
       .map((layer) => {
-        const latestSale = store.lastSalesByLayer?.[layer] ?? store.lastUpdatedAt;
-        return `Último dado de venda (${layer}): ${latestSale}`;
+        const date = store.lastSalesByLayer?.[layer] ?? 'Sem dados';
+        return `Último dado de venda (${layer}): ${date}`;
       })
       .join('\n');
   }
@@ -576,10 +572,12 @@ export class Dashboard {
         ? `${f.ultima_venda_SilverSTGN_Dedup} ${f.ultima_hora_venda_SilverSTGN_Dedup}`
         : null,
     );
+    const apiDatetime = this.formatDatetime(f.coletor_novo);
 
     const lastSalesByLayer: Partial<Record<ProblemLayer, string>> = {};
     if (goldDatetime) lastSalesByLayer['Gold'] = goldDatetime;
     if (silverDatetime) lastSalesByLayer['Silver'] = silverDatetime;
+    if (apiDatetime) lastSalesByLayer['API'] = apiDatetime;
     if (problemLayers.includes('Sem dados'))
       lastSalesByLayer['Sem dados'] = 'Sem recebimento de vendas';
 

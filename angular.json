@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "finora-frontend": {
+    "validacao-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -60,10 +60,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "finora-frontend:build:production"
+              "buildTarget": "validacao-frontend:build:production"
             },
             "development": {
-              "buildTarget": "finora-frontend:build:development"
+              "buildTarget": "validacao-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

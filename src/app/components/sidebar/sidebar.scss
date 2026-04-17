@@ -1,0 +1,264 @@
+:host {
+  display: contents;
+}
+
+// ── Mobile top bar ─────────────────────────────────────────
+.sidebar-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--painel-primary, #1f4f86);
+  box-shadow: 0 2px 12px rgb(15 45 90 / 28%);
+  border-bottom: 3px solid rgb(255 255 255 / 12%);
+}
+
+.sidebar-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.sidebar-topbar__toggle {
+  background: none;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 0.4rem;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+}
+
+// ── Mobile overlay ─────────────────────────────────────────
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1039;
+  background: rgb(0 0 0 / 45%);
+}
+
+// ── Sidebar panel ──────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  background-color: var(--painel-primary, #1f4f86);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 18px rgb(15 45 90 / 22%);
+  border-right: 1px solid rgb(255 255 255 / 10%);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  @media (width < 992px) {
+    position: fixed;
+    top: 0;
+    left: -240px;
+    z-index: 1040;
+    height: 100vh;
+    transition: left 0.25s ease;
+
+    &.sidebar--open {
+      left: 0;
+    }
+  }
+
+  @media (width >= 992px) {
+    transition: width 0.25s ease;
+
+    &.sidebar--collapsed {
+      width: 60px;
+
+      .sidebar__brand {
+        flex-direction: column;
+        gap: 0.4rem;
+        padding: 0.85rem 0;
+        align-items: center;
+      }
+
+      .sidebar__brand-link {
+        justify-content: center;
+        gap: 0;
+      }
+
+      .sidebar__nav {
+        padding-inline: 0.4rem;
+      }
+
+      .sidebar__link {
+        justify-content: center;
+        padding: 0.65rem 0;
+        gap: 0;
+      }
+
+      .sidebar__footer {
+        padding-inline: 0.4rem;
+      }
+
+      .update-badge {
+        padding: 0.45rem;
+        border-radius: 50%;
+        gap: 0;
+        flex-wrap: nowrap;
+      }
+
+      .sidebar__label {
+        max-width: 0;
+        opacity: 0;
+      }
+    }
+  }
+}
+
+// ── Label — text hidden on collapse ────────────────────────
+.sidebar__label {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+  transition:
+    max-width 0.25s ease,
+    opacity 0.15s ease;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  transition: padding 0.25s ease, flex-direction 0.25s ease;
+}
+
+.sidebar__brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.85;
+    color: white;
+  }
+
+  .bi {
+    font-size: 1.15rem;
+  }
+}
+
+.sidebar__nav {
+  flex: 1;
+  padding: 0.75rem;
+}
+
+.sidebar__links {
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.9rem;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: rgb(255 255 255 / 10%);
+    color: white;
+  }
+
+  &.is-active {
+    background: rgb(255 255 255 / 16%);
+    color: white;
+    font-weight: 500;
+  }
+
+  .bi {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+}
+
+// ── Collapse button (in brand header) ──────────────────────
+.sidebar__collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 0.4rem;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  color: rgb(255 255 255 / 65%);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: rgb(255 255 255 / 18%);
+    color: white;
+  }
+
+  .bi {
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+}
+
+.sidebar__footer {
+  padding: 1rem;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.update-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 0.3rem 0.75rem;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  color: rgb(255 255 255 / 68%);
+
+  strong {
+    color: rgb(255 255 255 / 88%);
+    font-weight: 600;
+  }
+
+  .bi {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+}

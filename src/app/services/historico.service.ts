@@ -30,4 +30,8 @@ export class HistoricoService {
   postComparar(associacao: string): Observable<ComparacaoResponse> {
     return this.http.post<ComparacaoResponse>(`${this.apiUrl}/comparar`, { associacao });
   }
+
+  getUltimaAtualizacao(): Observable<{ atualizado_em: string }> {
+    return this.http.get<{ atualizado_em: string }>(`${this.apiUrl}/ultima-atualizacao`);
+  }
 }

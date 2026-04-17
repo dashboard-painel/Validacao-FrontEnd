@@ -1,6 +1,4 @@
 :host {
-  --painel-navbar-height: 4.25rem;
-
   display: block;
   min-height: 100vh;
   color: #0f172a;
@@ -12,7 +10,7 @@
 }
 
 .app-main {
-  min-height: calc(100vh - var(--painel-navbar-height));
+  min-width: 0;
   padding: clamp(1.25rem, 2.2vw, 1.9rem) 1rem 1.9rem;
 }
 
