@@ -7,6 +7,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, switchMap, timer } from 'rxjs';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
@@ -275,16 +277,22 @@ export class Dashboard {
       this.renderedRowsCount.set(this.pageSize);
     });
 
-    this.historicoService.getHistorico().subscribe({
-      next: (data) => {
+    timer(0, 30_000)
+      .pipe(
+        switchMap(() =>
+          this.historicoService.getHistorico().pipe(
+            catchError(() => {
+              this.isLoading.set(false);
+              return EMPTY;
+            }),
+          ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((data) => {
         this.apiStores.set(data);
         this.isLoading.set(false);
-      },
-      error: () => {
-        this.loadError.set('Erro ao carregar dados da API. Tente novamente.');
-        this.isLoading.set(false);
-      },
-    });
+      });
   }
 
   private toPercent(value: number, total: number): number {

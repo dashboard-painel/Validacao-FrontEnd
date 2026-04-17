@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, of, switchMap, timer } from 'rxjs';
 
 import { HistoricoService } from '../../services/historico.service';
 
@@ -20,9 +20,13 @@ export class Sidebar {
   readonly collapsed = signal(false);
 
   readonly ultimaAtualizacao = toSignal(
-    this.service.getUltimaAtualizacao().pipe(
-      map((r) => r.atualizado_em),
-      catchError(() => of(null)),
+    timer(0, 30_000).pipe(
+      switchMap(() =>
+        this.service.getUltimaAtualizacao().pipe(
+          map((r) => r.atualizado_em),
+          catchError(() => of(null)),
+        ),
+      ),
     ),
   );
 
