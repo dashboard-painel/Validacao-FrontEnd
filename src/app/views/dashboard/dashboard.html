@@ -354,9 +354,9 @@
                           }}</small>
                         </td>
                         <td>
-                          @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados')) {
+                          @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
                             <span [class]="'delayed-stores__delay-badge delayed-stores__delay-badge--' + urgencyClass(store.delayHours)">
-                              {{ store.delayHours > 0 ? formatDelay(store.delayHours) : 'Atrasado' }}
+                              {{ formatDelay(store.delayHours) }}
                             </span>
                           } @else {
                             <span class="delayed-stores__delay-badge delayed-stores__delay-badge--ok">—</span>
