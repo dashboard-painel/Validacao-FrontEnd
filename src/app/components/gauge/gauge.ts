@@ -11,6 +11,8 @@ export class Gauge {
   totalStores = input(0);
   okStores = input(0);
 
+  embedded = input(false);
+
   readonly totalStoresSafe = computed(() => Math.max(0, this.totalStores()));
 
   readonly okStoresSafe = computed(() => {
@@ -65,21 +67,12 @@ export class Gauge {
   });
 
   readonly gaugeCardClass = computed(() => {
-    if (this.totalStoresSafe() === 0) {
-      return 'card gauge-card gauge-card--nodata h-100';
-    }
-
+    const cardBase = this.embedded() ? '' : 'card gauge-card ';
+    if (this.totalStoresSafe() === 0) return `${cardBase}gauge-card--nodata h-100`.trim();
     const percent = this.okStoresPercent();
-
-    if (percent >= 90) {
-      return 'card gauge-card gauge-card--success h-100';
-    }
-
-    if (percent >= 80) {
-      return 'card gauge-card gauge-card--warning h-100';
-    }
-
-    return 'card gauge-card gauge-card--danger h-100';
+    if (percent >= 90) return `${cardBase}gauge-card--success h-100`.trim();
+    if (percent >= 80) return `${cardBase}gauge-card--warning h-100`.trim();
+    return `${cardBase}gauge-card--danger h-100`.trim();
   });
 
   readonly gaugeSignalLabel = computed(() => {

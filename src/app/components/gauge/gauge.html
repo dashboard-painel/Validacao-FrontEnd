@@ -1,6 +1,8 @@
 <article [class]="gaugeCardClass()" role="group" aria-label="Status de lojas OK">
   <div
-    class="card-body d-flex flex-column align-items-center justify-content-center gap-3 text-center"
+    [class]="embedded()
+      ? 'd-flex flex-column align-items-center justify-content-center gap-3 text-center h-100'
+      : 'card-body d-flex flex-column align-items-center justify-content-center gap-3 text-center'"
   >
     <div
       class="gauge__ring"
