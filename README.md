@@ -1,18 +1,12 @@
-# Finora Frontend
+# Validação Frontend
 
-Dashboard frontend desenvolvido com **Angular 21** e **Bootstrap 5**.
+Dashboard de validação de vendas desenvolvido com **Angular 21** e **Bootstrap 5**.
 
 ## Pré-requisitos
 
 - [Node.js](https://nodejs.org/) v18 ou superior
 - [npm](https://www.npmjs.com/) v11 (definido no projeto)
-- [Angular CLI](https://angular.dev/tools/cli) v21
-
-Instale o Angular CLI globalmente, caso ainda não tenha:
-
-```bash
-npm install -g @angular/cli
-```
+- Backend rodando em `http://localhost:8000` (ver seção [API](#api))
 
 ## Instalação
 
@@ -51,9 +45,15 @@ Acesse no navegador: [http://localhost:4200](http://localhost:4200)
 src/
 ├── app/
 │   ├── components/
-│   │   ├── gauge/       # Componente de gauge
-│   │   ├── kpi/         # Componente de KPI
-│   │   └── navbar/      # Barra de navegação
+│   │   ├── gauge/       # Gauge circular de status
+│   │   ├── kpi/         # Cards de indicadores (KPI)
+│   │   └── sidebar/     # Navegação lateral com collapse
+│   ├── models/
+│   │   └── shared/      # Tipos e interfaces compartilhados
+│   ├── pipes/
+│   │   └── cnpj.pipe    # Formatação de CNPJ
+│   ├── services/
+│   │   └── historico.service  # Integração com a API
 │   ├── views/
 │   │   └── dashboard/   # Página principal do dashboard
 │   ├── mocks/           # Dados mockados para desenvolvimento/testes
@@ -70,10 +70,22 @@ src/
 | `/` | Redireciona para `/dashboard` |
 | `/dashboard` | Página principal do dashboard |
 
+## API
+
+A aplicação consome os seguintes endpoints do backend (`http://localhost:8000`):
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/historico` | Lista o histórico de todas as farmácias |
+| `GET` | `/historico/:associacao` | Histórico filtrado por associação |
+| `POST` | `/comparar` | Dispara uma nova comparação |
+| `GET` | `/ultima-atualizacao` | Retorna `{ atualizado_em: "..." }` com a data da última atualização |
+
 ## Tecnologias
 
 - [Angular 21](https://angular.dev/)
 - [Bootstrap 5](https://getbootstrap.com/)
+- [Bootstrap Icons](https://icons.getbootstrap.com/)
 - [TypeScript 5.9](https://www.typescriptlang.org/)
 - [Vitest](https://vitest.dev/) — testes unitários
 - [SCSS](https://sass-lang.com/) — estilização
