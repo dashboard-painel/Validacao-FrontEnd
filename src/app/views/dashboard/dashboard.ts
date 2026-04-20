@@ -6,6 +6,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, switchMap, timer } from 'rxjs';
@@ -109,7 +110,9 @@ export class Dashboard {
   readonly pharmacyNameFilter = signal('');
   readonly problemLayerFilter = signal<'all' | ProblemLayer>('all');
   readonly storeStatusFilter = signal<'all' | StoreStatus>('all');
-  readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>('associationCode');
+  readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
+    'associationCode',
+  );
   readonly sortDir = signal<'asc' | 'desc'>('asc');
 
   sortBy(col: 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'): void {
@@ -168,8 +171,38 @@ export class Dashboard {
   readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API', 'Sem dados'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
   readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
-  readonly farmaCodeOptions = computed(() => this.uniqueSortedOptions('farmaCode'));
-  readonly cnpjOptions = computed(() => this.uniqueCnpjOptions());
+
+  private readonly storesScopedForFarmaCode = computed(() => {
+    const selected = this.selectedMultiFilters().associationCode;
+    const stores = this.dashboardData().delayedStores;
+    if (selected.length === 0) return stores;
+    return stores.filter((s) => selected.includes(s.associationCode));
+  });
+
+  private readonly storesScopedForCnpj = computed(() => {
+    const { associationCode, farmaCode } = this.selectedMultiFilters();
+    const stores = this.dashboardData().delayedStores;
+    return stores.filter((s) => {
+      if (associationCode.length > 0 && !associationCode.includes(s.associationCode)) return false;
+      if (farmaCode.length > 0 && !farmaCode.includes(s.farmaCode)) return false;
+      return true;
+    });
+  });
+
+  readonly farmaCodeOptions = computed(() => {
+    const stores = this.storesScopedForFarmaCode();
+    return [...new Set(stores.map((s) => s.farmaCode))].sort((a, b) => a.localeCompare(b));
+  });
+
+  readonly cnpjOptions = computed(() => {
+    const map = new Map<string, string>();
+    for (const store of this.storesScopedForCnpj()) {
+      if (!map.has(store.cnpj)) map.set(store.cnpj, store.pharmacyName);
+    }
+    return Array.from(map, ([cnpj, pharmacyName]) => ({ cnpj, pharmacyName })).sort((a, b) =>
+      a.cnpj.localeCompare(b.cnpj),
+    );
+  });
   readonly filteredAssociationCodeOptions = computed(() =>
     this.filterOptionsBySearch('associationCode', this.associationCodeOptions()),
   );
@@ -202,7 +235,7 @@ export class Dashboard {
                 label: layer,
                 className: this.toLayerClass(layer),
               })),
-      }))
+      }));
   });
 
   readonly filteredDelayedStoreRows = computed(() => {
@@ -283,7 +316,9 @@ export class Dashboard {
     if (stored) {
       try {
         this.previousKpisStore.set(JSON.parse(stored) as DashboardData['kpis']);
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
 
     // Only update the KPI baseline when a new browser session starts (new tab / browser restart).
@@ -305,6 +340,21 @@ export class Dashboard {
       this.storeStatusFilter();
 
       this.renderedRowsCount.set(this.pageSize);
+    });
+
+    effect(() => {
+      const availableFarmaSet = new Set(this.farmaCodeOptions());
+      const availableCnpjSet = new Set(this.cnpjOptions().map((o) => o.cnpj));
+
+      const current = untracked(() => this.selectedMultiFilters());
+      const newFarmaCode = current.farmaCode.filter((c) => availableFarmaSet.has(c));
+      const newCnpj = current.cnpj.filter((c) => availableCnpjSet.has(c));
+
+      if (newFarmaCode.length < current.farmaCode.length || newCnpj.length < current.cnpj.length) {
+        untracked(() => {
+          this.selectedMultiFilters.set({ ...current, farmaCode: newFarmaCode, cnpj: newCnpj });
+        });
+      }
     });
 
     timer(0, 30_000)
@@ -503,20 +553,6 @@ export class Dashboard {
   private uniqueSortedOptions(key: MultiFilterKey): string[] {
     return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort(
       (a, b) => a.localeCompare(b),
-    );
-  }
-
-  private uniqueCnpjOptions(): CnpjOption[] {
-    const map = new Map<string, string>();
-
-    for (const store of this.dashboardData().delayedStores) {
-      if (!map.has(store.cnpj)) {
-        map.set(store.cnpj, store.pharmacyName);
-      }
-    }
-
-    return Array.from(map, ([cnpj, pharmacyName]) => ({ cnpj, pharmacyName })).sort((a, b) =>
-      a.cnpj.localeCompare(b.cnpj),
     );
   }
 

@@ -72,12 +72,13 @@ src/
 - **Filtros** — por código de associação, código Farma, CNPJ, nome da farmácia, camada problemática e status
 - **Sidebar colapsável** — recolhe para ícones em telas grandes; exibe data da última atualização do backend
 
-
+## Rotas
 
 | Rota | Componente |
 |---|---|
 | `/` | Redireciona para `/dashboard` |
 | `/dashboard` | Página principal do dashboard |
+| `**` | Redireciona para `/dashboard` |
 
 ## API
 
@@ -92,7 +93,9 @@ A aplicação consome os seguintes endpoints do backend (`http://localhost:8000`
 
 - [Angular 21](https://angular.dev/)
 - [Bootstrap 5](https://getbootstrap.com/)
-- [Bootstrap Icons](https://icons.getbootstrap.com/)
+- [Bootstrap Icons 1.13](https://icons.getbootstrap.com/) — carregado via CDN
+- [Inter](https://fonts.google.com/specimen/Inter) — fonte via Google Fonts
 - [TypeScript 5.9](https://www.typescriptlang.org/)
 - [Vitest](https://vitest.dev/) — testes unitários
 - [SCSS](https://sass-lang.com/) — estilização
+- [Prettier](https://prettier.io/) — formatação de código
