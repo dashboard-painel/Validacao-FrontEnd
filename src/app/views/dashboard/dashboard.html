@@ -7,8 +7,6 @@
         <span class="visually-hidden">Carregando...</span>
       </div>
     </div>
-  } @else if (loadError()) {
-    <div class="alert alert-danger" role="alert">{{ loadError() }}</div>
   } @else {
     <div class="row g-4">
       <section id="secao-kpis" class="col-12" aria-label="Indicadores de CNPJ">
@@ -300,22 +298,47 @@
             </div>
 
             <div
-              class="table-responsive delayed-stores__table-wrap"
+              class="delayed-stores__table-wrap"
               (scroll)="onTableScroll($event)"
             >
               <table class="table delayed-stores__table align-middle mb-0">
                 <thead>
                   <tr>
-                    <th scope="col">Cód Assoc.</th>
-                    <th scope="col">Cód. Farma</th>
-                    <th scope="col">CNPJ</th>
+                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('associationCode')">
+                      Cód Assoc.
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"></i>
+                    </th>
+                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('farmaCode')">
+                      Cód. Farma
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"></i>
+                    </th>
+                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('cnpj')">
+                      CNPJ
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"></i>
+                    </th>
+                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('delayHours')">
+                      Atraso
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"></i>
+                    </th>
                     <th scope="col">Camada com atraso</th>
                   </tr>
                 </thead>
                 <tbody>
                   @if (filteredDelayedStoreCount() === 0) {
                     <tr>
-                      <td class="delayed-stores__empty text-center py-3" colspan="4">
+                      <td class="delayed-stores__empty text-center py-3" colspan="5">
                         Nenhuma loja encontrada com os filtros selecionados.
                       </td>
                     </tr>
@@ -329,6 +352,15 @@
                           <small class="text-body-secondary delayed-stores__store-sub">{{
                             store.pharmacyName
                           }}</small>
+                        </td>
+                        <td>
+                          @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
+                            <span [class]="'delayed-stores__delay-badge delayed-stores__delay-badge--' + urgencyClass(store.delayHours)">
+                              {{ formatDelay(store.delayHours) }}
+                            </span>
+                          } @else {
+                            <span class="delayed-stores__delay-badge delayed-stores__delay-badge--ok">—</span>
+                          }
                         </td>
                         <td>
                           <div class="d-flex flex-wrap align-items-center gap-1">
@@ -353,7 +385,7 @@
                     }
                     @if (hasMoreRows()) {
                       <tr>
-                        <td class="text-body-secondary text-center py-2" colspan="4">
+                        <td class="text-body-secondary text-center py-2" colspan="5">
                           Role para carregar mais lojas...
                         </td>
                       </tr>

@@ -7,6 +7,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, switchMap, timer } from 'rxjs';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
@@ -44,7 +46,6 @@ type DashboardData = {
     farmaCode: string;
     cnpj: string;
     pharmacyName: string;
-    lastUpdatedAt: string;
     delayHours: number;
     problemLayers: ProblemLayer[];
     lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
@@ -92,7 +93,6 @@ export class Dashboard {
 
   readonly apiStores = signal<FarmaciaHistorico[]>([]);
   readonly isLoading = signal(true);
-  readonly loadError = signal<string | null>(null);
   private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
 
   readonly selectedMultiFilters = signal<Record<MultiFilterKey, string[]>>({
@@ -109,6 +109,17 @@ export class Dashboard {
   readonly pharmacyNameFilter = signal('');
   readonly problemLayerFilter = signal<'all' | ProblemLayer>('all');
   readonly storeStatusFilter = signal<'all' | StoreStatus>('all');
+  readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>('associationCode');
+  readonly sortDir = signal<'asc' | 'desc'>('asc');
+
+  sortBy(col: 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'): void {
+    if (this.sortColumn() === col) {
+      this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      this.sortColumn.set(col);
+      this.sortDir.set('asc');
+    }
+  }
 
   readonly dashboardData = computed(() => this.mapToDashboardData(this.apiStores()));
 
@@ -167,9 +178,19 @@ export class Dashboard {
   );
   readonly filteredCnpjOptions = computed(() => this.filterCnpjOptionsBySearch(this.cnpjOptions()));
 
-  readonly delayedStoreRows = computed((): DelayedStoreRow[] =>
-    [...this.dashboardData().delayedStores]
-      .sort((a, b) => b.delayHours - a.delayHours)
+  readonly delayedStoreRows = computed((): DelayedStoreRow[] => {
+    const col = this.sortColumn();
+    const dir = this.sortDir();
+    return [...this.dashboardData().delayedStores]
+      .sort((a, b) => {
+        let cmp: number;
+        if (col === 'delayHours') {
+          cmp = a.delayHours - b.delayHours;
+        } else {
+          cmp = a[col].localeCompare(b[col]);
+        }
+        return dir === 'asc' ? cmp : -cmp;
+      })
       .map((store) => ({
         ...store,
         layerTooltip: this.toLayerTooltip(store),
@@ -181,8 +202,8 @@ export class Dashboard {
                 label: layer,
                 className: this.toLayerClass(layer),
               })),
-      })),
-  );
+      }))
+  });
 
   readonly filteredDelayedStoreRows = computed(() => {
     const selectedFilters = this.selectedMultiFilters();
@@ -246,6 +267,17 @@ export class Dashboard {
     );
   });
 
+  readonly urgencyClass = (hours: number): string => {
+    if (hours >= 48) return 'critical';
+    if (hours >= 24) return 'high';
+    return 'moderate';
+  };
+
+  readonly formatDelay = (hours: number): string => {
+    if (hours > 48) return `${Math.round(hours / 24)} dias`;
+    return `${hours} horas`;
+  };
+
   constructor() {
     const stored = localStorage.getItem(this.kpisStorageKey);
     if (stored) {
@@ -275,16 +307,22 @@ export class Dashboard {
       this.renderedRowsCount.set(this.pageSize);
     });
 
-    this.historicoService.getHistorico().subscribe({
-      next: (data) => {
+    timer(0, 30_000)
+      .pipe(
+        switchMap(() =>
+          this.historicoService.getHistorico().pipe(
+            catchError(() => {
+              this.isLoading.set(false);
+              return EMPTY;
+            }),
+          ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((data) => {
         this.apiStores.set(data);
         this.isLoading.set(false);
-      },
-      error: () => {
-        this.loadError.set('Erro ao carregar dados da API. Tente novamente.');
-        this.isLoading.set(false);
-      },
-    });
+      });
   }
 
   private toPercent(value: number, total: number): number {
@@ -587,11 +625,49 @@ export class Dashboard {
       farmaCode: f.cod_farmacia,
       cnpj: f.cnpj ?? '',
       pharmacyName: f.nome_farmacia ?? '-',
-      lastUpdatedAt: goldDatetime ?? silverDatetime ?? '-',
-      delayHours: 0,
+      delayHours: this.computeDelayHours(f, problemLayers),
       problemLayers,
       lastSalesByLayer,
     };
+  }
+
+  private parseRawDatetime(raw: string | null): Date | null {
+    if (!raw) return null;
+    // remove fractional seconds, normalize T separator to space
+    const cleaned = raw.replace(/\.\d+/, '').replace('T', ' ').trim();
+    const match = cleaned.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+    if (!match) return null;
+    const [, year, month, day, time] = match;
+    return new Date(`${year}-${month}-${day}T${time}`);
+  }
+
+  private computeDelayHours(f: FarmaciaHistorico, problemLayers: ProblemLayer[]): number {
+    const relevantLayers = problemLayers.filter((l) => l !== 'Sem dados');
+    if (relevantLayers.length === 0) return 0;
+
+    const now = Date.now();
+    let maxMs = 0;
+
+    for (const layer of relevantLayers) {
+      let raw: string | null = null;
+      if (layer === 'Gold') {
+        raw = f.ultima_hora_venda_GoldVendas;
+      } else if (layer === 'Silver') {
+        raw =
+          f.ultima_venda_SilverSTGN_Dedup && f.ultima_hora_venda_SilverSTGN_Dedup
+            ? `${f.ultima_venda_SilverSTGN_Dedup} ${f.ultima_hora_venda_SilverSTGN_Dedup}`
+            : null;
+      } else if (layer === 'API') {
+        raw = f.coletor_novo;
+      }
+      const date = this.parseRawDatetime(raw);
+      if (date) {
+        const diff = now - date.getTime();
+        if (diff > maxMs) maxMs = diff;
+      }
+    }
+
+    return Math.round(maxMs / (1000 * 60 * 60));
   }
 
   private formatDatetime(datetime: string | null): string | null {

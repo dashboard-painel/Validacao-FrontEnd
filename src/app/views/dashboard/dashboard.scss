@@ -2,6 +2,37 @@
   display: block;
 }
 
+// ── Delay badge na tabela ──────────────────────────────────
+.delayed-stores__delay-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+
+  &--critical {
+    color: var(--status-danger-strong);
+    background-color: var(--status-danger-soft);
+  }
+
+  &--high {
+    color: var(--status-warning-strong);
+    background-color: var(--status-warning-soft);
+  }
+
+  &--moderate {
+    color: var(--status-silver-strong);
+    background-color: var(--status-silver-soft);
+  }
+
+  &--ok {
+    color: var(--painel-muted);
+  }
+}
+
 .status-chart-card,
 .delayed-stores-card {
   border-radius: 0.95rem;
@@ -217,7 +248,8 @@
 
 .delayed-stores__table-wrap {
   height: 20rem;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .delayed-stores__table {
@@ -237,6 +269,24 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom-width: 1px;
+}
+
+.delayed-stores__th--sortable {
+  cursor: pointer;
+  user-select: none;
+
+  i {
+    font-size: 0.65rem;
+    margin-left: 0.25rem;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+
+  &:hover {
+    color: var(--painel-text-strong);
+
+    i { opacity: 1; }
+  }
 }
 
 .delayed-stores__table tbody td {
