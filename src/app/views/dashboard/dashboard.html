@@ -289,6 +289,29 @@
                     }
                   </select>
                 </div>
+                <div class="col-12 col-sm-6 col-xl-2">
+                  <label class="form-label delayed-stores__filter-label mb-1">Sit. Contrato</label>
+                  <select
+                    class="form-select form-select-sm"
+                    [value]="sitContratoFilter()"
+                    (change)="onSitContratoFilter($event)"
+                  >
+                    <option value="all">Todos</option>
+                    @for (sit of sitContratoOptions(); track sit) {
+                      <option [value]="sit">{{ sit }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-2">
+                  <label class="form-label delayed-stores__filter-label mb-1">Possível Causa</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="Ex.: Pipeline falhou"
+                    [value]="possivelCausaFilter()"
+                    (input)="onPossivelCausaFilter($event)"
+                  />
+                </div>
                 <div class="col-12">
                   <small class="text-body-secondary"
                     >Nos filtros de lista, marque os itens desejados.</small
@@ -333,12 +356,14 @@
                         [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"></i>
                     </th>
                     <th scope="col">Camada com atraso</th>
+                    <th scope="col">Sit. Contrato</th>
+                    <th scope="col">Possível Causa</th>
                   </tr>
                 </thead>
                 <tbody>
                   @if (filteredDelayedStoreCount() === 0) {
                     <tr>
-                      <td class="delayed-stores__empty text-center py-3" colspan="5">
+                      <td class="delayed-stores__empty text-center py-3" colspan="7">
                         Nenhuma loja encontrada com os filtros selecionados.
                       </td>
                     </tr>
@@ -381,11 +406,29 @@
                             </span>
                           </div>
                         </td>
+                        <td>
+                          @if (store.sitContrato) {
+                            <span [class]="sitContratoClass(store.sitContrato)">
+                              {{ store.sitContrato }}
+                            </span>
+                          } @else {
+                            <span class="text-body-secondary">—</span>
+                          }
+                        </td>
+                        <td>
+                          @if (store.possivelCausa) {
+                            <span class="delayed-stores__causa" [title]="store.possivelCausa">
+                              {{ store.possivelCausa }}
+                            </span>
+                          } @else {
+                            <span class="text-body-secondary">—</span>
+                          }
+                        </td>
                       </tr>
                     }
                     @if (hasMoreRows()) {
                       <tr>
-                        <td class="text-body-secondary text-center py-2" colspan="5">
+                        <td class="text-body-secondary text-center py-2" colspan="7">
                           Role para carregar mais lojas...
                         </td>
                       </tr>
