@@ -370,7 +370,12 @@
                   } @else {
                     @for (store of visibleDelayedStoreRows(); track store.id) {
                       <tr>
-                        <td>{{ store.associationCode }}</td>
+                        <td>
+                          <span class="d-block">{{ store.associationCode }}</span>
+                          @if (store.codigoRede) {
+                            <small class="text-body-secondary delayed-stores__store-sub">Rede: {{ store.codigoRede }}</small>
+                          }
+                        </td>
                         <td>{{ store.farmaCode }}</td>
                         <td>
                           <span class="d-block">{{ store.cnpj | cnpj }}</span>
