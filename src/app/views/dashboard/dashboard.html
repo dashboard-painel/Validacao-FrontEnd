@@ -577,19 +577,22 @@
                     </tr>
                   } @else {
                     @for (store of visibleDelayedStoreRows(); track store.id) {
-                      <tr>
-                        <td>
-                          <span class="d-block">{{ store.associationCode }}</span>
+                      <tr
+                        [class]="'delayed-stores__table-row delayed-stores__table-row--' + rowUrgencyClass(store)"
+                        (click)="openStoreModal(store)"
+                      >
+                        <td class="delayed-stores__td-identity">
+                          <span class="delayed-stores__code-primary">{{ store.associationCode }}</span>
                           @if (store.codigoRede) {
-                            <small class="text-body-secondary delayed-stores__store-sub">Rede: {{ store.codigoRede }}</small>
+                            <small class="delayed-stores__code-sub">Rede {{ store.codigoRede }}</small>
                           }
                         </td>
-                        <td>{{ store.farmaCode }}</td>
-                        <td>
-                          <span class="d-block">{{ store.cnpj | cnpj }}</span>
-                          <small class="text-body-secondary delayed-stores__store-sub">{{
-                            store.pharmacyName
-                          }}</small>
+                        <td class="delayed-stores__td-identity">
+                          <span class="delayed-stores__code-primary">{{ store.farmaCode }}</span>
+                        </td>
+                        <td class="delayed-stores__td-store">
+                          <span class="delayed-stores__store-name">{{ store.pharmacyName }}</span>
+                          <small class="delayed-stores__store-cnpj">{{ store.cnpj | cnpj }}</small>
                         </td>
                         <td>
                           @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
@@ -600,31 +603,21 @@
                             <span class="delayed-stores__delay-badge delayed-stores__delay-badge--ok">—</span>
                           }
                         </td>
-                        <td>
-                          <div class="d-flex flex-wrap align-items-center gap-1">
+                        <td class="delayed-stores__td-layers">
+                          <div class="delayed-stores__layers-header">
                             <div class="d-flex flex-wrap gap-1">
                               @for (layer of store.layerItems; track layer.label) {
                                 <span [class]="layer.className">{{ layer.label }}</span>
                               }
                             </div>
-                            <button
-                              type="button"
-                              class="delayed-stores__layer-info-btn"
-                              aria-label="Ver detalhes da loja"
-                              (click)="openStoreModal(store)"
-                              (mouseenter)="positionTooltip($event)"
-                            >
-                              <i class="bi bi-info-circle"></i>
-                              <span class="delayed-stores__layer-tooltip" role="tooltip">
-                                <span class="delayed-stores__tooltip-title">Último dado de venda</span>
-                                @for (entry of ['Gold', 'Silver', 'API']; track entry) {
-                                  <span [class]="'delayed-stores__tooltip-row delayed-stores__tooltip-row--' + entry.toLowerCase()">
-                                    <span class="delayed-stores__tooltip-layer">{{ entry }}</span>
-                                    <span class="delayed-stores__tooltip-date">{{ layerLastSale(store, entry) }}</span>
-                                  </span>
-                                }
+                          </div>
+                          <div class="delayed-stores__layers-dates">
+                            @for (entry of ['Gold', 'Silver', 'API']; track entry) {
+                              <span [class]="'delayed-stores__date-row delayed-stores__date-row--' + entry.toLowerCase()">
+                                <span class="delayed-stores__date-label">{{ entry }}</span>
+                                <span class="delayed-stores__date-value">{{ layerLastSale(store, entry) }}</span>
                               </span>
-                            </button>
+                            }
                           </div>
                         </td>
                         <td>
