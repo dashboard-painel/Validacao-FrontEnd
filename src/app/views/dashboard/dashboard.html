@@ -428,6 +428,15 @@
                               (click)="openStoreModal(store)"
                             >
                               <i class="bi bi-info-circle"></i>
+                              <span class="delayed-stores__layer-tooltip" role="tooltip">
+                                <span class="delayed-stores__tooltip-title">Último dado de venda</span>
+                                @for (entry of ['Gold', 'Silver', 'API']; track entry) {
+                                  <span class="delayed-stores__tooltip-row">
+                                    <span class="delayed-stores__tooltip-layer">{{ entry }}</span>
+                                    <span class="delayed-stores__tooltip-date">{{ layerLastSale(store, entry) }}</span>
+                                  </span>
+                                }
+                              </span>
                             </button>
                           </div>
                         </td>
