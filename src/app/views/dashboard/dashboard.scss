@@ -69,12 +69,36 @@
   left: 0;
   min-width: max(100%, 14rem);
   z-index: 60;
+  background-color: var(--painel-dropdown-bg);
+  color: var(--painel-text);
+  border-color: var(--painel-border) !important;
   box-shadow: 0 8px 20px rgb(16 32 55 / 12%);
 }
 
 .global-filter__checklist {
   max-height: 12rem;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--painel-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.35rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--painel-border);
+    border-radius: 999px;
+    transition: background-color 0.15s;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--painel-muted);
+  }
 }
 
 .global-filter-bar__chips {
@@ -352,6 +376,7 @@
   overflow: hidden;
   box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
   background-color: var(--painel-dropdown-bg);
+  color: var(--painel-text);
   border-color: var(--painel-border) !important;
 }
 
@@ -359,6 +384,27 @@
   max-height: 8.8rem;
   overflow: auto;
   padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--painel-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.35rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--painel-border);
+    border-radius: 999px;
+    transition: background-color 0.15s;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--painel-muted);
+  }
 }
 
 .delayed-stores__option-sub {

@@ -149,6 +149,14 @@ body {
     border-color: var(--painel-primary);
   }
 
+  .form-check-label {
+    color: var(--painel-text);
+  }
+
+  .text-secondary {
+    color: var(--painel-muted) !important;
+  }
+
   .btn-outline-secondary {
     color: var(--painel-muted);
     border-color: var(--painel-border);
