@@ -76,6 +76,24 @@
   </nav>
 
   <div class="sidebar__footer py-2">
+    <button
+      class="sidebar__theme-toggle"
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="themeService.theme() === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'"
+      [attr.title]="collapsed() ? (themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro') : null"
+    >
+      <i
+        class="bi"
+        [class.bi-moon-fill]="themeService.theme() === 'light'"
+        [class.bi-sun-fill]="themeService.theme() === 'dark'"
+        aria-hidden="true"
+      ></i>
+      <span class="sidebar__label">{{ themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro' }}</span>
+    </button>
+  </div>
+
+  <div class="sidebar__footer py-2">
     <span
       class="update-badge"
       [attr.title]="collapsed() ? (ultimaAtualizacao() | date: 'dd/MM/yyyy HH:mm') || '—' : null"

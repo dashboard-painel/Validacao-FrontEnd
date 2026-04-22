@@ -48,7 +48,7 @@
 
 .status-chart__right-col {
   @media (min-width: 576px) {
-    border-left: 1px solid #dbe4f1;
+    border-left: 1px solid var(--painel-table-border);
     padding-left: 1.25rem;
   }
 }
@@ -62,7 +62,7 @@
 
 .status-chart__item {
   --status-item-color: var(--painel-primary);
-  --status-item-bg: #f7fafd;
+  --status-item-bg: var(--painel-surface-soft);
   --status-item-border: rgb(31 79 134 / 24%);
 
   padding: 0.6rem 0.7rem 0.7rem;
@@ -128,7 +128,7 @@
 .status-chart__progress {
   height: 0.72rem;
   border-radius: 999px;
-  background-color: #e2e8f1;
+  background-color: var(--painel-progress-bg);
   overflow: hidden;
 }
 
@@ -187,9 +187,9 @@
 .delayed-stores__filters-panel {
   position: relative;
   z-index: 3;
-  border: 1px solid #d8e3f0;
+  border: 1px solid var(--painel-filter-border);
   border-radius: 0.78rem;
-  background-color: #f7fafd;
+  background-color: var(--painel-filter-bg);
   padding: 0.7rem;
 }
 
@@ -227,6 +227,8 @@
   max-height: 15rem;
   overflow: hidden;
   box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
+  background-color: var(--painel-dropdown-bg);
+  border-color: var(--painel-border) !important;
 }
 
 .delayed-stores__checklist {
@@ -255,7 +257,7 @@
 .delayed-stores__table {
   --bs-table-bg: transparent;
   --bs-table-color: var(--painel-text);
-  --bs-table-border-color: #dbe4f1;
+  --bs-table-border-color: var(--painel-table-border);
 }
 
 .delayed-stores__table thead th {
@@ -339,8 +341,8 @@
   max-width: 18rem;
   border-radius: 0.55rem;
   padding: 0.45rem 0.55rem;
-  background-color: #11253b;
-  color: #f4f8fd;
+  background-color: var(--painel-popover-bg);
+  color: var(--painel-popover-text);
   font-size: 0.71rem;
   line-height: 1.3;
   box-shadow: 0 10px 24px rgb(16 32 55 / 18%);

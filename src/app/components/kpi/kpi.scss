@@ -66,15 +66,15 @@
 }
 
 .kpi-card__trend--green {
-  color: #1e8a4a;
+  color: var(--status-ok);
 }
 
 .kpi-card__trend--red {
-  color: #c94848;
+  color: var(--status-danger);
 }
 
 .kpi-card--neutral {
-  --kpi-bg-from: #f7fafd;
+  --kpi-bg-from: var(--painel-surface-soft);
   --kpi-bg-to: var(--painel-surface-soft);
   --kpi-border: rgb(31 79 134 / 22%);
   --kpi-accent: var(--painel-primary);
@@ -83,7 +83,7 @@
 }
 
 .kpi-card--success {
-  --kpi-bg-from: #f5fbf7;
+  --kpi-bg-from: var(--status-ok-soft);
   --kpi-bg-to: var(--status-ok-soft);
   --kpi-border: rgb(47 143 91 / 28%);
   --kpi-accent: var(--status-ok);
@@ -92,7 +92,7 @@
 }
 
 .kpi-card--warning {
-  --kpi-bg-from: #fffbf1;
+  --kpi-bg-from: var(--status-warning-soft);
   --kpi-bg-to: var(--status-warning-soft);
   --kpi-border: rgb(199 145 26 / 30%);
   --kpi-accent: var(--status-warning);
@@ -101,7 +101,7 @@
 }
 
 .kpi-card--danger {
-  --kpi-bg-from: #fff7f7;
+  --kpi-bg-from: var(--status-danger-soft);
   --kpi-bg-to: var(--status-danger-soft);
   --kpi-border: rgb(201 72 72 / 28%);
   --kpi-accent: var(--status-danger);
@@ -110,7 +110,7 @@
 }
 
 .kpi-card--nodata {
-  --kpi-bg-from: #f8f9fc;
+  --kpi-bg-from: var(--status-nodata-soft);
   --kpi-bg-to: var(--status-nodata-soft);
   --kpi-border: rgb(138 149 166 / 30%);
   --kpi-accent: var(--status-nodata);

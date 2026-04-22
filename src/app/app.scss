@@ -1,12 +1,12 @@
 :host {
   display: block;
   min-height: 100vh;
-  color: #0f172a;
+  color: var(--painel-text);
 }
 
 .app-shell {
   min-height: 100vh;
-  background-color: #eef4fb;
+  background-color: var(--painel-bg);
 }
 
 .app-main {

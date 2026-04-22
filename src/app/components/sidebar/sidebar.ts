@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, timer } from 'rxjs';
 
 import { HistoricoService } from '../../services/historico.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,6 +16,7 @@ import { HistoricoService } from '../../services/historico.service';
 })
 export class Sidebar {
   private readonly service = inject(HistoricoService);
+  readonly themeService = inject(ThemeService);
 
   readonly mobileOpen = signal(false);
   readonly collapsed = signal(false);
@@ -40,5 +42,9 @@ export class Sidebar {
 
   toggleCollapse(): void {
     this.collapsed.update((v) => !v);
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
   }
 }
