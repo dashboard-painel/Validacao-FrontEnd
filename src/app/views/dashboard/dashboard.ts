@@ -51,6 +51,7 @@ type DashboardData = {
     problemLayers: ProblemLayer[];
     lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
     sitContrato: string | null;
+    codigoRede: string | null;
     possivelCausa: string | null;
   }[];
 };
@@ -713,6 +714,7 @@ export class Dashboard {
       problemLayers,
       lastSalesByLayer,
       sitContrato: f.sit_contrato ?? null,
+      codigoRede: f.codigo_rede ?? null,
       possivelCausa: f.possivel_causa ?? null,
     };
   }

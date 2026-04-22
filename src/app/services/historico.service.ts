@@ -2,7 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { type FarmaciaHistorico } from '../models/shared/farmacia.model';
+import {
+  type ComparacaoResultado,
+  type FarmaciaHistorico,
+} from '../models/shared/farmacia.model';
 
 @Injectable({ providedIn: 'root' })
 export class HistoricoService {
@@ -11,6 +14,14 @@ export class HistoricoService {
 
   getHistorico(): Observable<FarmaciaHistorico[]> {
     return this.http.get<FarmaciaHistorico[]>(`${this.apiUrl}/historico`);
+  }
+
+  getHistoricoByAssociacao(associacao: string): Observable<FarmaciaHistorico[]> {
+    return this.http.get<FarmaciaHistorico[]>(`${this.apiUrl}/historico/${encodeURIComponent(associacao)}`);
+  }
+
+  comparar(associacao: string): Observable<ComparacaoResultado> {
+    return this.http.post<ComparacaoResultado>(`${this.apiUrl}/comparar`, { associacao });
   }
 
   getUltimaAtualizacao(): Observable<{ atualizado_em: string }> {
