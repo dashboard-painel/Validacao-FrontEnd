@@ -421,16 +421,24 @@
                                 <span [class]="layer.className">{{ layer.label }}</span>
                               }
                             </div>
-                            <span
-                              class="delayed-stores__layer-info"
-                              tabindex="0"
-                              [attr.aria-label]="store.layerTooltip"
+                            <button
+                              type="button"
+                              class="delayed-stores__layer-info-btn"
+                              aria-label="Ver detalhes da loja"
+                              (click)="openStoreModal(store)"
+                              (mouseenter)="positionTooltip($event)"
                             >
                               <i class="bi bi-info-circle"></i>
-                              <span class="delayed-stores__layer-popover" role="tooltip">{{
-                                store.layerTooltip
-                              }}</span>
-                            </span>
+                              <span class="delayed-stores__layer-tooltip" role="tooltip">
+                                <span class="delayed-stores__tooltip-title">Último dado de venda</span>
+                                @for (entry of ['Gold', 'Silver', 'API']; track entry) {
+                                  <span [class]="'delayed-stores__tooltip-row delayed-stores__tooltip-row--' + entry.toLowerCase()">
+                                    <span class="delayed-stores__tooltip-layer">{{ entry }}</span>
+                                    <span class="delayed-stores__tooltip-date">{{ layerLastSale(store, entry) }}</span>
+                                  </span>
+                                }
+                              </span>
+                            </button>
                           </div>
                         </td>
                         <td>
@@ -467,6 +475,112 @@
           </div>
         </article>
       </section>
+    </div>
+  }
+
+  @if (selectedStore(); as store) {
+    <div class="store-modal__backdrop" (click)="closeStoreModal()"></div>
+    <div class="store-modal" role="dialog" aria-modal="true" aria-labelledby="store-modal-title">
+      <div class="store-modal__header">
+        <h2 id="store-modal-title" class="store-modal__title">
+          <i class="bi bi-shop me-2"></i>{{ store.pharmacyName }}
+        </h2>
+        <button type="button" class="store-modal__close" aria-label="Fechar" (click)="closeStoreModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="store-modal__body">
+        <div class="store-modal__section">
+          <p class="store-modal__section-title">Identificação</p>
+          <div class="store-modal__grid">
+            <div class="store-modal__field">
+              <span class="store-modal__label">Cód. Associação</span>
+              <span class="store-modal__value">{{ store.associationCode }}</span>
+            </div>
+            <div class="store-modal__field">
+              <span class="store-modal__label">Cód. Farma</span>
+              <span class="store-modal__value">{{ store.farmaCode }}</span>
+            </div>
+            <div class="store-modal__field">
+              <span class="store-modal__label">CNPJ</span>
+              <span class="store-modal__value">{{ store.cnpj | cnpj }}</span>
+            </div>
+            @if (store.codigoRede) {
+              <div class="store-modal__field">
+                <span class="store-modal__label">Cód. Rede</span>
+                <span class="store-modal__value">{{ store.codigoRede }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="store-modal__section">
+          <p class="store-modal__section-title">Status</p>
+          <div class="store-modal__grid">
+            <div class="store-modal__field">
+              <span class="store-modal__label">Status geral</span>
+              <span class="store-modal__value">
+                <span [class]="'delayed-stores__layer delayed-stores__layer--' + (store.status === 'Sem atraso' ? 'ok' : store.status === 'Sem dados' ? 'nodata' : 'api')">
+                  {{ store.status }}
+                </span>
+              </span>
+            </div>
+            <div class="store-modal__field">
+              <span class="store-modal__label">Atraso</span>
+              <span class="store-modal__value">
+                @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
+                  <span [class]="'delayed-stores__delay-badge delayed-stores__delay-badge--' + urgencyClass(store.delayHours)">
+                    {{ formatDelay(store.delayHours) }}
+                  </span>
+                } @else {
+                  <span class="text-body-secondary">—</span>
+                }
+              </span>
+            </div>
+            <div class="store-modal__field">
+              <span class="store-modal__label">Sit. Contrato</span>
+              <span class="store-modal__value">
+                @if (store.sitContrato) {
+                  <span [class]="sitContratoClass(store.sitContrato)">{{ store.sitContrato }}</span>
+                } @else {
+                  <span class="text-body-secondary">—</span>
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="store-modal__section">
+          <p class="store-modal__section-title">Camadas com atraso</p>
+          <div class="d-flex flex-wrap gap-1 mb-2">
+            @for (layer of store.layerItems; track layer.label) {
+              <span [class]="layer.className">{{ layer.label }}</span>
+            }
+          </div>
+          <div class="store-modal__layers-detail">
+            @for (entry of ['Gold', 'Silver', 'API']; track entry) {
+              <div [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()">
+                <span class="store-modal__layer-name">{{ entry }}</span>
+                <span class="store-modal__layer-date">
+                  {{ layerLastSale(store, entry) }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (store.possivelCausa) {
+          <div class="store-modal__section">
+            <p class="store-modal__section-title">Possível causa</p>
+            <p class="store-modal__causa-text">{{ store.possivelCausa }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="store-modal__footer">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeStoreModal()">Fechar</button>
+      </div>
     </div>
   }
 </section>
