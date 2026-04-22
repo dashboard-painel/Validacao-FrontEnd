@@ -412,7 +412,9 @@ export class Dashboard {
     if (store.problemLayers.includes('Sem dados')) return 'nodata';
     if (store.problemLayers.length === 0) return 'ok';
     return this.urgencyClass(store.delayHours);
-  private readonly storeStatusOf = (f: FarmaciaHistorico): StoreStatus => {
+  };
+
+  private readonly storeStatusOf= (f: FarmaciaHistorico): StoreStatus => {
     const semDados = f.camadas_sem_dados?.length ?? 0;
     if (semDados >= 2) return 'Sem dados';
     const atrasadas = (f.camadas_atrasadas?.length ?? 0) + (semDados === 1 ? 1 : 0);
