@@ -389,6 +389,11 @@
   border-radius: 0.35rem;
   background-color: var(--painel-surface-soft);
   border: 1px solid var(--painel-table-border);
+  border-left: 0.22rem solid var(--painel-muted);
+
+  &--gold { border-left-color: var(--status-warning); }
+  &--silver { border-left-color: var(--status-silver); }
+  &--api { border-left-color: var(--status-danger); }
 }
 
 .delayed-stores__tooltip-layer {
@@ -598,6 +603,11 @@
   border-radius: 0.45rem;
   background-color: var(--painel-surface-soft);
   border: 1px solid var(--painel-table-border);
+  border-left: 0.25rem solid var(--painel-muted);
+
+  &--gold { border-left-color: var(--status-warning); }
+  &--silver { border-left-color: var(--status-silver); }
+  &--api { border-left-color: var(--status-danger); }
 }
 
 .store-modal__layer-name {

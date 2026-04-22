@@ -431,7 +431,7 @@
                               <span class="delayed-stores__layer-tooltip" role="tooltip">
                                 <span class="delayed-stores__tooltip-title">Último dado de venda</span>
                                 @for (entry of ['Gold', 'Silver', 'API']; track entry) {
-                                  <span class="delayed-stores__tooltip-row">
+                                  <span [class]="'delayed-stores__tooltip-row delayed-stores__tooltip-row--' + entry.toLowerCase()">
                                     <span class="delayed-stores__tooltip-layer">{{ entry }}</span>
                                     <span class="delayed-stores__tooltip-date">{{ layerLastSale(store, entry) }}</span>
                                   </span>
@@ -559,7 +559,7 @@
           </div>
           <div class="store-modal__layers-detail">
             @for (entry of ['Gold', 'Silver', 'API']; track entry) {
-              <div class="store-modal__layer-row">
+              <div [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()">
                 <span class="store-modal__layer-name">{{ entry }}</span>
                 <span class="store-modal__layer-date">
                   {{ layerLastSale(store, entry) }}
