@@ -124,6 +124,7 @@ export class Dashboard {
     'associationCode',
   );
   readonly sortDir = signal<'asc' | 'desc'>('asc');
+  readonly selectedStore = signal<DelayedStoreRow | null>(null);
 
   sortBy(col: 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'): void {
     if (this.sortColumn() === col) {
@@ -520,7 +521,23 @@ export class Dashboard {
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
+    if (this.selectedStore()) {
+      this.closeStoreModal();
+      return;
+    }
     this.openMultiFilter.set(null);
+  }
+
+  openStoreModal(store: DelayedStoreRow): void {
+    this.selectedStore.set(store);
+  }
+
+  closeStoreModal(): void {
+    this.selectedStore.set(null);
+  }
+
+  layerLastSale(store: DelayedStoreRow, layer: string): string {
+    return (store.lastSalesByLayer as Record<string, string> | undefined)?.[layer] ?? 'Sem dados';
   }
 
   clearFilters(): void {
