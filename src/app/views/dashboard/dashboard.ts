@@ -68,7 +68,7 @@ type StatusBarItem = {
 type DelayedStoreItem = DashboardData['delayedStores'][number];
 type ProblemLayer = 'Gold' | 'Silver' | 'API' | 'Sem dados';
 type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
-type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'storeStatus';
+type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'comDados';
 type LayerBadge = ProblemLayer | 'Sem atraso';
 type StoreStatus = 'Com atraso' | 'Sem atraso' | 'Sem dados';
 type CnpjOption = {
@@ -123,7 +123,7 @@ export class Dashboard {
   readonly selectedGlobalFilters = signal<Record<GlobalFilterKey, string[]>>({
     associationCode: [],
     sitContrato: ['Ativo'],
-    storeStatus: [],
+    comDados: ['ativo'],
   });
   readonly globalFilterSearch = signal('');
   readonly openGlobalFilter = signal<GlobalFilterKey | null>(null);
@@ -154,8 +154,7 @@ export class Dashboard {
         !gf.sitContrato.includes(this.sitContratoGroupOf(f.sit_contrato))
       )
         return false;
-      if (gf.storeStatus.length > 0 && !gf.storeStatus.includes(this.storeStatusOf(f)))
-        return false;
+      if (gf.comDados.length > 0 && this.storeStatusOf(f) === 'Sem dados') return false;
       return true;
     });
   });
@@ -224,7 +223,6 @@ export class Dashboard {
     const values = this.apiStores().map((f) => f.associacao).filter(Boolean);
     return [...new Set(values)].sort();
   });
-  readonly globalStoreStatusOptions = (): StoreStatus[] => ['Com atraso', 'Sem atraso', 'Sem dados'];
   readonly globalSitContratoOptions = (): string[] => ['Ativo', 'Inativo'];
   readonly filteredGlobalAssociationOptions = computed(() => {
     const search = this.globalFilterSearch().toLowerCase();
@@ -239,17 +237,21 @@ export class Dashboard {
     const labelMap: Record<GlobalFilterKey, string> = {
       associationCode: 'Assoc.',
       sitContrato: 'Sit.',
-      storeStatus: 'Status',
+      comDados: 'Com dados',
     };
     return (Object.keys(gf) as GlobalFilterKey[]).flatMap((key) =>
-      gf[key].map((value) => ({ key, value, label: labelMap[key] })),
+      gf[key].map((value) => ({
+        key,
+        value: key === 'comDados' ? '' : value,
+        label: labelMap[key],
+      })),
     );
   });
 
   removeGlobalFilterChip(key: GlobalFilterKey, value: string): void {
     this.selectedGlobalFilters.update((current) => ({
       ...current,
-      [key]: current[key].filter((v) => v !== value),
+      [key]: key === 'comDados' ? [] : current[key].filter((v) => v !== value),
     }));
   }
 
@@ -603,6 +605,11 @@ export class Dashboard {
     this.selectedGlobalFilters.update((current) => ({ ...current, [key]: [value] }));
   }
 
+  onComDadosToggle(event: Event): void {
+    const checked = this.readCheckboxChecked(event);
+    this.selectedGlobalFilters.update((f) => ({ ...f, comDados: checked ? ['ativo'] : [] }));
+  }
+
   onGlobalCheckboxFilter(key: GlobalFilterKey, value: string, event: Event): void {
     const checked = this.readCheckboxChecked(event);
     this.selectedGlobalFilters.update((current) => {
@@ -636,7 +643,7 @@ export class Dashboard {
   }
 
   clearGlobalFilters(): void {
-    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], storeStatus: [] });
+    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], comDados: [] });
     this.globalFilterSearch.set('');
     this.openGlobalFilter.set(null);
   }
