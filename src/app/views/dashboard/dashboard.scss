@@ -118,6 +118,14 @@
   letter-spacing: 0.02em;
 }
 
+.global-filter__toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 31px;
+  padding: 0 0.25rem;
+}
+
 // ── Delay badge na tabela ──────────────────────────────────
 .delayed-stores__delay-badge {
   display: inline-flex;
@@ -575,20 +583,20 @@
 
   // ATIVO
   &--ativo {
-    color: #fff;
-    background-color: var(--status-ok);
+    color: var(--status-ok-strong);
+    background-color: var(--status-ok-soft);
   }
 
   // ATIVO-RETIDO, ATIVO-ACORDO FINANCEIRO
   &--ativo-pendente {
-    color: #fff;
-    background-color: var(--status-warning);
+    color: var(--status-warning-strong);
+    background-color: var(--status-warning-soft);
   }
 
   // ISENTO, IMPLANTACAO, PARCEIROS
   &--em-processo {
-    color: #fff;
-    background-color: var(--status-silver);
+    color: var(--status-silver-strong);
+    background-color: var(--status-silver-soft);
   }
 
   // INATIVO, SUBSTITUIÇÃO, DES MANIPULAÇÃO

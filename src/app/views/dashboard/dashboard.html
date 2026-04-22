@@ -93,33 +93,21 @@
             </details>
           </div>
 
-          <!-- Status -->
+          <!-- Com dados -->
           <div class="global-filter__field">
-            <span class="global-filter__field-label">Status</span>
-            <details
-              class="global-filter__dropdown"
-              [open]="isGlobalFilterOpen('storeStatus')"
-              (toggle)="onGlobalFilterToggle('storeStatus', $event)"
-            >
-              <summary class="form-select form-select-sm global-filter__trigger">
-                {{ globalFilterSummary('storeStatus') }}
-              </summary>
-              <div class="global-filter__menu border rounded bg-white p-2 mt-1">
-                <div class="global-filter__checklist">
-                  @for (opt of globalStoreStatusOptions(); track opt) {
-                    <label class="form-check mb-1">
-                      <input
-                        type="checkbox"
-                        class="form-check-input"
-                        [checked]="isGlobalSelected('storeStatus', opt)"
-                        (change)="onGlobalCheckboxFilter('storeStatus', opt, $event)"
-                      />
-                      <span class="form-check-label">{{ opt }}</span>
-                    </label>
-                  }
-                </div>
+            <span class="global-filter__field-label">Com dados</span>
+            <div class="global-filter__toggle-wrapper">
+              <div class="form-check form-switch mb-0">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="comDadosToggle"
+                  role="switch"
+                  [checked]="selectedGlobalFilters().comDados.length > 0"
+                  (change)="onComDadosToggle($event)"
+                />
               </div>
-            </details>
+            </div>
           </div>
 
           @if (hasActiveGlobalFilters()) {
@@ -143,7 +131,7 @@
                 (click)="removeGlobalFilterChip(chip.key, chip.value)"
               >
                 <span class="global-filter__chip-label">{{ chip.label }}</span>
-                {{ chip.value }}
+                @if (chip.value) { {{ chip.value }} }
                 <i class="bi bi-x"></i>
               </button>
             }
