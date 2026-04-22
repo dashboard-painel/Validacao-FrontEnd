@@ -104,10 +104,32 @@
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
               <p class="delayed-stores__title mb-0">Lojas monitoradas</p>
-              <span class="delayed-stores__count"
-                >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows().length }} lojas</span
-              >
+              <div class="d-flex align-items-center gap-2">
+                <span class="delayed-stores__count"
+                  >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows().length }} lojas</span
+                >
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="!comparableAssociation() || isComparing()"
+                  (click)="onComparar()"
+                  [title]="comparableAssociation() ? 'Comparar associação ' + comparableAssociation() : 'Selecione exatamente 1 associação para comparar'"
+                >
+                  @if (isComparing()) {
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Comparando...
+                  } @else {
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Atualizar
+                  }
+                </button>
+              </div>
             </div>
+            @if (compareError()) {
+              <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>{{ compareError() }}
+              </div>
+            }
 
             <div class="delayed-stores__filters-panel mb-3">
               <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
@@ -370,7 +392,12 @@
                   } @else {
                     @for (store of visibleDelayedStoreRows(); track store.id) {
                       <tr>
-                        <td>{{ store.associationCode }}</td>
+                        <td>
+                          <span class="d-block">{{ store.associationCode }}</span>
+                          @if (store.codigoRede) {
+                            <small class="text-body-secondary delayed-stores__store-sub">Rede: {{ store.codigoRede }}</small>
+                          }
+                        </td>
                         <td>{{ store.farmaCode }}</td>
                         <td>
                           <span class="d-block">{{ store.cnpj | cnpj }}</span>

@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   HostListener,
   computed,
   effect,
@@ -9,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, catchError, switchMap, timer } from 'rxjs';
+import { EMPTY, Subject, catchError, merge, switchMap, timer } from 'rxjs';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
@@ -51,6 +52,7 @@ type DashboardData = {
     problemLayers: ProblemLayer[];
     lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
     sitContrato: string | null;
+    codigoRede: string | null;
     possivelCausa: string | null;
   }[];
 };
@@ -92,10 +94,14 @@ type DelayedStoreRow = DelayedStoreItem & {
 export class Dashboard {
   private readonly pageSize = 60;
   private readonly historicoService = inject(HistoricoService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly kpisStorageKey = 'dashboard-kpis';
+  private readonly forceRefresh$ = new Subject<void>();
 
   readonly apiStores = signal<FarmaciaHistorico[]>([]);
   readonly isLoading = signal(true);
+  readonly isComparing = signal(false);
+  readonly compareError = signal<string | null>(null);
   private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
 
   readonly selectedMultiFilters = signal<Record<MultiFilterKey, string[]>>({
@@ -179,6 +185,10 @@ export class Dashboard {
       .map((s) => s.sitContrato)
       .filter((v): v is string => v !== null && v !== '');
     return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+  });
+  readonly comparableAssociation = computed(() => {
+    const sel = this.selectedMultiFilters().associationCode;
+    return sel.length === 1 ? (sel[0] ?? null) : null;
   });
   readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
 
@@ -395,7 +405,7 @@ export class Dashboard {
       }
     });
 
-    timer(0, 30_000)
+    merge(timer(0, 30_000), this.forceRefresh$)
       .pipe(
         switchMap(() =>
           this.historicoService.getHistorico().pipe(
@@ -530,6 +540,28 @@ export class Dashboard {
     this.sitContratoFilter.set('all');
     this.possivelCausaFilter.set('');
     this.openMultiFilter.set(null);
+  }
+
+  onComparar(): void {
+    const associacao = this.comparableAssociation();
+    if (!associacao || this.isComparing()) return;
+
+    this.isComparing.set(true);
+    this.compareError.set(null);
+
+    this.historicoService
+      .comparar(associacao)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.forceRefresh$.next();
+          this.isComparing.set(false);
+        },
+        error: () => {
+          this.compareError.set('Falha ao comparar. Verifique a conexão e tente novamente.');
+          this.isComparing.set(false);
+        },
+      });
   }
 
   isMultiSelected(key: MultiFilterKey, value: string): boolean {
@@ -713,6 +745,7 @@ export class Dashboard {
       problemLayers,
       lastSalesByLayer,
       sitContrato: f.sit_contrato ?? null,
+      codigoRede: f.codigo_rede ?? null,
       possivelCausa: f.possivel_causa ?? null,
     };
   }
