@@ -254,6 +254,11 @@
   overflow-y: auto;
 }
 
+.delayed-stores__table tbody td {
+  position: relative;
+  overflow: visible;
+}
+
 .delayed-stores__table {
   --bs-table-bg: transparent;
   --bs-table-color: var(--painel-text);
@@ -352,8 +357,8 @@
 .delayed-stores__layer-tooltip {
   position: absolute;
   left: 50%;
-  top: calc(100% + 0.45rem);
-  transform: translateX(-50%) translateY(-4px);
+  bottom: calc(100% + 0.45rem);
+  transform: translateX(-50%) translateY(4px);
   z-index: 50;
   min-width: 17rem;
   border-radius: 0.65rem;
@@ -361,7 +366,7 @@
   background-color: var(--painel-surface);
   color: var(--painel-text);
   border: 1px solid var(--painel-border);
-  box-shadow: 0 12px 28px rgb(16 32 55 / 16%);
+  box-shadow: 0 -8px 28px rgb(16 32 55 / 16%);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
