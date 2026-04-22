@@ -2,6 +2,122 @@
   display: block;
 }
 
+// ── Filtro Global ──────────────────────────────────────────
+.global-filter-bar {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.global-filter-bar__card {
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
+  border-radius: 0.78rem;
+  padding: 0.45rem 0.75rem;
+  box-shadow: var(--painel-shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.global-filter-bar__label {
+  color: var(--painel-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.global-filter__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 8rem;
+}
+
+.global-filter__field-label {
+  color: var(--painel-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  text-align: center;
+}
+
+.global-filter__trigger {
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.global-filter__dropdown {
+  position: relative;
+
+  &[open] { z-index: 50; }
+}
+
+.global-filter__menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  min-width: max(100%, 14rem);
+  z-index: 60;
+  box-shadow: 0 8px 20px rgb(16 32 55 / 12%);
+}
+
+.global-filter__checklist {
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.global-filter-bar__chips {
+  border-top: 1px solid var(--painel-border);
+  padding-top: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.global-filter__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--painel-border);
+  background-color: var(--painel-surface);
+  color: var(--painel-primary);
+  cursor: pointer;
+  line-height: 1.3;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    background-color: var(--status-danger-soft);
+    border-color: var(--status-danger);
+    color: var(--status-danger-strong);
+  }
+
+  i {
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+}
+
+.global-filter__chip-label {
+  color: var(--painel-muted);
+  font-weight: 700;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 // ── Delay badge na tabela ──────────────────────────────────
 .delayed-stores__delay-badge {
   display: inline-flex;
@@ -457,23 +573,40 @@
   line-height: 1.1;
   text-transform: capitalize;
 
+  // ATIVO
   &--ativo {
-    color: var(--status-ok-strong);
-    background-color: var(--status-ok-soft);
+    color: #fff;
+    background-color: var(--status-ok);
   }
 
+  // ATIVO-RETIDO, ATIVO-ACORDO FINANCEIRO
+  &--ativo-pendente {
+    color: #fff;
+    background-color: var(--status-warning);
+  }
+
+  // ISENTO, IMPLANTACAO, PARCEIROS
+  &--em-processo {
+    color: #fff;
+    background-color: var(--status-silver);
+  }
+
+  // INATIVO, SUBSTITUIÇÃO, DES MANIPULAÇÃO
   &--inativo {
     color: var(--status-nodata-strong);
     background-color: var(--status-nodata-soft);
   }
 
-  &--other {
-    color: var(--status-warning-strong);
-    background-color: var(--status-warning-soft);
+  // INADIMPLENTE, DESISTENTE
+  &--inadimplente {
+    color: var(--status-danger-strong);
+    background-color: var(--status-danger-soft);
   }
 
-  &--unknown {
-    color: var(--painel-muted);
+  // BAIXA TEMPORARIA, CONGELADO
+  &--suspenso {
+    color: var(--status-warning-alt, #b98312);
+    background-color: var(--status-warning-soft);
   }
 }
 

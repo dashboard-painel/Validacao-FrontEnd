@@ -68,6 +68,7 @@ type StatusBarItem = {
 type DelayedStoreItem = DashboardData['delayedStores'][number];
 type ProblemLayer = 'Gold' | 'Silver' | 'API' | 'Sem dados';
 type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
+type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'storeStatus';
 type LayerBadge = ProblemLayer | 'Sem atraso';
 type StoreStatus = 'Com atraso' | 'Sem atraso' | 'Sem dados';
 type CnpjOption = {
@@ -114,11 +115,18 @@ export class Dashboard {
     farmaCode: '',
     cnpj: '',
   });
-  readonly openMultiFilter = signal<MultiFilterKey | null>(null);
+  readonly openMultiFilter = signal<string | null>(null);
   readonly pharmacyNameFilter = signal('');
-  readonly problemLayerFilter = signal<'all' | ProblemLayer>('all');
-  readonly storeStatusFilter = signal<'all' | StoreStatus>('all');
-  readonly sitContratoFilter = signal<string>('all');
+  readonly selectedProblemLayers = signal<ProblemLayer[]>([]);
+  readonly selectedStoreStatuses = signal<StoreStatus[]>([]);
+  readonly selectedSitContratosLocal = signal<string[]>([]);
+  readonly selectedGlobalFilters = signal<Record<GlobalFilterKey, string[]>>({
+    associationCode: [],
+    sitContrato: ['Ativo'],
+    storeStatus: [],
+  });
+  readonly globalFilterSearch = signal('');
+  readonly openGlobalFilter = signal<GlobalFilterKey | null>(null);
   readonly possivelCausaFilter = signal('');
   readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
     'associationCode',
@@ -135,7 +143,24 @@ export class Dashboard {
     }
   }
 
-  readonly dashboardData = computed(() => this.mapToDashboardData(this.apiStores()));
+  readonly globalFilteredStores = computed(() => {
+    const stores = this.apiStores();
+    const gf = this.selectedGlobalFilters();
+    return stores.filter((f) => {
+      if (gf.associationCode.length > 0 && !gf.associationCode.includes(f.associacao))
+        return false;
+      if (
+        gf.sitContrato.length > 0 &&
+        !gf.sitContrato.includes(this.sitContratoGroupOf(f.sit_contrato))
+      )
+        return false;
+      if (gf.storeStatus.length > 0 && !gf.storeStatus.includes(this.storeStatusOf(f)))
+        return false;
+      return true;
+    });
+  });
+
+  readonly dashboardData = computed(() => this.mapToDashboardData(this.globalFilteredStores()));
 
   readonly statusBarItems = computed((): StatusBarItem[] => {
     const data = this.dashboardData();
@@ -179,7 +204,7 @@ export class Dashboard {
     ];
   });
 
-  readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API', 'Sem dados'];
+  readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
   readonly sitContratoOptions = computed(() => {
     const values = this.dashboardData().delayedStores
@@ -188,10 +213,45 @@ export class Dashboard {
     return [...new Set(values)].sort((a, b) => a.localeCompare(b));
   });
   readonly comparableAssociation = computed(() => {
-    const sel = this.selectedMultiFilters().associationCode;
-    return sel.length === 1 ? (sel[0] ?? null) : null;
+    const globalSel = this.selectedGlobalFilters().associationCode;
+    if (globalSel.length === 1) return globalSel[0] ?? null;
+    const localSel = this.selectedMultiFilters().associationCode;
+    return localSel.length === 1 ? (localSel[0] ?? null) : null;
   });
   readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
+
+  readonly globalAssociationOptions = computed(() => {
+    const values = this.apiStores().map((f) => f.associacao).filter(Boolean);
+    return [...new Set(values)].sort();
+  });
+  readonly globalStoreStatusOptions = (): StoreStatus[] => ['Com atraso', 'Sem atraso', 'Sem dados'];
+  readonly globalSitContratoOptions = (): string[] => ['Ativo', 'Inativo'];
+  readonly filteredGlobalAssociationOptions = computed(() => {
+    const search = this.globalFilterSearch().toLowerCase();
+    return this.globalAssociationOptions().filter((v) => v.toLowerCase().includes(search));
+  });
+  readonly hasActiveGlobalFilters = computed(() =>
+    Object.values(this.selectedGlobalFilters()).some((v) => v.length > 0),
+  );
+
+  readonly activeGlobalFilterChips = computed(() => {
+    const gf = this.selectedGlobalFilters();
+    const labelMap: Record<GlobalFilterKey, string> = {
+      associationCode: 'Assoc.',
+      sitContrato: 'Sit.',
+      storeStatus: 'Status',
+    };
+    return (Object.keys(gf) as GlobalFilterKey[]).flatMap((key) =>
+      gf[key].map((value) => ({ key, value, label: labelMap[key] })),
+    );
+  });
+
+  removeGlobalFilterChip(key: GlobalFilterKey, value: string): void {
+    this.selectedGlobalFilters.update((current) => ({
+      ...current,
+      [key]: current[key].filter((v) => v !== value),
+    }));
+  }
 
   private readonly storesScopedForFarmaCode = computed(() => {
     const selected = this.selectedMultiFilters().associationCode;
@@ -262,9 +322,9 @@ export class Dashboard {
   readonly filteredDelayedStoreRows = computed(() => {
     const selectedFilters = this.selectedMultiFilters();
     const pharmacyNameQuery = this.pharmacyNameFilter().trim().toLowerCase();
-    const layerQuery = this.problemLayerFilter();
-    const statusQuery = this.storeStatusFilter();
-    const sitContratoQuery = this.sitContratoFilter();
+    const problemLayerFilters = this.selectedProblemLayers();
+    const statusFilters = this.selectedStoreStatuses();
+    const sitContratoFilters = this.selectedSitContratosLocal();
     const possivelCausaQuery = this.possivelCausaFilter().trim().toLowerCase();
 
     return this.delayedStoreRows().filter((store) => {
@@ -290,17 +350,20 @@ export class Dashboard {
         return false;
       }
 
-      if (layerQuery !== 'all' && !store.problemLayers.includes(layerQuery)) {
+      if (
+        problemLayerFilters.length > 0 &&
+        !store.problemLayers.some((l) => problemLayerFilters.includes(l))
+      ) {
         return false;
       }
 
-      if (statusQuery !== 'all' && store.status !== statusQuery) {
+      if (statusFilters.length > 0 && !statusFilters.includes(store.status)) {
         return false;
       }
 
       if (
-        sitContratoQuery !== 'all' &&
-        (store.sitContrato ?? '').toLowerCase() !== sitContratoQuery.toLowerCase()
+        sitContratoFilters.length > 0 &&
+        !sitContratoFilters.includes(store.sitContrato ?? '')
       ) {
         return false;
       }
@@ -332,9 +395,9 @@ export class Dashboard {
       selected.farmaCode.length > 0 ||
       selected.cnpj.length > 0 ||
       this.pharmacyNameFilter().trim().length > 0 ||
-      this.problemLayerFilter() !== 'all' ||
-      this.storeStatusFilter() !== 'all' ||
-      this.sitContratoFilter() !== 'all' ||
+      this.selectedProblemLayers().length > 0 ||
+      this.selectedStoreStatuses().length > 0 ||
+      this.selectedSitContratosLocal().length > 0 ||
       this.possivelCausaFilter().trim().length > 0
     );
   });
@@ -345,15 +408,53 @@ export class Dashboard {
     return 'moderate';
   };
 
-  readonly sitContratoClass = (sit: string | null): string => {
-    if (!sit) return 'sit-contrato-badge sit-contrato-badge--unknown';
-    const normalized = sit.toLowerCase();
-    if (normalized === 'ativo') return 'sit-contrato-badge sit-contrato-badge--ativo';
-    if (normalized === 'inativo') return 'sit-contrato-badge sit-contrato-badge--inativo';
-    return 'sit-contrato-badge sit-contrato-badge--other';
+  private readonly storeStatusOf = (f: FarmaciaHistorico): StoreStatus => {
+    const semDados = f.camadas_sem_dados?.length ?? 0;
+    if (semDados >= 2) return 'Sem dados';
+    const atrasadas = (f.camadas_atrasadas?.length ?? 0) + (semDados === 1 ? 1 : 0);
+    if (atrasadas > 0) return 'Com atraso';
+    return 'Sem atraso';
   };
 
-  readonly formatDelay = (hours: number): string => {
+  private readonly sitContratoClassMap: Record<string, string> = {
+    ATIVO: 'sit-contrato-badge sit-contrato-badge--ativo',
+    'ATIVO-RETIDO': 'sit-contrato-badge sit-contrato-badge--ativo-pendente',
+    'ATIVO-ACORDO FINANCEIRO': 'sit-contrato-badge sit-contrato-badge--ativo-pendente',
+    ISENTO: 'sit-contrato-badge sit-contrato-badge--em-processo',
+    IMPLANTACAO: 'sit-contrato-badge sit-contrato-badge--em-processo',
+    PARCEIROS: 'sit-contrato-badge sit-contrato-badge--em-processo',
+    INATIVO: 'sit-contrato-badge sit-contrato-badge--inativo',
+    INADIMPLENTE: 'sit-contrato-badge sit-contrato-badge--inadimplente',
+    DESISTENTE: 'sit-contrato-badge sit-contrato-badge--inadimplente',
+    'BAIXA TEMPORARIA': 'sit-contrato-badge sit-contrato-badge--suspenso',
+    CONGELADO: 'sit-contrato-badge sit-contrato-badge--suspenso',
+    'SUBSTITUIÇÃO': 'sit-contrato-badge sit-contrato-badge--inativo',
+    'DES MANIPULAÇÃO': 'sit-contrato-badge sit-contrato-badge--inativo',
+  };
+
+  readonly sitContratoClass = (sit: string | null): string => {
+    if (!sit) return 'sit-contrato-badge sit-contrato-badge--inativo';
+    return (
+      this.sitContratoClassMap[sit.toUpperCase().trim()] ??
+      'sit-contrato-badge sit-contrato-badge--inativo'
+    );
+  };
+
+  private readonly sitContratoGroupOf = (sit: string | null): 'Ativo' | 'Inativo' => {
+    if (!sit) return 'Inativo';
+    const upper = sit.toUpperCase().trim();
+    if (
+      upper.startsWith('ATIVO') ||
+      upper === 'ISENTO' ||
+      upper === 'IMPLANTACAO' ||
+      upper === 'PARCEIROS'
+    ) {
+      return 'Ativo';
+    }
+    return 'Inativo';
+  };
+
+  readonly formatDelay= (hours: number): string => {
     if (hours > 48) return `${Math.round(hours / 24)} dias`;
     return `${hours} horas`;
   };
@@ -380,12 +481,14 @@ export class Dashboard {
     }
 
     effect(() => {
+      this.selectedGlobalFilters();
+      this.globalFilterSearch();
       this.selectedMultiFilters();
       this.multiFilterSearch();
       this.pharmacyNameFilter();
-      this.problemLayerFilter();
-      this.storeStatusFilter();
-      this.sitContratoFilter();
+      this.selectedProblemLayers();
+      this.selectedStoreStatuses();
+      this.selectedSitContratosLocal();
       this.possivelCausaFilter();
 
       this.renderedRowsCount.set(this.pageSize);
@@ -454,31 +557,89 @@ export class Dashboard {
     this.multiFilterSearch.update((current) => ({ ...current, [key]: value }));
   }
 
-  onProblemLayerFilter(event: Event): void {
-    const value = this.readSelectValue(event);
-
-    if (value === 'all' || this.delayedLayerOptions.includes(value as ProblemLayer)) {
-      this.problemLayerFilter.set(value as 'all' | ProblemLayer);
-    }
+  onProblemLayerCheckbox(layer: ProblemLayer, event: Event): void {
+    const checked = this.readCheckboxChecked(event);
+    this.selectedProblemLayers.update((current) =>
+      checked ? [...new Set([...current, layer])] : current.filter((l) => l !== layer),
+    );
   }
 
-  onStoreStatusFilter(event: Event): void {
-    const value = this.readSelectValue(event);
-
-    if (value === 'all' || this.storeStatusOptions.includes(value as StoreStatus)) {
-      this.storeStatusFilter.set(value as 'all' | StoreStatus);
-    }
+  onStoreStatusCheckbox(status: StoreStatus, event: Event): void {
+    const checked = this.readCheckboxChecked(event);
+    this.selectedStoreStatuses.update((current) =>
+      checked ? [...new Set([...current, status])] : current.filter((s) => s !== status),
+    );
   }
 
-  onSitContratoFilter(event: Event): void {
-    this.sitContratoFilter.set(this.readSelectValue(event));
+  onSitContratoLocalCheckbox(value: string, event: Event): void {
+    const checked = this.readCheckboxChecked(event);
+    this.selectedSitContratosLocal.update((current) =>
+      checked ? [...new Set([...current, value])] : current.filter((s) => s !== value),
+    );
+  }
+
+  tableMultiSummary(key: 'problemLayer' | 'storeStatus' | 'sitContratoLocal'): string {
+    let selected: string[];
+    if (key === 'problemLayer') selected = this.selectedProblemLayers();
+    else if (key === 'storeStatus') selected = this.selectedStoreStatuses();
+    else selected = this.selectedSitContratosLocal();
+
+    if (selected.length === 0) return 'Todos';
+    if (selected.length === 1) return selected[0] ?? 'Todos';
+    return `${selected.length} selecionados`;
+  }
+
+  isGlobalSelected(key: GlobalFilterKey, value: string): boolean {
+    return this.selectedGlobalFilters()[key].includes(value);
+  }
+
+  onGlobalRadioFilter(key: GlobalFilterKey, value: string): void {
+    this.selectedGlobalFilters.update((current) => ({ ...current, [key]: [value] }));
+  }
+
+  onGlobalCheckboxFilter(key: GlobalFilterKey, value: string, event: Event): void {
+    const checked = this.readCheckboxChecked(event);
+    this.selectedGlobalFilters.update((current) => {
+      const currentValues = current[key];
+      const nextValues = checked
+        ? [...new Set([...currentValues, value])]
+        : currentValues.filter((item) => item !== value);
+      return { ...current, [key]: nextValues };
+    });
+  }
+
+  onGlobalFilterSearch(event: Event): void {
+    this.globalFilterSearch.set(this.readInputValue(event));
+  }
+
+  isGlobalFilterOpen(key: GlobalFilterKey): boolean {
+    return this.openGlobalFilter() === key;
+  }
+
+  onGlobalFilterToggle(key: GlobalFilterKey, event: Event): void {
+    const details = this.readDetailsElement(event);
+    if (!details) return;
+    this.openGlobalFilter.set(details.open ? key : null);
+  }
+
+  globalFilterSummary(key: GlobalFilterKey): string {
+    const selected = this.selectedGlobalFilters()[key];
+    if (selected.length === 0) return 'Todos';
+    if (selected.length === 1) return selected[0] ?? 'Todos';
+    return `${selected.length} selecionados`;
+  }
+
+  clearGlobalFilters(): void {
+    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], storeStatus: [] });
+    this.globalFilterSearch.set('');
+    this.openGlobalFilter.set(null);
   }
 
   onPossivelCausaFilter(event: Event): void {
     this.possivelCausaFilter.set(this.readInputValue(event));
   }
 
-  onMultiFilterToggle(key: MultiFilterKey, event: Event): void {
+  onMultiFilterToggle(key: string, event: Event): void {
     const details = this.readDetailsElement(event);
 
     if (!details) {
@@ -512,11 +673,13 @@ export class Dashboard {
       return;
     }
 
-    if (target.closest('.delayed-stores__dropdown')) {
-      return;
+    if (!target.closest('.delayed-stores__dropdown')) {
+      this.openMultiFilter.set(null);
     }
 
-    this.openMultiFilter.set(null);
+    if (!target.closest('.global-filter__dropdown')) {
+      this.openGlobalFilter.set(null);
+    }
   }
 
   @HostListener('document:keydown.escape')
@@ -526,6 +689,7 @@ export class Dashboard {
       return;
     }
     this.openMultiFilter.set(null);
+    this.openGlobalFilter.set(null);
   }
 
   openStoreModal(store: DelayedStoreRow): void {
@@ -568,9 +732,9 @@ export class Dashboard {
       cnpj: '',
     });
     this.pharmacyNameFilter.set('');
-    this.problemLayerFilter.set('all');
-    this.storeStatusFilter.set('all');
-    this.sitContratoFilter.set('all');
+    this.selectedProblemLayers.set([]);
+    this.selectedStoreStatuses.set([]);
+    this.selectedSitContratosLocal.set([]);
     this.possivelCausaFilter.set('');
     this.openMultiFilter.set(null);
   }
@@ -601,7 +765,7 @@ export class Dashboard {
     return this.selectedMultiFilters()[key].includes(value);
   }
 
-  isMultiFilterOpen(key: MultiFilterKey): boolean {
+  isMultiFilterOpen(key: string): boolean {
     return this.openMultiFilter() === key;
   }
 
@@ -743,13 +907,24 @@ export class Dashboard {
   private mapFarmaciaToDashboard(f: FarmaciaHistorico): DashboardData['delayedStores'][number] {
     const problemLayers: ProblemLayer[] = [];
 
-    if (f.camadas_sem_dados && f.camadas_sem_dados.length > 0) {
+    const semDados = f.camadas_sem_dados ?? [];
+    const atrasadas = f.camadas_atrasadas ?? [];
+
+    if (semDados.length >= 2) {
+      // Multiple layers with no data → "Sem dados"
       problemLayers.push('Sem dados');
-    } else if (f.camadas_atrasadas) {
-      for (const camada of f.camadas_atrasadas) {
+    } else {
+      // Exactly 1 layer with no data → treat as delayed in that layer
+      if (semDados.length === 1) {
+        const camada = semDados[0];
         if (camada === 'GoldVendas') problemLayers.push('Gold');
         else if (camada === 'SilverSTGN_Dedup') problemLayers.push('Silver');
-        else if (camada === 'API') problemLayers.push('API');
+      }
+      for (const camada of atrasadas) {
+        if (camada === 'GoldVendas' && !problemLayers.includes('Gold')) problemLayers.push('Gold');
+        else if (camada === 'SilverSTGN_Dedup' && !problemLayers.includes('Silver'))
+          problemLayers.push('Silver');
+        else if (camada === 'API' && !problemLayers.includes('API')) problemLayers.push('API');
       }
     }
 

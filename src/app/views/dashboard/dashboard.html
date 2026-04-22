@@ -8,6 +8,150 @@
       </div>
     </div>
   } @else {
+    <!-- ── Filtro Global ──────────────────────────────────────────── -->
+    <div class="global-filter-bar">
+      <span class="global-filter-bar__label">
+        <i class="bi bi-funnel me-1"></i>Filtro global
+      </span>
+
+      <div class="global-filter-bar__card">
+        <div class="d-flex align-items-end gap-2 flex-wrap justify-content-center">
+
+          <!-- Associação -->
+          <div class="global-filter__field">
+            <span class="global-filter__field-label">Associação</span>
+            <details
+              class="global-filter__dropdown"
+              [open]="isGlobalFilterOpen('associationCode')"
+              (toggle)="onGlobalFilterToggle('associationCode', $event)"
+            >
+              <summary class="form-select form-select-sm global-filter__trigger">
+                {{ globalFilterSummary('associationCode') }}
+              </summary>
+              <div class="global-filter__menu border rounded bg-white p-2 mt-1">
+                <input
+                  type="text"
+                  class="form-control form-control-sm mb-2"
+                  placeholder="Buscar associação..."
+                  [value]="globalFilterSearch()"
+                  (input)="onGlobalFilterSearch($event)"
+                />
+                <div class="global-filter__checklist">
+                  @for (opt of filteredGlobalAssociationOptions(); track opt) {
+                    <label class="form-check mb-1">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        [checked]="isGlobalSelected('associationCode', opt)"
+                        (change)="onGlobalCheckboxFilter('associationCode', opt, $event)"
+                      />
+                      <span class="form-check-label">{{ opt }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Sit. Contrato -->
+          <div class="global-filter__field">
+            <span class="global-filter__field-label">Sit. Contrato</span>
+            <details
+              class="global-filter__dropdown"
+              [open]="isGlobalFilterOpen('sitContrato')"
+              (toggle)="onGlobalFilterToggle('sitContrato', $event)"
+            >
+              <summary class="form-select form-select-sm global-filter__trigger">
+                {{ globalFilterSummary('sitContrato') }}
+              </summary>
+              <div class="global-filter__menu border rounded bg-white p-2 mt-1">
+                <div class="global-filter__checklist">
+                  <label class="form-check mb-1">
+                    <input
+                      type="radio"
+                      name="sitContratoGlobal"
+                      class="form-check-input"
+                      [checked]="selectedGlobalFilters().sitContrato.length === 0"
+                      (change)="selectedGlobalFilters.update(f => ({ ...f, sitContrato: [] }))"
+                    />
+                    <span class="form-check-label text-secondary">Todos</span>
+                  </label>
+                  @for (opt of globalSitContratoOptions(); track opt) {
+                    <label class="form-check mb-1">
+                      <input
+                        type="radio"
+                        name="sitContratoGlobal"
+                        class="form-check-input"
+                        [checked]="isGlobalSelected('sitContrato', opt)"
+                        (change)="onGlobalRadioFilter('sitContrato', opt)"
+                      />
+                      <span [class]="sitContratoClass(opt)" style="pointer-events:none">{{ opt }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Status -->
+          <div class="global-filter__field">
+            <span class="global-filter__field-label">Status</span>
+            <details
+              class="global-filter__dropdown"
+              [open]="isGlobalFilterOpen('storeStatus')"
+              (toggle)="onGlobalFilterToggle('storeStatus', $event)"
+            >
+              <summary class="form-select form-select-sm global-filter__trigger">
+                {{ globalFilterSummary('storeStatus') }}
+              </summary>
+              <div class="global-filter__menu border rounded bg-white p-2 mt-1">
+                <div class="global-filter__checklist">
+                  @for (opt of globalStoreStatusOptions(); track opt) {
+                    <label class="form-check mb-1">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        [checked]="isGlobalSelected('storeStatus', opt)"
+                        (change)="onGlobalCheckboxFilter('storeStatus', opt, $event)"
+                      />
+                      <span class="form-check-label">{{ opt }}</span>
+                    </label>
+                  }
+                </div>
+              </div>
+            </details>
+          </div>
+
+          @if (hasActiveGlobalFilters()) {
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary align-self-end"
+              (click)="clearGlobalFilters()"
+            >
+              <i class="bi bi-x me-1"></i>Limpar
+            </button>
+          }
+        </div>
+
+        <!-- chips de filtros ativos -->
+        @if (hasActiveGlobalFilters()) {
+          <div class="global-filter-bar__chips d-flex gap-1 flex-wrap justify-content-center">
+            @for (chip of activeGlobalFilterChips(); track chip.key + chip.value) {
+              <button
+                type="button"
+                class="global-filter__chip"
+                (click)="removeGlobalFilterChip(chip.key, chip.value)"
+              >
+                <span class="global-filter__chip-label">{{ chip.label }}</span>
+                {{ chip.value }}
+                <i class="bi bi-x"></i>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
     <div class="row g-4">
       <section id="secao-kpis" class="col-12" aria-label="Indicadores de CNPJ">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
@@ -287,42 +431,84 @@
                   <label class="form-label delayed-stores__filter-label mb-1"
                     >Camada com atraso</label
                   >
-                  <select
-                    class="form-select form-select-sm"
-                    [value]="problemLayerFilter()"
-                    (change)="onProblemLayerFilter($event)"
+                  <details
+                    class="delayed-stores__dropdown"
+                    [open]="isMultiFilterOpen('problemLayer')"
+                    (toggle)="onMultiFilterToggle('problemLayer', $event)"
                   >
-                    <option value="all">Todas</option>
-                    @for (layer of delayedLayerOptions; track layer) {
-                      <option [value]="layer">{{ layer }}</option>
-                    }
-                  </select>
+                    <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                      {{ tableMultiSummary('problemLayer') }}
+                    </summary>
+                    <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                      <div class="delayed-stores__checklist">
+                        @for (layer of delayedLayerOptions; track layer) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="selectedProblemLayers().includes(layer)"
+                              (change)="onProblemLayerCheckbox(layer, $event)"
+                            />
+                            <span class="form-check-label">{{ layer }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  </details>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-2">
                   <label class="form-label delayed-stores__filter-label mb-1">Status</label>
-                  <select
-                    class="form-select form-select-sm"
-                    [value]="storeStatusFilter()"
-                    (change)="onStoreStatusFilter($event)"
+                  <details
+                    class="delayed-stores__dropdown"
+                    [open]="isMultiFilterOpen('storeStatus')"
+                    (toggle)="onMultiFilterToggle('storeStatus', $event)"
                   >
-                    <option value="all">Todos</option>
-                    @for (status of storeStatusOptions; track status) {
-                      <option [value]="status">{{ status }}</option>
-                    }
-                  </select>
+                    <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                      {{ tableMultiSummary('storeStatus') }}
+                    </summary>
+                    <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                      <div class="delayed-stores__checklist">
+                        @for (status of storeStatusOptions; track status) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="selectedStoreStatuses().includes(status)"
+                              (change)="onStoreStatusCheckbox(status, $event)"
+                            />
+                            <span class="form-check-label">{{ status }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  </details>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-2">
                   <label class="form-label delayed-stores__filter-label mb-1">Sit. Contrato</label>
-                  <select
-                    class="form-select form-select-sm"
-                    [value]="sitContratoFilter()"
-                    (change)="onSitContratoFilter($event)"
+                  <details
+                    class="delayed-stores__dropdown"
+                    [open]="isMultiFilterOpen('sitContratoLocal')"
+                    (toggle)="onMultiFilterToggle('sitContratoLocal', $event)"
                   >
-                    <option value="all">Todos</option>
-                    @for (sit of sitContratoOptions(); track sit) {
-                      <option [value]="sit">{{ sit }}</option>
-                    }
-                  </select>
+                    <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
+                      {{ tableMultiSummary('sitContratoLocal') }}
+                    </summary>
+                    <div class="delayed-stores__dropdown-menu border rounded bg-white p-2 mt-1">
+                      <div class="delayed-stores__checklist">
+                        @for (sit of sitContratoOptions(); track sit) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="selectedSitContratosLocal().includes(sit)"
+                              (change)="onSitContratoLocalCheckbox(sit, $event)"
+                            />
+                            <span [class]="sitContratoClass(sit)" style="pointer-events:none">{{ sit }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  </details>
                 </div>
                 <div class="col-12 col-sm-6 col-xl-2">
                   <label class="form-label delayed-stores__filter-label mb-1">Possível Causa</label>
