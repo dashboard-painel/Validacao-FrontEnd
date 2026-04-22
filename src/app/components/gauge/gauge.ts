@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-gauge',
@@ -8,6 +9,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Gauge {
+  private readonly themeService = inject(ThemeService);
+
   totalStores = input(0);
   okStores = input(0);
 
@@ -31,39 +34,43 @@ export class Gauge {
   });
 
   readonly gaugeColor = computed(() => {
+    const dark = this.themeService.theme() === 'dark';
+
     if (this.totalStoresSafe() === 0) {
-      return '#8a95a6';
+      return dark ? '#94a3b8' : '#8a95a6';
     }
 
     const percent = this.okStoresPercent();
 
     if (percent >= 90) {
-      return '#1f9d55';
+      return dark ? '#4ade80' : '#1f9d55';
     }
 
     if (percent >= 80) {
-      return '#d4a017';
+      return dark ? '#fbbf24' : '#d4a017';
     }
 
-    return '#d64545';
+    return dark ? '#ff4d4d' : '#d64545';
   });
 
   readonly gaugePercentColor = computed(() => {
+    const dark = this.themeService.theme() === 'dark';
+
     if (this.totalStoresSafe() === 0) {
-      return '#616b79';
+      return dark ? '#cbd5e1' : '#616b79';
     }
 
     const percent = this.okStoresPercent();
 
     if (percent >= 90) {
-      return '#197946';
+      return dark ? '#86efac' : '#197946';
     }
 
     if (percent >= 80) {
-      return '#8a6500';
+      return dark ? '#fcd34d' : '#8a6500';
     }
 
-    return '#a22a2a';
+    return dark ? '#ff7a7a' : '#a22a2a';
   });
 
   readonly gaugeCardClass = computed(() => {
