@@ -79,7 +79,7 @@ type DelayedStoreRow = DelayedStoreItem & {
   status: StoreStatus;
   layerTooltip: string;
   layerItems: {
-    label: LayerBadge;
+    label: string;
     className: string;
   }[];
 };
@@ -251,9 +251,9 @@ export class Dashboard {
         status: this.toStoreStatus(store),
         layerItems:
           store.problemLayers.length === 0
-            ? [{ label: 'Sem atraso' as LayerBadge, className: this.toLayerClass('Sem atraso') }]
+            ? [{ label: 'Sem atraso', className: this.toLayerClass('Sem atraso') }]
             : store.problemLayers.map((layer) => ({
-                label: layer,
+                label: this.toLayerDisplayLabel(layer),
                 className: this.toLayerClass(layer),
               })),
       }));
@@ -343,6 +343,12 @@ export class Dashboard {
     if (hours >= 48) return 'critical';
     if (hours >= 24) return 'high';
     return 'moderate';
+  };
+
+  readonly rowUrgencyClass = (store: DelayedStoreRow): string => {
+    if (store.problemLayers.includes('Sem dados')) return 'nodata';
+    if (store.problemLayers.length === 0) return 'ok';
+    return this.urgencyClass(store.delayHours);
   };
 
   readonly sitContratoClass = (sit: string | null): string => {
@@ -540,22 +546,6 @@ export class Dashboard {
     return (store.lastSalesByLayer as Record<string, string> | undefined)?.[layer] ?? 'Sem dados';
   }
 
-  positionTooltip(event: MouseEvent): void {
-    const btn = event.currentTarget as HTMLElement;
-    const scrollContainer = btn.closest('.delayed-stores__table-wrap');
-    if (!scrollContainer) return;
-
-    const btnRect = btn.getBoundingClientRect();
-    const containerRect = scrollContainer.getBoundingClientRect();
-    const spaceBelow = containerRect.bottom - btnRect.bottom;
-
-    if (spaceBelow < 140) {
-      btn.classList.add('delayed-stores__layer-info-btn--above');
-    } else {
-      btn.classList.remove('delayed-stores__layer-info-btn--above');
-    }
-  }
-
   clearFilters(): void {
     this.selectedMultiFilters.set({
       associationCode: [],
@@ -631,6 +621,15 @@ export class Dashboard {
         return 'delayed-stores__layer delayed-stores__layer--ok';
       default:
         return 'delayed-stores__layer delayed-stores__layer--nodata';
+    }
+  }
+
+  private toLayerDisplayLabel(layer: ProblemLayer): string {
+    switch (layer) {
+      case 'Gold':    return 'Gold em atraso';
+      case 'Silver':  return 'Silver em atraso';
+      case 'API':     return 'API em atraso';
+      default:        return layer;
     }
   }
 
