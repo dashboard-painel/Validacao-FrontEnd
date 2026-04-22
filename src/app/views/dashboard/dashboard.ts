@@ -540,6 +540,22 @@ export class Dashboard {
     return (store.lastSalesByLayer as Record<string, string> | undefined)?.[layer] ?? 'Sem dados';
   }
 
+  positionTooltip(event: MouseEvent): void {
+    const btn = event.currentTarget as HTMLElement;
+    const scrollContainer = btn.closest('.delayed-stores__table-wrap');
+    if (!scrollContainer) return;
+
+    const btnRect = btn.getBoundingClientRect();
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const spaceBelow = containerRect.bottom - btnRect.bottom;
+
+    if (spaceBelow < 140) {
+      btn.classList.add('delayed-stores__layer-info-btn--above');
+    } else {
+      btn.classList.remove('delayed-stores__layer-info-btn--above');
+    }
+  }
+
   clearFilters(): void {
     this.selectedMultiFilters.set({
       associationCode: [],

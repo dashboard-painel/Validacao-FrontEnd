@@ -426,6 +426,7 @@
                               class="delayed-stores__layer-info-btn"
                               aria-label="Ver detalhes da loja"
                               (click)="openStoreModal(store)"
+                              (mouseenter)="positionTooltip($event)"
                             >
                               <i class="bi bi-info-circle"></i>
                               <span class="delayed-stores__layer-tooltip" role="tooltip">
