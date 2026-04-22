@@ -50,6 +50,8 @@ type DashboardData = {
     delayHours: number;
     problemLayers: ProblemLayer[];
     lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
+    sitContrato: string | null;
+    possivelCausa: string | null;
   }[];
 };
 
@@ -110,6 +112,8 @@ export class Dashboard {
   readonly pharmacyNameFilter = signal('');
   readonly problemLayerFilter = signal<'all' | ProblemLayer>('all');
   readonly storeStatusFilter = signal<'all' | StoreStatus>('all');
+  readonly sitContratoFilter = signal<string>('all');
+  readonly possivelCausaFilter = signal('');
   readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
     'associationCode',
   );
@@ -170,6 +174,12 @@ export class Dashboard {
 
   readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API', 'Sem dados'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
+  readonly sitContratoOptions = computed(() => {
+    const values = this.dashboardData().delayedStores
+      .map((s) => s.sitContrato)
+      .filter((v): v is string => v !== null && v !== '');
+    return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+  });
   readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
 
   private readonly storesScopedForFarmaCode = computed(() => {
@@ -243,6 +253,8 @@ export class Dashboard {
     const pharmacyNameQuery = this.pharmacyNameFilter().trim().toLowerCase();
     const layerQuery = this.problemLayerFilter();
     const statusQuery = this.storeStatusFilter();
+    const sitContratoQuery = this.sitContratoFilter();
+    const possivelCausaQuery = this.possivelCausaFilter().trim().toLowerCase();
 
     return this.delayedStoreRows().filter((store) => {
       if (
@@ -275,6 +287,20 @@ export class Dashboard {
         return false;
       }
 
+      if (
+        sitContratoQuery !== 'all' &&
+        (store.sitContrato ?? '').toLowerCase() !== sitContratoQuery.toLowerCase()
+      ) {
+        return false;
+      }
+
+      if (
+        possivelCausaQuery &&
+        !(store.possivelCausa ?? '').toLowerCase().includes(possivelCausaQuery)
+      ) {
+        return false;
+      }
+
       return true;
     });
   });
@@ -296,7 +322,9 @@ export class Dashboard {
       selected.cnpj.length > 0 ||
       this.pharmacyNameFilter().trim().length > 0 ||
       this.problemLayerFilter() !== 'all' ||
-      this.storeStatusFilter() !== 'all'
+      this.storeStatusFilter() !== 'all' ||
+      this.sitContratoFilter() !== 'all' ||
+      this.possivelCausaFilter().trim().length > 0
     );
   });
 
@@ -304,6 +332,14 @@ export class Dashboard {
     if (hours >= 48) return 'critical';
     if (hours >= 24) return 'high';
     return 'moderate';
+  };
+
+  readonly sitContratoClass = (sit: string | null): string => {
+    if (!sit) return 'sit-contrato-badge sit-contrato-badge--unknown';
+    const normalized = sit.toLowerCase();
+    if (normalized === 'ativo') return 'sit-contrato-badge sit-contrato-badge--ativo';
+    if (normalized === 'inativo') return 'sit-contrato-badge sit-contrato-badge--inativo';
+    return 'sit-contrato-badge sit-contrato-badge--other';
   };
 
   readonly formatDelay = (hours: number): string => {
@@ -338,6 +374,8 @@ export class Dashboard {
       this.pharmacyNameFilter();
       this.problemLayerFilter();
       this.storeStatusFilter();
+      this.sitContratoFilter();
+      this.possivelCausaFilter();
 
       this.renderedRowsCount.set(this.pageSize);
     });
@@ -421,6 +459,14 @@ export class Dashboard {
     }
   }
 
+  onSitContratoFilter(event: Event): void {
+    this.sitContratoFilter.set(this.readSelectValue(event));
+  }
+
+  onPossivelCausaFilter(event: Event): void {
+    this.possivelCausaFilter.set(this.readInputValue(event));
+  }
+
   onMultiFilterToggle(key: MultiFilterKey, event: Event): void {
     const details = this.readDetailsElement(event);
 
@@ -481,6 +527,8 @@ export class Dashboard {
     this.pharmacyNameFilter.set('');
     this.problemLayerFilter.set('all');
     this.storeStatusFilter.set('all');
+    this.sitContratoFilter.set('all');
+    this.possivelCausaFilter.set('');
     this.openMultiFilter.set(null);
   }
 
@@ -630,7 +678,7 @@ export class Dashboard {
   private mapFarmaciaToDashboard(f: FarmaciaHistorico): DashboardData['delayedStores'][number] {
     const problemLayers: ProblemLayer[] = [];
 
-    if (!f.ultima_venda_GoldVendas && !f.ultima_venda_SilverSTGN_Dedup) {
+    if (f.camadas_sem_dados && f.camadas_sem_dados.length > 0) {
       problemLayers.push('Sem dados');
     } else if (f.camadas_atrasadas) {
       for (const camada of f.camadas_atrasadas) {
@@ -664,6 +712,8 @@ export class Dashboard {
       delayHours: this.computeDelayHours(f, problemLayers),
       problemLayers,
       lastSalesByLayer,
+      sitContrato: f.sit_contrato ?? null,
+      possivelCausa: f.possivel_causa ?? null,
     };
   }
 
@@ -694,7 +744,10 @@ export class Dashboard {
             ? `${f.ultima_venda_SilverSTGN_Dedup} ${f.ultima_hora_venda_SilverSTGN_Dedup}`
             : null;
       } else if (layer === 'API') {
-        raw = f.coletor_novo;
+        raw =
+          f.coletor_bi_ultima_data && f.coletor_bi_ultima_hora
+            ? `${f.coletor_bi_ultima_data} ${f.coletor_bi_ultima_hora}`
+            : null;
       }
       const date = this.parseRawDatetime(raw);
       if (date) {
