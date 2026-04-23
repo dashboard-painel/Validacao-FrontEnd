@@ -5,8 +5,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, catchError, switchMap, timer } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, map, of, switchMap, timer } from 'rxjs';
 
 import { VendasParceirosService } from '../../services/vendas-parceiros.service';
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
@@ -26,6 +26,19 @@ export class Vendas {
 
   readonly stores = signal<VendaParceiro[]>([]);
   readonly isLoading = signal(true);
+  readonly isRefreshing = signal(false);
+  readonly refreshError = signal<string | null>(null);
+
+  readonly ultimaAtualizacao = toSignal(
+    timer(0, 30_000).pipe(
+      switchMap(() =>
+        this.service.getUltimaAtualizacao().pipe(
+          map((r) => r.atualizado_em),
+          catchError(() => of(null)),
+        ),
+      ),
+    ),
+  );
 
   readonly sortColumn = signal<SortColumn>('associacao');
   readonly sortDir = signal<'asc' | 'desc'>('asc');
@@ -153,7 +166,7 @@ export class Vendas {
     timer(0, 60_000)
       .pipe(
         switchMap(() =>
-          this.service.getVendasParceiros().pipe(
+          this.service.getHistorico().pipe(
             catchError(() => {
               this.isLoading.set(false);
               return EMPTY;
@@ -166,6 +179,21 @@ export class Vendas {
         this.stores.set(resp.resultados);
         this.isLoading.set(false);
       });
+  }
+
+  onAtualizar(): void {
+    this.isRefreshing.set(true);
+    this.refreshError.set(null);
+    this.service.atualizar().subscribe({
+      next: (resp) => {
+        this.stores.set(resp.resultados);
+        this.isRefreshing.set(false);
+      },
+      error: () => {
+        this.refreshError.set('Erro ao atualizar dados do Redshift.');
+        this.isRefreshing.set(false);
+      },
+    });
   }
 
   // ── Actions ───────────────────────────────────────────────

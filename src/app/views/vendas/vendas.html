@@ -45,8 +45,36 @@
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
               <p class="vendas__title mb-0">Farmácias — Vendas Parceiros</p>
-              <span class="vendas__count">{{ filteredStores().length }} de {{ stores().length }} farmácias</span>
+              <div class="d-flex align-items-center gap-2">
+                @if (ultimaAtualizacao(); as ts) {
+                  <span class="vendas__update-badge">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Atualizado: {{ formatDate(ts) }}
+                  </span>
+                }
+                <span class="vendas__count">{{ filteredStores().length }} de {{ stores().length }} farmácias</span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="isRefreshing()"
+                  (click)="onAtualizar()"
+                  title="Consultar Redshift e atualizar dados"
+                >
+                  @if (isRefreshing()) {
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Atualizando...
+                  } @else {
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Atualizar
+                  }
+                </button>
+              </div>
             </div>
+            @if (refreshError()) {
+              <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>{{ refreshError() }}
+              </div>
+            }
 
             <!-- ── Filtros ──────────────────────────────── -->
             <div class="vendas__filters-panel mb-3">
