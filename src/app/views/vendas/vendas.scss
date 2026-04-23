@@ -1,0 +1,341 @@
+:host {
+  display: block;
+}
+
+// ── KPI Cards ───────────────────────────────────────────────
+.vendas__kpi-card {
+  border-radius: 0.95rem;
+  border: 1px solid var(--painel-border);
+  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
+  box-shadow: var(--painel-shadow-soft);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-left: 0.32rem solid var(--painel-primary);
+
+  &--ok {
+    border-left-color: var(--status-ok);
+  }
+
+  &--danger {
+    border-left-color: var(--status-danger);
+  }
+
+  &--info {
+    border-left-color: var(--status-silver);
+  }
+}
+
+.vendas__kpi-label {
+  color: var(--painel-muted);
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vendas__kpi-value {
+  color: var(--painel-text-strong);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+// ── Main card ───────────────────────────────────────────────
+.vendas__card {
+  border-radius: 0.95rem;
+  border: 1px solid var(--painel-border);
+  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
+  box-shadow: var(--painel-shadow-soft);
+
+  .card-body {
+    padding: 1rem 1.05rem;
+  }
+}
+
+.vendas__title {
+  color: var(--painel-text-strong);
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.vendas__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+  background-color: rgb(31 79 134 / 14%);
+  color: var(--painel-primary-strong);
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+// ── Filters panel ───────────────────────────────────────────
+.vendas__filters-panel {
+  position: relative;
+  z-index: 3;
+  border: 1px solid var(--painel-filter-border);
+  border-radius: 0.78rem;
+  background-color: var(--painel-filter-bg);
+  padding: 0.7rem;
+}
+
+.vendas__filters-title {
+  color: var(--painel-text-strong);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.vendas__filter-label {
+  color: var(--painel-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.vendas__dropdown {
+  position: relative;
+
+  &[open] {
+    z-index: 30;
+  }
+}
+
+.vendas__dropdown-trigger {
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.vendas__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  left: 0;
+  min-width: max(100%, 14rem);
+  z-index: 40;
+  max-height: 15rem;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
+  background-color: var(--painel-dropdown-bg);
+  color: var(--painel-text);
+  border-color: var(--painel-border) !important;
+}
+
+.vendas__checklist {
+  max-height: 8.8rem;
+  overflow: auto;
+  padding-right: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--painel-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.35rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--painel-border);
+    border-radius: 999px;
+    transition: background-color 0.15s;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--painel-muted);
+  }
+}
+
+// ── Table ───────────────────────────────────────────────────
+.vendas__table-wrap {
+  height: 24rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--painel-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 0.35rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--painel-border);
+    border-radius: 999px;
+    transition: background-color 0.15s;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--painel-muted);
+  }
+}
+
+.vendas__table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--painel-text);
+  --bs-table-border-color: var(--painel-table-border);
+}
+
+.vendas__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--painel-surface-soft);
+  color: var(--painel-muted);
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom-width: 1px;
+}
+
+.vendas__th--sortable {
+  cursor: pointer;
+  user-select: none;
+
+  i {
+    font-size: 0.65rem;
+    margin-left: 0.25rem;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+
+  &:hover {
+    color: var(--painel-text-strong);
+
+    i {
+      opacity: 1;
+    }
+  }
+}
+
+.vendas__table-row {
+  transition: background-color 0.1s;
+
+  td {
+    font-size: 0.84rem;
+    border-bottom-width: 1px;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+
+  &:hover td {
+    background-color: rgb(31 79 134 / 4%);
+  }
+}
+
+.vendas__td-identity {
+  white-space: nowrap;
+}
+
+.vendas__code-primary {
+  display: block;
+  color: var(--painel-text-strong);
+  font-weight: 600;
+  font-size: 0.84rem;
+}
+
+.vendas__code-sub {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--painel-muted);
+  margin-top: 0.1rem;
+}
+
+.vendas__td-store {
+  min-width: 10rem;
+}
+
+.vendas__store-name {
+  display: block;
+  color: var(--painel-text-strong);
+  font-weight: 650;
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.vendas__td-date {
+  white-space: nowrap;
+}
+
+.vendas__date-value {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--painel-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.vendas__empty {
+  color: var(--painel-muted);
+  font-size: 0.84rem;
+}
+
+// ── Sit. Contrato badges ────────────────────────────────────
+.vendas__sit-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: capitalize;
+
+  &--ativo {
+    color: var(--status-ok-strong);
+    background-color: var(--status-ok-soft);
+  }
+
+  &--inativo {
+    color: var(--status-nodata-strong);
+    background-color: var(--status-nodata-soft);
+  }
+}
+
+// ── Recência badges ─────────────────────────────────────────
+.vendas__recencia-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+
+  &--ok {
+    color: var(--status-ok-strong);
+    background-color: var(--status-ok-soft);
+  }
+
+  &--warning {
+    color: var(--status-warning-strong);
+    background-color: var(--status-warning-soft);
+  }
+
+  &--critical {
+    color: var(--status-danger-strong);
+    background-color: var(--status-danger-soft);
+  }
+
+  &--sem-dados {
+    color: var(--painel-muted);
+  }
+}
