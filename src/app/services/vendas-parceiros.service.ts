@@ -10,6 +10,6 @@ export class VendasParceirosService {
   private readonly apiUrl = 'http://localhost:8000';
 
   getVendasParceiros(): Observable<VendasParceirosResponse> {
-    return this.http.get<VendasParceirosResponse>(`${this.apiUrl}/vendas-parceiros`);
+    return this.http.get<VendasParceirosResponse>(`${this.apiUrl}/vendas-parceiros/historico`);
   }
 }
