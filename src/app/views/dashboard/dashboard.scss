@@ -419,7 +419,7 @@
 }
 
 .delayed-stores__table-wrap {
-  height: 20rem;
+  height: 40rem;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -542,6 +542,83 @@
   color: var(--painel-muted);
   margin-top: 0.1rem;
   font-variant-numeric: tabular-nums;
+}
+
+.coletor-versao-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--painel-muted, #6b7a90);
+  background-color: var(--painel-surface-soft, #f0f2f5);
+  border: 1px solid var(--painel-border, #d8dde6);
+}
+
+// ── Coletor info card (modal) ──────────────────────────────
+.coletor-info-card {
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
+  border-left: 3px solid var(--painel-border);
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.coletor-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.coletor-info-label {
+  font-size: 0.75rem;
+  color: var(--painel-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.coletor-info-value {
+  font-size: 0.82rem;
+  color: var(--painel-text-strong);
+  font-weight: 600;
+  text-align: right;
+}
+
+.coletor-info-code {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--painel-text-strong);
+  background: none;
+  padding: 0;
+}
+
+.coletor-info-schedule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.coletor-info-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--comercial {
+    background-color: var(--status-ok-strong, #1a7a4a);
+  }
+
+  &--fora {
+    background-color: var(--painel-muted, #8a9ab0);
+  }
 }
 
 .delayed-stores__empty {

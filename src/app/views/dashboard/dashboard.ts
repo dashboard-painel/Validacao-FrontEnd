@@ -17,6 +17,7 @@ import { Kpi } from '../../components/kpi/kpi';
 import { CnpjPipe } from '../../pipes/cnpj.pipe';
 import { type FarmaciaHistorico } from '../../models/shared/farmacia.model';
 import { HistoricoService } from '../../services/historico.service';
+import { getColetorSchedule } from '../../data/coletor-schedule.data';
 
 type DashboardData = {
   kpis: {
@@ -53,6 +54,7 @@ type DashboardData = {
     lastSalesByLayer?: Partial<Record<ProblemLayer, string>>;
     sitContrato: string | null;
     codigoRede: string | null;
+    numVersao: string | null;
     possivelCausa: string | null;
   }[];
 };
@@ -466,6 +468,9 @@ export class Dashboard {
     if (hours > 48) return `${Math.round(hours / 24)} dias`;
     return `${hours} horas`;
   };
+
+  readonly coletorSchedule = (numVersao: string | null): string | null =>
+    getColetorSchedule(numVersao);
 
   constructor() {
     const stored = localStorage.getItem(this.kpisStorageKey);
@@ -960,6 +965,7 @@ export class Dashboard {
       lastSalesByLayer,
       sitContrato: f.sit_contrato ?? null,
       codigoRede: f.codigo_rede ?? null,
+      numVersao: f.num_versao ?? null,
       possivelCausa: f.possivel_causa ?? null,
     };
   }

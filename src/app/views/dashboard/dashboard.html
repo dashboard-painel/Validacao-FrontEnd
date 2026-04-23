@@ -581,6 +581,11 @@
                         <td class="delayed-stores__td-store">
                           <span class="delayed-stores__store-name">{{ store.pharmacyName }}</span>
                           <small class="delayed-stores__store-cnpj">{{ store.cnpj | cnpj }}</small>
+                          @if (store.numVersao) {
+                            <span class="coletor-versao-badge">
+                              <i class="bi bi-cpu me-1"></i>v{{ store.numVersao }}
+                            </span>
+                          }
                         </td>
                         <td>
                           @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
@@ -743,6 +748,35 @@
             <p class="store-modal__causa-text">{{ store.possivelCausa }}</p>
           </div>
         }
+
+        <div class="store-modal__section">
+          <p class="store-modal__section-title">Informações do Coletor</p>
+          <div class="coletor-info-card">
+            <div class="coletor-info-row">
+              <span class="coletor-info-label">Versão instalada</span>
+              <span class="coletor-info-value">
+                @if (store.numVersao) {
+                  <code class="coletor-info-code">{{ store.numVersao }}</code>
+                } @else {
+                  <span class="text-body-secondary">Não informado</span>
+                }
+              </span>
+            </div>
+            <div class="coletor-info-row">
+              <span class="coletor-info-label">Horário de operação</span>
+              <span class="coletor-info-value">
+                @if (coletorSchedule(store.numVersao); as schedule) {
+                  <span class="coletor-info-schedule">
+                    <span [class]="'coletor-info-dot coletor-info-dot--' + (schedule === 'horário comercial' ? 'comercial' : 'fora')"></span>
+                    {{ schedule === 'horário comercial' ? 'Horário comercial' : 'Fora do horário comercial' }}
+                  </span>
+                } @else {
+                  <span class="text-body-secondary">Não informado</span>
+                }
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="store-modal__footer">

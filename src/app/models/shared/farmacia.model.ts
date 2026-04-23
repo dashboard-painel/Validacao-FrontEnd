@@ -5,6 +5,7 @@ export type FarmaciaHistorico = {
   cnpj: string | null;
   sit_contrato: string | null;
   codigo_rede: string | null;
+  num_versao: string | null;
   ultima_venda_GoldVendas: string | null;
   ultima_hora_venda_GoldVendas: string | null;
   ultima_venda_SilverSTGN_Dedup: string | null;
