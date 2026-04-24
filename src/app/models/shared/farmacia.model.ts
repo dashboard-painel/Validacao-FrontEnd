@@ -13,6 +13,7 @@ export type FarmaciaHistorico = {
   coletor_novo: string | null;
   coletor_bi_ultima_data: string | null;
   coletor_bi_ultima_hora: string | null;
+  classificacao: string | null;
   tipo_divergencia: string | null;
   camadas_atrasadas: string[] | null;
   camadas_sem_dados: string[] | null;
@@ -30,6 +31,7 @@ export type Divergencia = {
   ultima_hora_venda_GoldVendas: string | null;
   ultima_venda_SilverSTGN_Dedup: string | null;
   ultima_hora_venda_SilverSTGN_Dedup: string | null;
+  classificacao: string | null;
   tipo_divergencia: string | null;
   camadas_atrasadas: string[] | null;
   camadas_sem_dados: string[] | null;

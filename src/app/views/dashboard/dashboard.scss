@@ -60,7 +60,9 @@
 .global-filter__dropdown {
   position: relative;
 
-  &[open] { z-index: 50; }
+  &[open] {
+    z-index: 50;
+  }
 }
 
 .global-filter__menu {
@@ -120,7 +122,10 @@
   color: var(--painel-primary);
   cursor: pointer;
   line-height: 1.3;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 
   &:hover {
     background-color: var(--status-danger-soft);
@@ -483,7 +488,9 @@
   &:hover {
     color: var(--painel-text-strong);
 
-    i { opacity: 1; }
+    i {
+      opacity: 1;
+    }
   }
 }
 
@@ -670,9 +677,15 @@
     margin-top: 0.05rem;
   }
 
-  &--gold::before   { background-color: var(--status-warning); }
-  &--silver::before { background-color: var(--status-silver); }
-  &--api::before    { background-color: var(--status-danger); }
+  &--gold::before {
+    background-color: var(--status-warning);
+  }
+  &--silver::before {
+    background-color: var(--status-silver);
+  }
+  &--api::before {
+    background-color: var(--status-danger);
+  }
 }
 
 .delayed-stores__date-label {
@@ -836,7 +849,9 @@
   font-size: 1rem;
   cursor: pointer;
   flex-shrink: 0;
-  transition: color 0.15s, background-color 0.15s;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
 
   &:hover {
     color: var(--painel-text-strong);
@@ -907,9 +922,15 @@
   border: 1px solid var(--painel-table-border);
   border-left: 0.25rem solid var(--painel-muted);
 
-  &--gold { border-left-color: var(--status-warning); }
-  &--silver { border-left-color: var(--status-silver); }
-  &--api { border-left-color: var(--status-danger); }
+  &--gold {
+    border-left-color: var(--status-warning);
+  }
+  &--silver {
+    border-left-color: var(--status-silver);
+  }
+  &--api {
+    border-left-color: var(--status-danger);
+  }
 }
 
 .store-modal__layer-name {
@@ -939,8 +960,12 @@
 }
 
 @keyframes storeModalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes storeModalSlideIn {
@@ -951,5 +976,69 @@
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
+  }
+}
+
+// ── Classificação badge ──────────────────────────────────────────────────────
+.classificacao-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--gold {
+    color: #7a5200;
+    background-color: #fff3cd;
+  }
+
+  &--select {
+    color: var(--status-silver-strong);
+    background-color: var(--status-silver-soft);
+  }
+
+  &--prime {
+    color: #4a148c;
+    background-color: #f3e5f5;
+  }
+
+  &--neonatal {
+    color: var(--status-ok-strong);
+    background-color: var(--status-ok-soft);
+  }
+
+  &--implantacao {
+    color: var(--status-warning-strong);
+    background-color: var(--status-warning-soft);
+  }
+
+  &--inativo {
+    color: var(--status-nodata-strong);
+    background-color: var(--status-nodata-soft);
+  }
+
+  &--brasil {
+    color: #1b5e20;
+    background-color: #e8f5e9;
+  }
+
+  &--cloud {
+    color: #0d47a1;
+    background-color: #e3f2fd;
+  }
+
+  &--sngpc {
+    color: #4a148c;
+    background-color: #f3e5f5;
+  }
+
+  &--null {
+    color: var(--status-nodata-strong);
+    background-color: var(--status-nodata-soft);
   }
 }

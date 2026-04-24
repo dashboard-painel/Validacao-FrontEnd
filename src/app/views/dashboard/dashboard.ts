@@ -55,6 +55,7 @@ type DashboardData = {
     sitContrato: string | null;
     codigoRede: string | null;
     numVersao: string | null;
+    classificacao: string | null;
     possivelCausa: string | null;
   }[];
 };
@@ -70,7 +71,7 @@ type StatusBarItem = {
 type DelayedStoreItem = DashboardData['delayedStores'][number];
 type ProblemLayer = 'Gold' | 'Silver' | 'API' | 'Sem dados';
 type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
-type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'comDados';
+type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'classificacao';
 type LayerBadge = ProblemLayer | 'Sem atraso';
 type StoreStatus = 'Com atraso' | 'Sem atraso' | 'Sem dados';
 type CnpjOption = {
@@ -125,7 +126,7 @@ export class Dashboard {
   readonly selectedGlobalFilters = signal<Record<GlobalFilterKey, string[]>>({
     associationCode: [],
     sitContrato: ['Ativo'],
-    comDados: ['ativo'],
+    classificacao: ['Padrão'],
   });
   readonly globalFilterSearch = signal('');
   readonly openGlobalFilter = signal<GlobalFilterKey | null>(null);
@@ -156,7 +157,11 @@ export class Dashboard {
         !gf.sitContrato.includes(this.sitContratoGroupOf(f.sit_contrato))
       )
         return false;
-      if (gf.comDados.length > 0 && this.storeStatusOf(f) === 'Sem dados') return false;
+      if (
+        gf.classificacao.length > 0 &&
+        !gf.classificacao.includes(this.classificacaoGroupOf(f.classificacao))
+      )
+        return false;
       return true;
     });
   });
@@ -226,7 +231,8 @@ export class Dashboard {
     return [...new Set(values)].sort();
   });
   readonly globalSitContratoOptions = (): string[] => ['Ativo', 'Inativo'];
-  readonly filteredGlobalAssociationOptions = computed(() => {
+  readonly globalClassificacaoGroupOptions = (): string[] => ['Padrão', 'Cloud'];
+  readonly filteredGlobalAssociationOptions= computed(() => {
     const search = this.globalFilterSearch().toLowerCase();
     return this.globalAssociationOptions().filter((v) => v.toLowerCase().includes(search));
   });
@@ -239,12 +245,12 @@ export class Dashboard {
     const labelMap: Record<GlobalFilterKey, string> = {
       associationCode: 'Assoc.',
       sitContrato: 'Sit.',
-      comDados: 'Com dados',
+      classificacao: 'Classif.',
     };
     return (Object.keys(gf) as GlobalFilterKey[]).flatMap((key) =>
       gf[key].map((value) => ({
         key,
-        value: key === 'comDados' ? '' : value,
+        value,
         label: labelMap[key],
       })),
     );
@@ -253,7 +259,7 @@ export class Dashboard {
   removeGlobalFilterChip(key: GlobalFilterKey, value: string): void {
     this.selectedGlobalFilters.update((current) => ({
       ...current,
-      [key]: key === 'comDados' ? [] : current[key].filter((v) => v !== value),
+      [key]: current[key].filter((v) => v !== value),
     }));
   }
 
@@ -442,12 +448,41 @@ export class Dashboard {
     'DES MANIPULAÇÃO': 'sit-contrato-badge sit-contrato-badge--inativo',
   };
 
+  private readonly classificacaoClassMap: Record<string, string> = {
+    'GOLD': 'classificacao-badge classificacao-badge--gold',
+    'SELECT1': 'classificacao-badge classificacao-badge--select',
+    'SELECT2': 'classificacao-badge classificacao-badge--select',
+    'PRIME': 'classificacao-badge classificacao-badge--prime',
+    'NEONATAL': 'classificacao-badge classificacao-badge--neonatal',
+    'NEONATAL CLOUD': 'classificacao-badge classificacao-badge--neonatal',
+    'IMPLANTACAO': 'classificacao-badge classificacao-badge--implantacao',
+    '100% BRASIL': 'classificacao-badge classificacao-badge--brasil',
+    'CLOUD': 'classificacao-badge classificacao-badge--cloud',
+    'SNGPC': 'classificacao-badge classificacao-badge--sngpc',
+    'INATIVO': 'classificacao-badge classificacao-badge--inativo',
+  };
+
+  readonly classificacaoClass = (classificacao: string | null): string => {
+    if (!classificacao) return 'classificacao-badge classificacao-badge--null';
+    return (
+      this.classificacaoClassMap[classificacao.toUpperCase().trim()] ??
+      'classificacao-badge classificacao-badge--null'
+    );
+  };
+
   readonly sitContratoClass = (sit: string | null): string => {
     if (!sit) return 'sit-contrato-badge sit-contrato-badge--inativo';
     return (
       this.sitContratoClassMap[sit.toUpperCase().trim()] ??
       'sit-contrato-badge sit-contrato-badge--inativo'
     );
+  };
+
+  private readonly classificacaoGroupOf = (classif: string | null): 'Padrão' | 'Cloud' => {
+    if (!classif) return 'Padrão';
+    const upper = classif.toUpperCase().trim();
+    if (upper === 'CLOUD' || upper === 'NEONATAL CLOUD') return 'Cloud';
+    return 'Padrão';
   };
 
   private readonly sitContratoGroupOf = (sit: string | null): 'Ativo' | 'Inativo' => {
@@ -610,11 +645,6 @@ export class Dashboard {
     this.selectedGlobalFilters.update((current) => ({ ...current, [key]: [value] }));
   }
 
-  onComDadosToggle(event: Event): void {
-    const checked = this.readCheckboxChecked(event);
-    this.selectedGlobalFilters.update((f) => ({ ...f, comDados: checked ? ['ativo'] : [] }));
-  }
-
   onGlobalCheckboxFilter(key: GlobalFilterKey, value: string, event: Event): void {
     const checked = this.readCheckboxChecked(event);
     this.selectedGlobalFilters.update((current) => {
@@ -648,7 +678,7 @@ export class Dashboard {
   }
 
   clearGlobalFilters(): void {
-    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], comDados: [] });
+    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], classificacao: [] });
     this.globalFilterSearch.set('');
     this.openGlobalFilter.set(null);
   }
@@ -966,6 +996,7 @@ export class Dashboard {
       sitContrato: f.sit_contrato ?? null,
       codigoRede: f.codigo_rede ?? null,
       numVersao: f.num_versao ?? null,
+      classificacao: f.classificacao ?? null,
       possivelCausa: f.possivel_causa ?? null,
     };
   }

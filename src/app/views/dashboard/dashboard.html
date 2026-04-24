@@ -93,21 +93,44 @@
             </details>
           </div>
 
-          <!-- Com dados -->
+          <!-- Classificação -->
           <div class="global-filter__field">
-            <span class="global-filter__field-label">Com dados</span>
-            <div class="global-filter__toggle-wrapper">
-              <div class="form-check form-switch mb-0">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="comDadosToggle"
-                  role="switch"
-                  [checked]="selectedGlobalFilters().comDados.length > 0"
-                  (change)="onComDadosToggle($event)"
-                />
+            <span class="global-filter__field-label">Classificação</span>
+            <details
+              class="global-filter__dropdown"
+              [open]="isGlobalFilterOpen('classificacao')"
+              (toggle)="onGlobalFilterToggle('classificacao', $event)"
+            >
+              <summary class="form-select form-select-sm global-filter__trigger">
+                {{ globalFilterSummary('classificacao') }}
+              </summary>
+              <div class="global-filter__menu border rounded p-2 mt-1">
+                <div class="global-filter__checklist">
+                  <label class="form-check mb-1">
+                    <input
+                      type="radio"
+                      name="classificacaoGlobal"
+                      class="form-check-input"
+                      [checked]="isGlobalSelected('classificacao', 'Todos') || selectedGlobalFilters().classificacao.length === 0"
+                      (change)="selectedGlobalFilters.update(f => ({ ...f, classificacao: [] }))"
+                    />
+                    <span class="form-check-label text-secondary">Todos</span>
+                  </label>
+                  @for (opt of globalClassificacaoGroupOptions(); track opt) {
+                    <label class="form-check mb-1">
+                      <input
+                        type="radio"
+                        name="classificacaoGlobal"
+                        class="form-check-input"
+                        [checked]="isGlobalSelected('classificacao', opt)"
+                        (change)="onGlobalRadioFilter('classificacao', opt)"
+                      />
+                      <span class="form-check-label">{{ opt }}</span>
+                    </label>
+                  }
+                </div>
               </div>
-            </div>
+            </details>
           </div>
 
           @if (hasActiveGlobalFilters()) {
@@ -553,13 +576,14 @@
                     </th>
                     <th scope="col">Camada com atraso</th>
                     <th scope="col">Sit. Contrato</th>
+                    <th scope="col">Classificação</th>
                     <th scope="col">Possível Causa</th>
                   </tr>
                 </thead>
                 <tbody>
                   @if (filteredDelayedStoreCount() === 0) {
                     <tr>
-                      <td class="delayed-stores__empty text-center py-3" colspan="7">
+                      <td class="delayed-stores__empty text-center py-3" colspan="8">
                         Nenhuma loja encontrada com os filtros selecionados.
                       </td>
                     </tr>
@@ -623,6 +647,15 @@
                           }
                         </td>
                         <td>
+                          @if (store.classificacao) {
+                            <span [class]="classificacaoClass(store.classificacao)">
+                              {{ store.classificacao }}
+                            </span>
+                          } @else {
+                            <span class="text-body-secondary">—</span>
+                          }
+                        </td>
+                        <td>
                           @if (store.possivelCausa) {
                             <span class="delayed-stores__causa" [title]="store.possivelCausa">
                               {{ store.possivelCausa }}
@@ -635,7 +668,7 @@
                     }
                     @if (hasMoreRows()) {
                       <tr>
-                        <td class="text-body-secondary text-center py-2" colspan="7">
+                        <td class="text-body-secondary text-center py-2" colspan="8">
                           Role para carregar mais lojas...
                         </td>
                       </tr>
@@ -684,6 +717,16 @@
                 <span class="store-modal__value">{{ store.codigoRede }}</span>
               </div>
             }
+            <div class="store-modal__field">
+              <span class="store-modal__label">Classificação</span>
+              <span class="store-modal__value">
+                @if (store.classificacao) {
+                  <span [class]="classificacaoClass(store.classificacao)">{{ store.classificacao }}</span>
+                } @else {
+                  <span class="text-body-secondary">—</span>
+                }
+              </span>
+            </div>
           </div>
         </div>
 
