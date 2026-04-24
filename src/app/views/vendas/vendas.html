@@ -1,0 +1,286 @@
+<section data-testid="page-vendas" aria-labelledby="heading-vendas">
+  <h1 id="heading-vendas" data-testid="heading-vendas" class="visually-hidden">Vendas Parceiros</h1>
+
+  @if (isLoading()) {
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <!-- ── KPIs ─────────────────────────────────────────── -->
+      <section class="col-12" aria-label="Indicadores de vendas parceiros">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+          <div class="col">
+            <div class="vendas__kpi-card">
+              <span class="vendas__kpi-label">Total de Farmácias</span>
+              <strong class="vendas__kpi-value">{{ totalFarmacias() }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="vendas__kpi-card vendas__kpi-card--ok">
+              <span class="vendas__kpi-label">Ativas</span>
+              <strong class="vendas__kpi-value">{{ farmaciasAtivas() }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="vendas__kpi-card vendas__kpi-card--danger">
+              <span class="vendas__kpi-label">Inativas</span>
+              <strong class="vendas__kpi-value">{{ farmaciasInativas() }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="vendas__kpi-card vendas__kpi-card--info">
+              <span class="vendas__kpi-label">Venda nas últimas 24h</span>
+              <strong class="vendas__kpi-value">{{ comVendaRecente() }}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tabela ───────────────────────────────────────── -->
+      <section class="col-12" aria-label="Lista de vendas parceiros">
+        <article class="card vendas__card" role="group" aria-label="Lista de vendas parceiros">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+              <p class="vendas__title mb-0">Farmácias — Vendas Parceiros</p>
+              <div class="d-flex align-items-center gap-2">
+                @if (ultimaAtualizacao(); as ts) {
+                  <span class="vendas__update-badge">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Atualizado: {{ formatDate(ts) }}
+                  </span>
+                }
+                <span class="vendas__count">{{ filteredStores().length }} de {{ stores().length }} farmácias</span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="isRefreshing()"
+                  (click)="onAtualizar()"
+                  title="Consultar Redshift e atualizar dados"
+                >
+                  @if (isRefreshing()) {
+                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    Atualizando...
+                  } @else {
+                    <i class="bi bi-arrow-clockwise me-1"></i>
+                    Atualizar
+                  }
+                </button>
+              </div>
+            </div>
+            @if (refreshError()) {
+              <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>{{ refreshError() }}
+              </div>
+            }
+
+            <!-- ── Filtros ──────────────────────────────── -->
+            <div class="vendas__filters-panel mb-3">
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                <p class="vendas__filters-title mb-0">Filtros</p>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  [disabled]="!hasActiveFilters()"
+                  (click)="clearFilters()"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+
+              <div class="row g-2">
+                <!-- Associação -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                  <label class="form-label vendas__filter-label mb-1">Associação</label>
+                  <details
+                    class="vendas__dropdown"
+                    [open]="isFilterOpen('associacao')"
+                    (toggle)="onFilterToggle('associacao', $event)"
+                  >
+                    <summary class="form-select form-select-sm vendas__dropdown-trigger">
+                      {{ filterSummary('associacao') }}
+                    </summary>
+                    <div class="vendas__dropdown-menu border rounded p-2 mt-1">
+                      <input
+                        type="text"
+                        class="form-control form-control-sm mb-2"
+                        placeholder="Buscar associação..."
+                        [value]="filterSearch().associacao"
+                        (input)="onFilterSearch('associacao', $event)"
+                      />
+                      <div class="vendas__checklist">
+                        @if (filteredAssociacaoOptions().length === 0) {
+                          <small class="text-body-secondary d-block">Nenhuma associação encontrada.</small>
+                        } @else {
+                          @for (opt of filteredAssociacaoOptions(); track opt) {
+                            <label class="form-check mb-1">
+                              <input
+                                type="checkbox"
+                                class="form-check-input"
+                                [checked]="isSelected('associacao', opt)"
+                                (change)="onCheckboxFilter('associacao', opt, $event)"
+                              />
+                              <span class="form-check-label">{{ opt }}</span>
+                            </label>
+                          }
+                        }
+                      </div>
+                    </div>
+                  </details>
+                </div>
+
+                <!-- Sit. Contrato -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                  <label class="form-label vendas__filter-label mb-1">Sit. Contrato</label>
+                  <details
+                    class="vendas__dropdown"
+                    [open]="isFilterOpen('sitContrato')"
+                    (toggle)="onFilterToggle('sitContrato', $event)"
+                  >
+                    <summary class="form-select form-select-sm vendas__dropdown-trigger">
+                      {{ filterSummary('sitContrato') }}
+                    </summary>
+                    <div class="vendas__dropdown-menu border rounded p-2 mt-1">
+                      <div class="vendas__checklist">
+                        @for (opt of sitContratoOptions(); track opt) {
+                          <label class="form-check mb-1">
+                            <input
+                              type="checkbox"
+                              class="form-check-input"
+                              [checked]="isSelected('sitContrato', opt)"
+                              (change)="onCheckboxFilter('sitContrato', opt, $event)"
+                            />
+                            <span [class]="sitContratoClass(opt)" style="pointer-events:none">{{ opt }}</span>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  </details>
+                </div>
+
+                <!-- Nome -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                  <label class="form-label vendas__filter-label mb-1">Nome</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="Ex.: Farmácia Central"
+                    [value]="nameFilter()"
+                    (input)="onNameFilter($event)"
+                  />
+                </div>
+
+                <!-- Cód Farmácia -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                  <label class="form-label vendas__filter-label mb-1">Cód. Farmácia</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    placeholder="Ex.: 12345"
+                    [value]="codFarmaciaFilter()"
+                    (input)="onCodFarmaciaFilter($event)"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Table ────────────────────────────────── -->
+            <div class="vendas__table-wrap" (scroll)="onTableScroll($event)">
+              <table class="table vendas__table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col" class="vendas__th--sortable" (click)="sortBy('associacao')">
+                      Associação
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'associacao' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'associacao' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'associacao'"></i>
+                    </th>
+                    <th scope="col" class="vendas__th--sortable" (click)="sortBy('cod_farmacia')">
+                      Cód. Farmácia
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'cod_farmacia' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'cod_farmacia' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'cod_farmacia'"></i>
+                    </th>
+                    <th scope="col" class="vendas__th--sortable" (click)="sortBy('nome_farmacia')">
+                      Nome
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'nome_farmacia' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'nome_farmacia' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'nome_farmacia'"></i>
+                    </th>
+                    <th scope="col">Sit. Contrato</th>
+                    <th scope="col" class="vendas__th--sortable" (click)="sortBy('ultima_venda_parceiros')">
+                      Última Venda
+                      <i class="bi"
+                        [class.bi-chevron-up]="sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'asc'"
+                        [class.bi-chevron-down]="sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'desc'"
+                        [class.bi-chevron-expand]="sortColumn() !== 'ultima_venda_parceiros'"></i>
+                    </th>
+                    <th scope="col">Recência</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (sortedStores().length === 0) {
+                    <tr>
+                      <td class="vendas__empty text-center py-3" colspan="6">
+                        Nenhuma farmácia encontrada com os filtros selecionados.
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (store of visibleRows(); track store.cod_farmacia + store.associacao) {
+                      <tr class="vendas__table-row">
+                        <td class="vendas__td-identity">
+                          <span class="vendas__code-primary">{{ store.associacao }}</span>
+                          @if (store.associacao_parceiro && store.associacao_parceiro !== store.associacao) {
+                            <small class="vendas__code-sub">Parceiro {{ store.associacao_parceiro }}</small>
+                          }
+                        </td>
+                        <td class="vendas__td-identity">
+                          <span class="vendas__code-primary">{{ store.cod_farmacia }}</span>
+                          @if (store.farmacia) {
+                            <small class="vendas__code-sub">{{ store.farmacia }}</small>
+                          }
+                        </td>
+                        <td class="vendas__td-store">
+                          <span class="vendas__store-name">{{ store.nome_farmacia ?? '—' }}</span>
+                        </td>
+                        <td>
+                          @if (store.sit_contrato) {
+                            <span [class]="sitContratoClass(store.sit_contrato)">
+                              {{ store.sit_contrato }}
+                            </span>
+                          } @else {
+                            <span class="text-body-secondary">—</span>
+                          }
+                        </td>
+                        <td class="vendas__td-date">
+                          <span class="vendas__date-value">{{ formatDate(store.ultima_venda_parceiros) }}</span>
+                        </td>
+                        <td>
+                          <span [class]="vendaRecenciaBadge(store.ultima_venda_parceiros)">
+                            {{ vendaRecenciaLabel(store.ultima_venda_parceiros) }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                    @if (hasMoreRows()) {
+                      <tr>
+                        <td class="text-body-secondary text-center py-2" colspan="6">
+                          Role para carregar mais farmácias...
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  }
+</section>
