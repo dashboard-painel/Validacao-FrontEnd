@@ -163,22 +163,27 @@
   border-radius: 0.4rem;
   padding: 0.2rem 0.5rem;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
 
   &--critical {
-    color: var(--status-danger-strong);
-    background-color: var(--status-danger-soft);
+    color: var(--status-danger);
+    background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
   }
 
   &--high {
     color: var(--status-warning-strong);
-    background-color: var(--status-warning-soft);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
   }
 
   &--moderate {
-    color: var(--status-silver-strong);
-    background-color: var(--status-silver-soft);
+    color: var(--status-silver);
+    background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
   }
 
   &--ok {
@@ -640,8 +645,9 @@
   border-radius: 999px;
   padding: 0.18rem 0.5rem;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
+  border: 1px solid transparent;
 }
 
 // ── Cell layers + inline dates ─────────────────────────────
@@ -708,27 +714,32 @@
 
 .delayed-stores__layer--gold {
   color: var(--status-warning-strong);
-  background-color: var(--status-warning-soft);
+  background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
 }
 
 .delayed-stores__layer--silver {
   color: var(--status-silver-strong);
-  background-color: var(--status-silver-soft);
+  background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
 }
 
 .delayed-stores__layer--api {
-  color: var(--status-danger-strong);
-  background-color: var(--status-danger-soft);
+  color: var(--status-danger);
+  background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
 }
 
 .delayed-stores__layer--ok {
-  color: var(--status-ok-strong);
-  background-color: var(--status-ok-soft);
+  color: var(--status-ok);
+  background-color: color-mix(in srgb, var(--status-ok) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-ok) 28%, transparent);
 }
 
 .delayed-stores__layer--nodata {
   color: var(--status-nodata-strong);
-  background-color: var(--status-nodata-soft);
+  background-color: color-mix(in srgb, var(--status-nodata) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-nodata) 28%, transparent);
 }
 
 // ── Situação de contrato ───────────────────────────────────
@@ -739,44 +750,51 @@
   border-radius: 999px;
   padding: 0.18rem 0.55rem;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
   text-transform: capitalize;
+  border: 1px solid transparent;
 
   // ATIVO
   &--ativo {
-    color: var(--status-ok-strong);
-    background-color: var(--status-ok-soft);
+    color: var(--status-ok);
+    background-color: color-mix(in srgb, var(--status-ok) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-ok) 28%, transparent);
   }
 
   // ATIVO-RETIDO, ATIVO-ACORDO FINANCEIRO
   &--ativo-pendente {
     color: var(--status-warning-strong);
-    background-color: var(--status-warning-soft);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
   }
 
   // ISENTO, IMPLANTACAO, PARCEIROS
   &--em-processo {
     color: var(--status-silver-strong);
-    background-color: var(--status-silver-soft);
+    background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
   }
 
   // INATIVO, SUBSTITUIÇÃO, DES MANIPULAÇÃO
   &--inativo {
     color: var(--status-nodata-strong);
-    background-color: var(--status-nodata-soft);
+    background-color: color-mix(in srgb, var(--status-nodata) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-nodata) 28%, transparent);
   }
 
   // INADIMPLENTE, DESISTENTE
   &--inadimplente {
-    color: var(--status-danger-strong);
-    background-color: var(--status-danger-soft);
+    color: var(--status-danger);
+    background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
   }
 
   // BAIXA TEMPORARIA, CONGELADO
   &--suspenso {
     color: var(--status-warning-alt, #b98312);
-    background-color: var(--status-warning-soft);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
   }
 }
 
@@ -808,7 +826,6 @@
   transform: translate(-50%, -50%);
   z-index: 1050;
   width: min(92vw, 32rem);
-  max-height: 85vh;
   display: flex;
   flex-direction: column;
   border-radius: 0.85rem;
@@ -861,8 +878,6 @@
 
 .store-modal__body {
   padding: 1rem;
-  overflow-y: auto;
-  flex: 1;
 }
 
 .store-modal__section {
@@ -987,58 +1002,62 @@
   border-radius: 999px;
   padding: 0.18rem 0.55rem;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  border: 1px solid transparent;
+  color: var(--painel-text-strong);
 
   &--gold {
-    color: #7a5200;
-    background-color: #fff3cd;
+    background-color: color-mix(in srgb, #c7911a 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #c7911a 38%, transparent);
   }
 
   &--select {
-    color: var(--status-silver-strong);
-    background-color: var(--status-silver-soft);
+    background-color: color-mix(in srgb, var(--status-silver) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 38%, transparent);
   }
 
   &--prime {
-    color: #4a148c;
-    background-color: #f3e5f5;
+    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
   }
 
   &--neonatal {
-    color: var(--status-ok-strong);
-    background-color: var(--status-ok-soft);
+    background-color: color-mix(in srgb, var(--status-ok) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-ok) 38%, transparent);
   }
 
   &--implantacao {
-    color: var(--status-warning-strong);
-    background-color: var(--status-warning-soft);
+    background-color: color-mix(in srgb, var(--status-warning) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 38%, transparent);
   }
 
   &--inativo {
     color: var(--status-nodata-strong);
-    background-color: var(--status-nodata-soft);
+    background-color: color-mix(in srgb, var(--status-nodata) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-nodata) 38%, transparent);
   }
 
   &--brasil {
-    color: #1b5e20;
-    background-color: #e8f5e9;
+    background-color: color-mix(in srgb, #2e7d32 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #2e7d32 38%, transparent);
   }
 
   &--cloud {
-    color: #0d47a1;
-    background-color: #e3f2fd;
+    background-color: color-mix(in srgb, #1976d2 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #1976d2 38%, transparent);
   }
 
   &--sngpc {
-    color: #4a148c;
-    background-color: #f3e5f5;
+    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
   }
 
   &--null {
-    color: var(--status-nodata-strong);
-    background-color: var(--status-nodata-soft);
+    color: var(--painel-muted);
+    background-color: var(--painel-surface-soft);
+    border-color: var(--painel-border);
   }
 }

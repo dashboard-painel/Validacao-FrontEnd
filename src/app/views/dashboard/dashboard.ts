@@ -940,7 +940,7 @@ export class Dashboard {
         apiDelayed: stores.filter((s) => s.problemLayers.includes('API')).length,
         noData: storesWithoutData,
       },
-      gauge: { totalStores, okStores },
+      gauge: { totalStores, okStores: okStores + storesWithoutData },
       delayedStores: stores,
     };
   }
