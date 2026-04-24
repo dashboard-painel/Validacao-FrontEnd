@@ -321,8 +321,28 @@
   }
 
   &--inativo {
+    color: var(--status-danger-strong);
+    background-color: var(--status-danger-soft);
+  }
+
+  &--implantacao {
+    color: var(--status-silver-strong);
+    background-color: var(--status-silver-soft);
+  }
+
+  &--desistente {
+    color: var(--status-warning-strong);
+    background-color: var(--status-warning-soft);
+  }
+
+  &--isento {
     color: var(--status-nodata-strong);
     background-color: var(--status-nodata-soft);
+  }
+
+  &--parceiros {
+    color: var(--painel-primary-strong);
+    background-color: var(--painel-primary-soft);
   }
 }
 

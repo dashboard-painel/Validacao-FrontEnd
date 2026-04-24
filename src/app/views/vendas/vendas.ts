@@ -160,6 +160,10 @@ export class Vendas {
   readonly sitContratoClassMap: Record<string, string> = {
     ATIVO: 'vendas__sit-badge vendas__sit-badge--ativo',
     INATIVO: 'vendas__sit-badge vendas__sit-badge--inativo',
+    IMPLANTACAO: 'vendas__sit-badge vendas__sit-badge--implantacao',
+    DESISTENTE: 'vendas__sit-badge vendas__sit-badge--desistente',
+    ISENTO: 'vendas__sit-badge vendas__sit-badge--isento',
+    PARCEIROS: 'vendas__sit-badge vendas__sit-badge--parceiros',
   };
 
   constructor() {
