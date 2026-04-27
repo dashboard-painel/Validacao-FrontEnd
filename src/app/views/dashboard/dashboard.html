@@ -10,13 +10,10 @@
   } @else {
     <!-- ── Filtro Global ──────────────────────────────────────────── -->
     <div class="global-filter-bar">
-      <span class="global-filter-bar__label">
-        <i class="bi bi-funnel me-1"></i>Filtro global
-      </span>
+      <span class="global-filter-bar__label"> <i class="bi bi-funnel me-1"></i>Filtro global </span>
 
       <div class="global-filter-bar__card">
         <div class="d-flex align-items-end gap-2 flex-wrap justify-content-center">
-
           <!-- Associação -->
           <div class="global-filter__field">
             <span class="global-filter__field-label">Associação</span>
@@ -72,7 +69,7 @@
                       name="sitContratoGlobal"
                       class="form-check-input"
                       [checked]="selectedGlobalFilters().sitContrato.length === 0"
-                      (change)="selectedGlobalFilters.update(f => ({ ...f, sitContrato: [] }))"
+                      (change)="selectedGlobalFilters.update((f) => ({ ...f, sitContrato: [] }))"
                     />
                     <span class="form-check-label text-secondary">Todos</span>
                   </label>
@@ -85,7 +82,9 @@
                         [checked]="isGlobalSelected('sitContrato', opt)"
                         (change)="onGlobalRadioFilter('sitContrato', opt)"
                       />
-                      <span [class]="sitContratoClass(opt)" style="pointer-events:none">{{ opt }}</span>
+                      <span [class]="sitContratoClass(opt)" style="pointer-events: none">{{
+                        opt
+                      }}</span>
                     </label>
                   }
                 </div>
@@ -111,8 +110,11 @@
                       type="radio"
                       name="classificacaoGlobal"
                       class="form-check-input"
-                      [checked]="isGlobalSelected('classificacao', 'Todos') || selectedGlobalFilters().classificacao.length === 0"
-                      (change)="selectedGlobalFilters.update(f => ({ ...f, classificacao: [] }))"
+                      [checked]="
+                        isGlobalSelected('classificacao', 'Todos') ||
+                        selectedGlobalFilters().classificacao.length === 0
+                      "
+                      (change)="selectedGlobalFilters.update((f) => ({ ...f, classificacao: [] }))"
                     />
                     <span class="form-check-label text-secondary">Todos</span>
                   </label>
@@ -154,7 +156,9 @@
                 (click)="removeGlobalFilterChip(chip.key, chip.value)"
               >
                 <span class="global-filter__chip-label">{{ chip.label }}</span>
-                @if (chip.value) { {{ chip.value }} }
+                @if (chip.value) {
+                  {{ chip.value }}
+                }
                 <i class="bi bi-x"></i>
               </button>
             }
@@ -268,10 +272,18 @@
                   class="btn btn-sm btn-primary"
                   [disabled]="!comparableAssociation() || isComparing()"
                   (click)="onComparar()"
-                  [title]="comparableAssociation() ? 'Comparar associação ' + comparableAssociation() : 'Selecione exatamente 1 associação para comparar'"
+                  [title]="
+                    comparableAssociation()
+                      ? 'Comparar associação ' + comparableAssociation()
+                      : 'Selecione exatamente 1 associação para comparar'
+                  "
                 >
                   @if (isComparing()) {
-                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                    <span
+                      class="spinner-border spinner-border-sm me-1"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Comparando...
                   } @else {
                     <i class="bi bi-arrow-clockwise me-1"></i>
@@ -514,7 +526,9 @@
                               [checked]="selectedSitContratosLocal().includes(sit)"
                               (change)="onSitContratoLocalCheckbox(sit, $event)"
                             />
-                            <span [class]="sitContratoClass(sit)" style="pointer-events:none">{{ sit }}</span>
+                            <span [class]="sitContratoClass(sit)" style="pointer-events: none">{{
+                              sit
+                            }}</span>
                           </label>
                         }
                       </div>
@@ -539,40 +553,65 @@
               </div>
             </div>
 
-            <div
-              class="delayed-stores__table-wrap"
-              (scroll)="onTableScroll($event)"
-            >
+            <div class="delayed-stores__table-wrap" (scroll)="onTableScroll($event)">
               <table class="table delayed-stores__table align-middle mb-0">
                 <thead>
                   <tr>
-                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('associationCode')">
+                    <th
+                      scope="col"
+                      class="delayed-stores__th--sortable"
+                      (click)="sortBy('associationCode')"
+                    >
                       Cód Assoc.
-                      <i class="bi"
-                        [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"></i>
+                      <i
+                        class="bi"
+                        [class.bi-chevron-up]="
+                          sortColumn() === 'associationCode' && sortDir() === 'asc'
+                        "
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'associationCode' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"
+                      ></i>
                     </th>
-                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('farmaCode')">
+                    <th
+                      scope="col"
+                      class="delayed-stores__th--sortable"
+                      (click)="sortBy('farmaCode')"
+                    >
                       Cód. Farma
-                      <i class="bi"
+                      <i
+                        class="bi"
                         [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"></i>
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'farmaCode' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"
+                      ></i>
                     </th>
                     <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('cnpj')">
                       CNPJ
-                      <i class="bi"
+                      <i
+                        class="bi"
                         [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
                         [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"></i>
+                        [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"
+                      ></i>
                     </th>
-                    <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('delayHours')">
+                    <th
+                      scope="col"
+                      class="delayed-stores__th--sortable"
+                      (click)="sortBy('delayHours')"
+                    >
                       Atraso
-                      <i class="bi"
+                      <i
+                        class="bi"
                         [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"></i>
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'delayHours' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"
+                      ></i>
                     </th>
                     <th scope="col">Camada com atraso</th>
                     <th scope="col">Sit. Contrato</th>
@@ -590,13 +629,20 @@
                   } @else {
                     @for (store of visibleDelayedStoreRows(); track store.id) {
                       <tr
-                        [class]="'delayed-stores__table-row delayed-stores__table-row--' + rowUrgencyClass(store)"
+                        [class]="
+                          'delayed-stores__table-row delayed-stores__table-row--' +
+                          rowUrgencyClass(store)
+                        "
                         (click)="openStoreModal(store)"
                       >
                         <td class="delayed-stores__td-identity">
-                          <span class="delayed-stores__code-primary">{{ store.associationCode }}</span>
+                          <span class="delayed-stores__code-primary">{{
+                            store.associationCode
+                          }}</span>
                           @if (store.codigoRede) {
-                            <small class="delayed-stores__code-sub">Rede {{ store.codigoRede }}</small>
+                            <small class="delayed-stores__code-sub"
+                              >Rede {{ store.codigoRede }}</small
+                            >
                           }
                         </td>
                         <td class="delayed-stores__td-identity">
@@ -612,12 +658,24 @@
                           }
                         </td>
                         <td>
-                          @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
-                            <span [class]="'delayed-stores__delay-badge delayed-stores__delay-badge--' + urgencyClass(store.delayHours)">
+                          @if (
+                            store.problemLayers.length > 0 &&
+                            !store.problemLayers.includes('Sem dados') &&
+                            store.delayHours > 0
+                          ) {
+                            <span
+                              [class]="
+                                'delayed-stores__delay-badge delayed-stores__delay-badge--' +
+                                urgencyClass(store.delayHours)
+                              "
+                            >
                               {{ formatDelay(store.delayHours) }}
                             </span>
                           } @else {
-                            <span class="delayed-stores__delay-badge delayed-stores__delay-badge--ok">—</span>
+                            <span
+                              class="delayed-stores__delay-badge delayed-stores__delay-badge--ok"
+                              >—</span
+                            >
                           }
                         </td>
                         <td class="delayed-stores__td-layers">
@@ -629,10 +687,17 @@
                             </div>
                           </div>
                           <div class="delayed-stores__layers-dates">
-                            @for (entry of ['Gold', 'Silver', 'API']; track entry) {
-                              <span [class]="'delayed-stores__date-row delayed-stores__date-row--' + entry.toLowerCase()">
+                            @for (entry of ['Gold', 'Silver', 'Coletor']; track entry) {
+                              <span
+                                [class]="
+                                  'delayed-stores__date-row delayed-stores__date-row--' +
+                                  entry.toLowerCase()
+                                "
+                              >
                                 <span class="delayed-stores__date-label">{{ entry }}</span>
-                                <span class="delayed-stores__date-value">{{ layerLastSale(store, entry) }}</span>
+                                <span class="delayed-stores__date-value">{{
+                                  layerLastSale(store, entry)
+                                }}</span>
                               </span>
                             }
                           </div>
@@ -690,7 +755,12 @@
         <h2 id="store-modal-title" class="store-modal__title">
           <i class="bi bi-shop me-2"></i>{{ store.pharmacyName }}
         </h2>
-        <button type="button" class="store-modal__close" aria-label="Fechar" (click)="closeStoreModal()">
+        <button
+          type="button"
+          class="store-modal__close"
+          aria-label="Fechar"
+          (click)="closeStoreModal()"
+        >
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -721,7 +791,9 @@
               <span class="store-modal__label">Classificação</span>
               <span class="store-modal__value">
                 @if (store.classificacao) {
-                  <span [class]="classificacaoClass(store.classificacao)">{{ store.classificacao }}</span>
+                  <span [class]="classificacaoClass(store.classificacao)">{{
+                    store.classificacao
+                  }}</span>
                 } @else {
                   <span class="text-body-secondary">—</span>
                 }
@@ -736,7 +808,16 @@
             <div class="store-modal__field">
               <span class="store-modal__label">Status geral</span>
               <span class="store-modal__value">
-                <span [class]="'delayed-stores__layer delayed-stores__layer--' + (store.status === 'Sem atraso' ? 'ok' : store.status === 'Sem dados' ? 'nodata' : 'api')">
+                <span
+                  [class]="
+                    'delayed-stores__layer delayed-stores__layer--' +
+                    (store.status === 'Sem atraso'
+                      ? 'ok'
+                      : store.status === 'Sem dados'
+                        ? 'nodata'
+                        : 'api')
+                  "
+                >
                   {{ store.status }}
                 </span>
               </span>
@@ -744,8 +825,17 @@
             <div class="store-modal__field">
               <span class="store-modal__label">Atraso</span>
               <span class="store-modal__value">
-                @if (store.problemLayers.length > 0 && !store.problemLayers.includes('Sem dados') && store.delayHours > 0) {
-                  <span [class]="'delayed-stores__delay-badge delayed-stores__delay-badge--' + urgencyClass(store.delayHours)">
+                @if (
+                  store.problemLayers.length > 0 &&
+                  !store.problemLayers.includes('Sem dados') &&
+                  store.delayHours > 0
+                ) {
+                  <span
+                    [class]="
+                      'delayed-stores__delay-badge delayed-stores__delay-badge--' +
+                      urgencyClass(store.delayHours)
+                    "
+                  >
                     {{ formatDelay(store.delayHours) }}
                   </span>
                 } @else {
@@ -774,8 +864,10 @@
             }
           </div>
           <div class="store-modal__layers-detail">
-            @for (entry of ['Gold', 'Silver', 'API']; track entry) {
-              <div [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()">
+            @for (entry of ['Gold', 'Silver', 'Coletor']; track entry) {
+              <div
+                [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()"
+              >
                 <span class="store-modal__layer-name">{{ entry }}</span>
                 <span class="store-modal__layer-date">
                   {{ layerLastSale(store, entry) }}
@@ -810,8 +902,17 @@
               <span class="coletor-info-value">
                 @if (coletorSchedule(store.numVersao); as schedule) {
                   <span class="coletor-info-schedule">
-                    <span [class]="'coletor-info-dot coletor-info-dot--' + (schedule === 'horário comercial' ? 'comercial' : 'fora')"></span>
-                    {{ schedule === 'horário comercial' ? 'Horário comercial' : 'Fora do horário comercial' }}
+                    <span
+                      [class]="
+                        'coletor-info-dot coletor-info-dot--' +
+                        (schedule === 'horário comercial' ? 'comercial' : 'fora')
+                      "
+                    ></span>
+                    {{
+                      schedule === 'horário comercial'
+                        ? 'Horário comercial'
+                        : 'Fora do horário comercial'
+                    }}
                   </span>
                 } @else {
                   <span class="text-body-secondary">Não informado</span>
@@ -823,7 +924,9 @@
       </div>
 
       <div class="store-modal__footer">
-        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeStoreModal()">Fechar</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="closeStoreModal()">
+          Fechar
+        </button>
       </div>
     </div>
   }
