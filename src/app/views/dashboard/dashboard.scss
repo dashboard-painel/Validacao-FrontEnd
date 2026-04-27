@@ -689,7 +689,7 @@
   &--silver::before {
     background-color: var(--status-silver);
   }
-  &--api::before {
+  &--coletor::before {
     background-color: var(--status-danger);
   }
 }
@@ -724,7 +724,7 @@
   border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
 }
 
-.delayed-stores__layer--api {
+.delayed-stores__layer--coletor {
   color: var(--status-danger);
   background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
   border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
@@ -943,7 +943,7 @@
   &--silver {
     border-left-color: var(--status-silver);
   }
-  &--api {
+  &--coletor {
     border-left-color: var(--status-danger);
   }
 }

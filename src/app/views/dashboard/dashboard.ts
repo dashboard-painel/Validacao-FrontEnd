@@ -69,7 +69,7 @@ type StatusBarItem = {
 };
 
 type DelayedStoreItem = DashboardData['delayedStores'][number];
-type ProblemLayer = 'Gold' | 'Silver' | 'API' | 'Sem dados';
+type ProblemLayer = 'Gold' | 'Silver' | 'Coletor' | 'Sem dados';
 type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
 type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'classificacao';
 type LayerBadge = ProblemLayer | 'Sem atraso';
@@ -210,7 +210,7 @@ export class Dashboard {
     ];
   });
 
-  readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'API'];
+  readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'Coletor'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
   readonly sitContratoOptions = computed(() => {
     const values = this.dashboardData().delayedStores
@@ -821,8 +821,8 @@ export class Dashboard {
         return 'delayed-stores__layer delayed-stores__layer--gold';
       case 'Silver':
         return 'delayed-stores__layer delayed-stores__layer--silver';
-      case 'API':
-        return 'delayed-stores__layer delayed-stores__layer--api';
+      case 'Coletor':
+        return 'delayed-stores__layer delayed-stores__layer--coletor';
       case 'Sem atraso':
         return 'delayed-stores__layer delayed-stores__layer--ok';
       default:
@@ -834,7 +834,7 @@ export class Dashboard {
     switch (layer) {
       case 'Gold':    return 'Gold em atraso';
       case 'Silver':  return 'Silver em atraso';
-      case 'API':     return 'Migração Pendente';
+      case 'Coletor':  return 'Migração Pendente';
       default:        return layer;
     }
   }
@@ -852,7 +852,7 @@ export class Dashboard {
   }
 
   private toLayerTooltip(store: DelayedStoreItem): string {
-    return (['Gold', 'Silver', 'API'] as const)
+    return (['Gold', 'Silver', 'Coletor'] as const)
       .map((layer) => {
         const date = store.lastSalesByLayer?.[layer] ?? 'Sem dados';
         return `Último dado de venda (${layer}): ${date}`;
@@ -937,7 +937,7 @@ export class Dashboard {
         ok: okStores,
         goldDelayed: stores.filter((s) => s.problemLayers.includes('Gold')).length,
         silverDelayed: stores.filter((s) => s.problemLayers.includes('Silver')).length,
-        apiDelayed: stores.filter((s) => s.problemLayers.includes('API')).length,
+        apiDelayed: stores.filter((s) => s.problemLayers.includes('Coletor')).length,
         noData: storesWithoutData,
       },
       gauge: { totalStores, okStores: okStores + storesWithoutData },
@@ -965,7 +965,7 @@ export class Dashboard {
         if (camada === 'GoldVendas' && !problemLayers.includes('Gold')) problemLayers.push('Gold');
         else if (camada === 'SilverSTGN_Dedup' && !problemLayers.includes('Silver'))
           problemLayers.push('Silver');
-        else if (camada === 'API' && !problemLayers.includes('API')) problemLayers.push('API');
+        else if (camada === 'API' && !problemLayers.includes('Coletor')) problemLayers.push('Coletor');
       }
     }
 
@@ -980,7 +980,7 @@ export class Dashboard {
     const lastSalesByLayer: Partial<Record<ProblemLayer, string>> = {};
     if (goldDatetime) lastSalesByLayer['Gold'] = goldDatetime;
     if (silverDatetime) lastSalesByLayer['Silver'] = silverDatetime;
-    if (apiDatetime) lastSalesByLayer['API'] = apiDatetime;
+    if (apiDatetime) lastSalesByLayer['Coletor'] = apiDatetime;
     if (problemLayers.includes('Sem dados'))
       lastSalesByLayer['Sem dados'] = 'Sem recebimento de vendas';
 
@@ -997,7 +997,7 @@ export class Dashboard {
       codigoRede: f.codigo_rede ?? null,
       numVersao: f.num_versao ?? null,
       classificacao: f.classificacao ?? null,
-      possivelCausa: f.possivel_causa ?? null,
+      possivelCausa: this.formatPossivelCausa(f.possivel_causa),
     };
   }
 
@@ -1027,7 +1027,7 @@ export class Dashboard {
           f.ultima_venda_SilverSTGN_Dedup && f.ultima_hora_venda_SilverSTGN_Dedup
             ? `${f.ultima_venda_SilverSTGN_Dedup} ${f.ultima_hora_venda_SilverSTGN_Dedup}`
             : null;
-      } else if (layer === 'API') {
+      } else if (layer === 'Coletor') {
         raw =
           f.coletor_bi_ultima_data && f.coletor_bi_ultima_hora
             ? `${f.coletor_bi_ultima_data} ${f.coletor_bi_ultima_hora}`
@@ -1041,6 +1041,14 @@ export class Dashboard {
     }
 
     return Math.round(maxMs / (1000 * 60 * 60));
+  }
+
+  private formatPossivelCausa(causa: string | null): string | null {
+    if (!causa) return null;
+    return causa.replace(
+      /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}:\d{2}:\d{2})(?:\.\d+)?/g,
+      (_, year, month, day, time) => `${day}/${month}/${year} ${time}`,
+    );
   }
 
   private formatDatetime(datetime: string | null): string | null {
