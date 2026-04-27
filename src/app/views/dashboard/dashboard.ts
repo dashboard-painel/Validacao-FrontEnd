@@ -194,7 +194,7 @@ export class Dashboard {
         itemClass: 'status-chart__item status-chart__item--warning-alt',
       },
       {
-        label: 'API ATRASADA',
+        label: 'MIGRAÇÃO PENDENTE',
         value: data.statuses.apiDelayed,
         percent: this.toPercent(data.statuses.apiDelayed, total),
         barClass: 'progress-bar bg-danger',
@@ -834,7 +834,7 @@ export class Dashboard {
     switch (layer) {
       case 'Gold':    return 'Gold em atraso';
       case 'Silver':  return 'Silver em atraso';
-      case 'API':     return 'API em atraso';
+      case 'API':     return 'Migração Pendente';
       default:        return layer;
     }
   }
