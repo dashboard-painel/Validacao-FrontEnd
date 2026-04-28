@@ -1,4 +1,4 @@
-﻿<section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
+<section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
   <h1 id="heading-dashboard" data-testid="heading-dashboard" class="visually-hidden">Dashboard</h1>
 
   @if (isLoading()) {
@@ -84,29 +84,23 @@
         </article>
       </section>
 
-      <section id="secao-lojas-monitoradas" class="col-12" aria-label="Lista de lojas monitoradas">
-        <article
-          class="card delayed-stores-card"
-          role="group"
-          aria-label="Lista de lojas monitoradas"
-        >
+      <section id="secao-lojas-monitoradas" class="col-12" aria-labelledby="heading-lojas-monitoradas">
+        <article class="card delayed-stores-card">
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-              <p class="delayed-stores__title mb-0">Lojas monitoradas</p>
+              <p id="heading-lojas-monitoradas" class="delayed-stores__title mb-0">Lojas monitoradas</p>
               <div class="d-flex align-items-center gap-2">
                 <span class="delayed-stores__count"
                   >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows().length }} lojas</span
                 >
+                <span id="compare-hint" class="visually-hidden">{{ compareButtonTitle() }}</span>
                 <button
                   type="button"
                   class="btn btn-sm btn-primary"
                   [disabled]="!comparableAssociation() || isComparing()"
                   (click)="onComparar()"
-                  [title]="
-                    comparableAssociation()
-                      ? 'Comparar associação ' + comparableAssociation()
-                      : 'Selecione exatamente 1 associação para comparar'
-                  "
+                  [title]="compareButtonTitle()"
+                  aria-describedby="compare-hint"
                 >
                   @if (isComparing()) {
                     <span

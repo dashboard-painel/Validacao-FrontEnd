@@ -2,52 +2,35 @@
   display: block;
 }
 
-// ── Filtro Global ──────────────────────────────────────────
-.global-filter-bar {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
+// ── Card ──────────────────────────────────────────────────
 .global-filter-bar__card {
   background-color: var(--painel-surface-soft);
   border: 1px solid var(--painel-border);
   border-radius: 0.78rem;
   padding: 0.45rem 0.75rem;
   box-shadow: var(--painel-shadow-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
 }
 
+// ── Label ─────────────────────────────────────────────────
 .global-filter-bar__label {
   color: var(--painel-muted);
   font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
-  white-space: nowrap;
 }
 
+// ── Field ─────────────────────────────────────────────────
 .global-filter__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
   min-width: 8rem;
 }
 
+// ── Field label ───────────────────────────────────────────
 .global-filter__field-label {
   color: var(--painel-muted);
   font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
-  line-height: 1;
-  text-align: center;
 }
 
+// ── Trigger (summary) ─────────────────────────────────────
 .global-filter__trigger {
   list-style: none;
   cursor: pointer;
@@ -57,29 +40,26 @@
   }
 }
 
+// ── Dropdown ──────────────────────────────────────────────
 .global-filter__dropdown {
-  position: relative;
-
   &[open] {
     z-index: 50;
   }
 }
 
+// ── Menu ──────────────────────────────────────────────────
 .global-filter__menu {
-  position: absolute;
   top: calc(100% + 0.3rem);
-  left: 0;
   min-width: max(100%, 14rem);
   z-index: 60;
   background-color: var(--painel-dropdown-bg);
   color: var(--painel-text);
   border-color: var(--painel-border) !important;
-  box-shadow: 0 8px 20px rgb(16 32 55 / 12%);
 }
 
+// ── Checklist ─────────────────────────────────────────────
 .global-filter__checklist {
   max-height: 12rem;
-  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--painel-border) transparent;
 
@@ -103,20 +83,15 @@
   }
 }
 
+// ── Chips row ─────────────────────────────────────────────
 .global-filter-bar__chips {
-  border-top: 1px solid var(--painel-border);
-  padding-top: 0.4rem;
-  margin-top: 0.35rem;
+  border-top-color: var(--painel-border) !important;
 }
 
+// ── Chip button ───────────────────────────────────────────
 .global-filter__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  border-radius: 999px;
   padding: 0.2rem 0.6rem;
   font-size: 0.72rem;
-  font-weight: 600;
   border: 1px solid var(--painel-border);
   background-color: var(--painel-surface);
   color: var(--painel-primary);
@@ -139,18 +114,10 @@
   }
 }
 
+// ── Chip label ────────────────────────────────────────────
 .global-filter__chip-label {
   color: var(--painel-muted);
-  font-weight: 700;
   font-size: 0.65rem;
-  text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 
-.global-filter__toggle-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 31px;
-  padding: 0 0.25rem;
-}

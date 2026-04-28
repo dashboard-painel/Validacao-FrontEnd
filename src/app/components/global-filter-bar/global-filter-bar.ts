@@ -25,6 +25,11 @@ export class GlobalFilterBar {
   readonly chipRemove     = output<{ key: GlobalFilterKey; value: string }>();
   readonly clearAll       = output<void>();
 
+  // Unique ID per instance so radio groups don't bleed across multiple usages on the same page
+  private readonly uid = Math.random().toString(36).slice(2, 7);
+  readonly sitContratoName      = `sitContrato_${this.uid}`;
+  readonly classificacaoName    = `classificacao_${this.uid}`;
+
   // --- Computed ---
   readonly filteredAssociationOptions = computed(() => {
     const search = this.globalFilterSearch().toLowerCase();
@@ -91,7 +96,11 @@ export class GlobalFilterBar {
   }
 
   onToggle(key: GlobalFilterKey, event: Event): void {
-    const details = event.target as HTMLDetailsElement;
+    const details = event.currentTarget as HTMLDetailsElement;
+    if (!details.open && key === 'associationCode') {
+      // Clear stale search text so the list resets on next open
+      this.searchChange.emit('');
+    }
     this.toggleDropdown.emit({ key, open: details.open });
   }
 

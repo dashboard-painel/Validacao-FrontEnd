@@ -52,7 +52,14 @@ describe('GlobalFilterBar', () => {
   it('should emit filterChange on association checkbox', () => {
     const events: { key: GlobalFilterKey; values: string[] }[] = [];
     component.filterChange.subscribe((e) => events.push(e));
-    component.onAssociationCheckbox('ASS01', { target: { checked: true } } as unknown as Event);
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = true;
+    const mockEvent = new Event('change');
+    Object.defineProperty(mockEvent, 'target', { value: input });
+
+    component.onAssociationCheckbox('ASS01', mockEvent);
     expect(events[0]?.key).toBe('associationCode');
     expect(events[0]?.values).toContain('ASS01');
   });

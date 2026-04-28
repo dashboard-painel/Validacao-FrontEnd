@@ -210,7 +210,8 @@ export class DelayedStoresTable {
   }
 
   onMultiFilterToggle(key: string, event: Event): void {
-    const details = event.target as HTMLDetailsElement;
+    const details = event.target instanceof HTMLDetailsElement ? event.target : null;
+    if (!details) return;
     this.multiFilterToggle.emit({ key, open: details.open });
   }
 

@@ -1,28 +1,31 @@
-<div class="global-filter-bar">
-  <span class="global-filter-bar__label"> <i class="bi bi-funnel me-1"></i>Filtro global </span>
+<div class="d-flex flex-column align-items-center gap-1 mb-3">
+  <span class="global-filter-bar__label fw-bold text-uppercase text-nowrap">
+    <i class="bi bi-funnel me-1" aria-hidden="true"></i>Filtro global
+  </span>
 
-  <div class="global-filter-bar__card">
+  <div class="global-filter-bar__card d-flex flex-column gap-1">
     <div class="d-flex align-items-end gap-2 flex-wrap justify-content-center">
       <!-- Associação -->
-      <div class="global-filter__field">
-        <span class="global-filter__field-label">Associação</span>
+      <div class="global-filter__field d-flex flex-column gap-1">
+        <span class="global-filter__field-label fw-bold text-uppercase text-center lh-1">Associação</span>
         <details
-          class="global-filter__dropdown"
+          class="global-filter__dropdown position-relative"
           [open]="isOpen('associationCode')"
           (toggle)="onToggle('associationCode', $event)"
         >
           <summary class="form-select form-select-sm global-filter__trigger">
             {{ summary('associationCode') }}
           </summary>
-          <div class="global-filter__menu border rounded p-2 mt-1">
+          <div class="global-filter__menu position-absolute start-0 border rounded p-2 mt-1 shadow">
             <input
               type="text"
               class="form-control form-control-sm mb-2"
+              aria-label="Buscar associação"
               placeholder="Buscar associação..."
               [value]="globalFilterSearch()"
               (input)="onAssociationSearch($event)"
             />
-            <div class="global-filter__checklist">
+            <div class="global-filter__checklist overflow-y-auto">
               @for (opt of filteredAssociationOptions(); track opt) {
                 <label class="form-check mb-1">
                   <input
@@ -40,22 +43,22 @@
       </div>
 
       <!-- Sit. Contrato -->
-      <div class="global-filter__field">
-        <span class="global-filter__field-label">Sit. Contrato</span>
+      <div class="global-filter__field d-flex flex-column gap-1">
+        <span class="global-filter__field-label fw-bold text-uppercase text-center lh-1">Sit. Contrato</span>
         <details
-          class="global-filter__dropdown"
+          class="global-filter__dropdown position-relative"
           [open]="isOpen('sitContrato')"
           (toggle)="onToggle('sitContrato', $event)"
         >
           <summary class="form-select form-select-sm global-filter__trigger">
             {{ summary('sitContrato') }}
           </summary>
-          <div class="global-filter__menu border rounded p-2 mt-1">
-            <div class="global-filter__checklist">
+          <div class="global-filter__menu position-absolute start-0 border rounded p-2 mt-1 shadow">
+            <div class="global-filter__checklist overflow-y-auto">
               <label class="form-check mb-1">
                 <input
                   type="radio"
-                  name="sitContratoGlobal"
+                  [name]="sitContratoName"
                   class="form-check-input"
                   [checked]="selectedGlobalFilters().sitContrato.length === 0"
                   (change)="onSitContratoChange('', true)"
@@ -66,7 +69,7 @@
                 <label class="form-check mb-1">
                   <input
                     type="radio"
-                    name="sitContratoGlobal"
+                    [name]="sitContratoName"
                     class="form-check-input"
                     [checked]="isSelected('sitContrato', opt)"
                     (change)="onSitContratoChange(opt, false)"
@@ -80,27 +83,24 @@
       </div>
 
       <!-- Classificação -->
-      <div class="global-filter__field">
-        <span class="global-filter__field-label">Classificação</span>
+      <div class="global-filter__field d-flex flex-column gap-1">
+        <span class="global-filter__field-label fw-bold text-uppercase text-center lh-1">Classificação</span>
         <details
-          class="global-filter__dropdown"
+          class="global-filter__dropdown position-relative"
           [open]="isOpen('classificacao')"
           (toggle)="onToggle('classificacao', $event)"
         >
           <summary class="form-select form-select-sm global-filter__trigger">
             {{ summary('classificacao') }}
           </summary>
-          <div class="global-filter__menu border rounded p-2 mt-1">
-            <div class="global-filter__checklist">
+          <div class="global-filter__menu position-absolute start-0 border rounded p-2 mt-1 shadow">
+            <div class="global-filter__checklist overflow-y-auto">
               <label class="form-check mb-1">
                 <input
                   type="radio"
-                  name="classificacaoGlobal"
+                  [name]="classificacaoName"
                   class="form-check-input"
-                  [checked]="
-                    isSelected('classificacao', 'Todos') ||
-                    selectedGlobalFilters().classificacao.length === 0
-                  "
+                  [checked]="selectedGlobalFilters().classificacao.length === 0"
                   (change)="onClassificacaoChange('', true)"
                 />
                 <span class="form-check-label text-secondary">Todos</span>
@@ -109,7 +109,7 @@
                 <label class="form-check mb-1">
                   <input
                     type="radio"
-                    name="classificacaoGlobal"
+                    [name]="classificacaoName"
                     class="form-check-input"
                     [checked]="isSelected('classificacao', opt)"
                     (change)="onClassificacaoChange(opt, false)"
@@ -128,25 +128,26 @@
           class="btn btn-sm btn-outline-secondary align-self-end"
           (click)="onClearAll()"
         >
-          <i class="bi bi-x me-1"></i>Limpar
+          <i class="bi bi-x me-1" aria-hidden="true"></i>Limpar
         </button>
       }
     </div>
 
     <!-- chips de filtros ativos -->
     @if (hasActiveFilters()) {
-      <div class="global-filter-bar__chips d-flex gap-1 flex-wrap justify-content-center">
-        @for (chip of activeChips(); track chip.key + chip.value) {
+      <div class="global-filter-bar__chips d-flex gap-1 flex-wrap justify-content-center border-top pt-2 mt-1">
+        @for (chip of activeChips(); track chip.key + ':' + chip.value) {
           <button
             type="button"
-            class="global-filter__chip"
+            class="global-filter__chip d-inline-flex align-items-center gap-1 rounded-pill fw-semibold"
+            [attr.aria-label]="'Remover filtro: ' + chip.label + ' ' + chip.value"
             (click)="onChipRemove(chip.key, chip.value)"
           >
-            <span class="global-filter__chip-label">{{ chip.label }}</span>
+            <span class="global-filter__chip-label fw-bold text-uppercase">{{ chip.label }}</span>
             @if (chip.value) {
               {{ chip.value }}
             }
-            <i class="bi bi-x"></i>
+            <i class="bi bi-x" aria-hidden="true"></i>
           </button>
         }
       </div>
