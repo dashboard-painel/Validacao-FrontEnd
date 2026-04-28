@@ -298,21 +298,74 @@
               </div>
             }
 
+            <div class="delayed-stores__presets mb-3">
+              <button
+                type="button"
+                class="delayed-stores__preset-btn"
+                [class.delayed-stores__preset-btn--active]="activePreset() === 'all'"
+                (click)="applyPreset('all')"
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                class="delayed-stores__preset-btn delayed-stores__preset-btn--critical"
+                [class.delayed-stores__preset-btn--active]="activePreset() === 'critical'"
+                (click)="applyPreset('critical')"
+              >
+                <i class="bi bi-exclamation-triangle me-1"></i>Críticos
+                <span class="delayed-stores__preset-badge">+48h</span>
+              </button>
+              <button
+                type="button"
+                class="delayed-stores__preset-btn delayed-stores__preset-btn--nodata"
+                [class.delayed-stores__preset-btn--active]="activePreset() === 'nodata'"
+                (click)="applyPreset('nodata')"
+              >
+                <i class="bi bi-dash-circle me-1"></i>Sem dados
+              </button>
+              <button
+                type="button"
+                class="delayed-stores__preset-btn delayed-stores__preset-btn--ok"
+                [class.delayed-stores__preset-btn--active]="activePreset() === 'ok'"
+                (click)="applyPreset('ok')"
+              >
+                <i class="bi bi-check-circle me-1"></i>OK
+              </button>
+            </div>
+
             <div class="delayed-stores__filters-panel mb-3">
-              <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                <p class="delayed-stores__filters-title mb-0">Filtros</p>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-secondary"
-                  [disabled]="!hasActiveFilters()"
-                  (click)="clearFilters()"
-                >
-                  Limpar filtros
-                </button>
+              <div
+                class="delayed-stores__filters-header"
+                (click)="toggleFilters()"
+                [attr.aria-expanded]="filtersOpen()"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="toggleFilters()"
+                (keydown.space)="toggleFilters()"
+              >
+                <span class="delayed-stores__filters-title">Filtros avançados</span>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                  @if (hasActiveFilters()) {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      (click)="$event.stopPropagation(); clearFilters()"
+                    >
+                      Limpar filtros
+                    </button>
+                  }
+                  <i
+                    class="bi"
+                    [class.bi-chevron-down]="!filtersOpen()"
+                    [class.bi-chevron-up]="filtersOpen()"
+                  ></i>
+                </div>
               </div>
 
-              <div class="row g-2 delayed-stores__filters">
-                <div class="col-12 col-sm-6 col-xl-2">
+              @if (filtersOpen()) {
+                <div class="row g-2 delayed-stores__filters">
+                  <div class="col-12 col-sm-6 col-xl-2">
                   <label class="form-label delayed-stores__filter-label mb-1">Cód Assoc.</label>
                   <details
                     class="delayed-stores__dropdown"
@@ -551,6 +604,7 @@
                   >
                 </div>
               </div>
+              }
             </div>
 
             <div class="delayed-stores__table-wrap" (scroll)="onTableScroll($event)">

@@ -131,6 +131,28 @@ export class Dashboard {
   readonly globalFilterSearch = signal('');
   readonly openGlobalFilter = signal<GlobalFilterKey | null>(null);
   readonly possivelCausaFilter = signal('');
+  readonly minDelayHoursFilter = signal(0);
+  readonly filtersOpen = signal(false);
+
+  readonly activePreset = computed((): 'all' | 'critical' | 'nodata' | 'ok' | null => {
+    if (!this.hasActiveFilters()) return 'all';
+    const statuses = this.selectedStoreStatuses();
+    const minDelay = this.minDelayHoursFilter();
+    const hasOtherFilters =
+      this.selectedMultiFilters().associationCode.length > 0 ||
+      this.selectedMultiFilters().farmaCode.length > 0 ||
+      this.selectedMultiFilters().cnpj.length > 0 ||
+      this.pharmacyNameFilter().trim().length > 0 ||
+      this.selectedProblemLayers().length > 0 ||
+      this.selectedSitContratosLocal().length > 0 ||
+      this.possivelCausaFilter().trim().length > 0;
+    if (hasOtherFilters) return null;
+    if (statuses.length === 1 && statuses[0] === 'Com atraso' && minDelay === 48) return 'critical';
+    if (statuses.length === 1 && statuses[0] === 'Sem dados' && minDelay === 0) return 'nodata';
+    if (statuses.length === 1 && statuses[0] === 'Sem atraso' && minDelay === 0) return 'ok';
+    return null;
+  });
+
   readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
     'associationCode',
   );
@@ -336,6 +358,7 @@ export class Dashboard {
     const statusFilters = this.selectedStoreStatuses();
     const sitContratoFilters = this.selectedSitContratosLocal();
     const possivelCausaQuery = this.possivelCausaFilter().trim().toLowerCase();
+    const minDelayHours = this.minDelayHoursFilter();
 
     return this.delayedStoreRows().filter((store) => {
       if (
@@ -385,6 +408,10 @@ export class Dashboard {
         return false;
       }
 
+      if (minDelayHours > 0 && store.delayHours < minDelayHours) {
+        return false;
+      }
+
       return true;
     });
   });
@@ -408,7 +435,8 @@ export class Dashboard {
       this.selectedProblemLayers().length > 0 ||
       this.selectedStoreStatuses().length > 0 ||
       this.selectedSitContratosLocal().length > 0 ||
-      this.possivelCausaFilter().trim().length > 0
+      this.possivelCausaFilter().trim().length > 0 ||
+      this.minDelayHoursFilter() > 0
     );
   });
 
@@ -538,6 +566,7 @@ export class Dashboard {
       this.selectedStoreStatuses();
       this.selectedSitContratosLocal();
       this.possivelCausaFilter();
+      this.minDelayHoursFilter();
 
       this.renderedRowsCount.set(this.pageSize);
     });
@@ -768,7 +797,24 @@ export class Dashboard {
     this.selectedStoreStatuses.set([]);
     this.selectedSitContratosLocal.set([]);
     this.possivelCausaFilter.set('');
+    this.minDelayHoursFilter.set(0);
     this.openMultiFilter.set(null);
+  }
+
+  applyPreset(preset: 'all' | 'critical' | 'nodata' | 'ok'): void {
+    this.clearFilters();
+    if (preset === 'critical') {
+      this.selectedStoreStatuses.set(['Com atraso']);
+      this.minDelayHoursFilter.set(48);
+    } else if (preset === 'nodata') {
+      this.selectedStoreStatuses.set(['Sem dados']);
+    } else if (preset === 'ok') {
+      this.selectedStoreStatuses.set(['Sem atraso']);
+    }
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen.update((v) => !v);
   }
 
   onComparar(): void {

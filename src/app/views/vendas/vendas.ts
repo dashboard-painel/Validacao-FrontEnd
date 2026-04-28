@@ -8,6 +8,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, map, of, switchMap, timer } from 'rxjs';
 
+import { Kpi } from '../../components/kpi/kpi';
 import { VendasParceirosService } from '../../services/vendas-parceiros.service';
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
 
@@ -16,6 +17,7 @@ type FilterKey = 'associacao' | 'sitContrato';
 
 @Component({
   selector: 'app-vendas',
+  imports: [Kpi],
   templateUrl: './vendas.html',
   styleUrl: './vendas.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +57,8 @@ export class Vendas {
   });
   readonly openFilter = signal<string | null>(null);
   readonly renderedRowsCount = signal(60);
+  readonly filtersOpen = signal(false);
+  readonly onlyVendaRecente = signal(false);
 
   // ── Derived data ──────────────────────────────────────────
   readonly associacaoOptions = computed(() => {
@@ -84,6 +88,9 @@ export class Vendas {
     const filters = this.selectedFilters();
     const nameQ = this.nameFilter().toLowerCase();
     const codQ = this.codFarmaciaFilter().toLowerCase();
+    const onlyRecente = this.onlyVendaRecente();
+    const now = Date.now();
+    const threshold24h = 24 * 60 * 60 * 1000;
 
     return all.filter((s) => {
       if (filters.associacao.length > 0 && !filters.associacao.includes(s.associacao))
@@ -95,6 +102,10 @@ export class Vendas {
         return false;
       if (nameQ && !(s.nome_farmacia ?? '').toLowerCase().includes(nameQ)) return false;
       if (codQ && !s.cod_farmacia.toLowerCase().includes(codQ)) return false;
+      if (onlyRecente) {
+        if (!s.ultima_venda_parceiros) return false;
+        if (now - new Date(s.ultima_venda_parceiros).getTime() >= threshold24h) return false;
+      }
       return true;
     });
   });
@@ -153,8 +164,25 @@ export class Vendas {
       f.associacao.length > 0 ||
       f.sitContrato.length > 0 ||
       this.nameFilter() !== '' ||
-      this.codFarmaciaFilter() !== ''
+      this.codFarmaciaFilter() !== '' ||
+      this.onlyVendaRecente()
     );
+  });
+
+  readonly activePreset = computed((): 'all' | 'ativas' | 'inativas' | 'venda24h' | null => {
+    if (!this.hasActiveFilters()) return 'all';
+    const f = this.selectedFilters();
+    const hasOtherFilters =
+      f.associacao.length > 0 ||
+      this.nameFilter() !== '' ||
+      this.codFarmaciaFilter() !== '';
+    if (hasOtherFilters) return null;
+    if (this.onlyVendaRecente() && f.sitContrato.length === 0) return 'venda24h';
+    if (f.sitContrato.length === 1 && f.sitContrato[0] === 'ATIVO' && !this.onlyVendaRecente())
+      return 'ativas';
+    if (f.sitContrato.length === 1 && f.sitContrato[0] === 'INATIVO' && !this.onlyVendaRecente())
+      return 'inativas';
+    return null;
   });
 
   readonly sitContratoClassMap: Record<string, string> = {
@@ -259,6 +287,22 @@ export class Vendas {
     this.filterSearch.set({ associacao: '', sitContrato: '' });
     this.nameFilter.set('');
     this.codFarmaciaFilter.set('');
+    this.onlyVendaRecente.set(false);
+  }
+
+  applyPreset(preset: 'all' | 'ativas' | 'inativas' | 'venda24h'): void {
+    this.clearFilters();
+    if (preset === 'ativas') {
+      this.selectedFilters.update((f) => ({ ...f, sitContrato: ['ATIVO'] }));
+    } else if (preset === 'inativas') {
+      this.selectedFilters.update((f) => ({ ...f, sitContrato: ['INATIVO'] }));
+    } else if (preset === 'venda24h') {
+      this.onlyVendaRecente.set(true);
+    }
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen.update((v) => !v);
   }
 
   onTableScroll(event: Event): void {

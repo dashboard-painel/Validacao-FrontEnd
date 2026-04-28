@@ -320,6 +320,113 @@
   font-weight: 650;
 }
 
+// ── Quick Presets ──────────────────────────────────────────
+.delayed-stores__presets {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding: 0.25rem;
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
+  border-radius: 0.6rem;
+  width: fit-content;
+}
+
+.delayed-stores__preset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 0.4rem;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: var(--painel-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s,
+    color 0.12s,
+    box-shadow 0.12s;
+
+  i {
+    font-size: 0.72rem;
+  }
+
+  &:hover {
+    background-color: var(--painel-surface);
+    color: var(--painel-text-strong);
+    border-color: var(--painel-border);
+  }
+
+  &--active {
+    background-color: var(--painel-surface);
+    color: var(--painel-primary-strong);
+    border-color: var(--painel-primary);
+    box-shadow: 0 1px 4px rgb(31 79 134 / 12%);
+  }
+
+  &--critical.delayed-stores__preset-btn--active {
+    color: var(--status-danger);
+    border-color: color-mix(in srgb, var(--status-danger) 40%, transparent);
+    background-color: color-mix(in srgb, var(--status-danger) 8%, var(--painel-surface));
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-danger) 16%, transparent);
+  }
+
+  &--nodata.delayed-stores__preset-btn--active {
+    color: var(--status-nodata-strong);
+    border-color: color-mix(in srgb, var(--status-nodata) 40%, transparent);
+    background-color: color-mix(in srgb, var(--status-nodata) 8%, var(--painel-surface));
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-nodata) 16%, transparent);
+  }
+
+  &--ok.delayed-stores__preset-btn--active {
+    color: var(--status-ok);
+    border-color: color-mix(in srgb, var(--status-ok) 40%, transparent);
+    background-color: color-mix(in srgb, var(--status-ok) 8%, var(--painel-surface));
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-ok) 16%, transparent);
+  }
+}
+
+.delayed-stores__preset-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+  margin-left: 0.1rem;
+}
+
+// ── Filter panel collapsible toggle ───────────────────────
+.delayed-stores__filters-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.1rem 0.15rem;
+  border-radius: 0.35rem;
+  margin-bottom: 0;
+  user-select: none;
+
+  i {
+    font-size: 0.78rem;
+    color: var(--painel-muted);
+    margin-left: auto;
+  }
+}
+
+.delayed-stores__filters-panel {
+  &:has(.delayed-stores__filters-header:not([aria-expanded='true'])) {
+    padding-bottom: 0.5rem;
+  }
+}
+
 .delayed-stores__count {
   display: inline-flex;
   align-items: center;
@@ -511,8 +618,61 @@
     padding-bottom: 0.65rem;
   }
 
+  td:first-child {
+    border-left: 3px solid transparent;
+    padding-left: 0.6rem;
+  }
+
   &:hover td {
     background-color: rgb(31 79 134 / 4%);
+  }
+
+  &--critical {
+    td:first-child {
+      border-left-color: var(--status-danger);
+    }
+    td {
+      background-color: color-mix(in srgb, var(--status-danger) 4%, transparent);
+    }
+    &:hover td {
+      background-color: color-mix(in srgb, var(--status-danger) 8%, transparent);
+    }
+  }
+  &--high {
+    td:first-child {
+      border-left-color: var(--status-warning);
+    }
+    td {
+      background-color: color-mix(in srgb, var(--status-warning) 4%, transparent);
+    }
+    &:hover td {
+      background-color: color-mix(in srgb, var(--status-warning) 8%, transparent);
+    }
+  }
+  &--moderate {
+    td:first-child {
+      border-left-color: color-mix(in srgb, var(--status-warning) 60%, var(--status-ok));
+    }
+    td {
+      background-color: color-mix(in srgb, var(--status-warning) 2%, transparent);
+    }
+    &:hover td {
+      background-color: color-mix(in srgb, var(--status-warning) 5%, transparent);
+    }
+  }
+  &--nodata {
+    td:first-child {
+      border-left-color: var(--status-nodata);
+    }
+    td {
+      background-color: color-mix(in srgb, var(--status-nodata) 3%, transparent);
+    }
+    &:hover td {
+      background-color: color-mix(in srgb, var(--status-nodata) 6%, transparent);
+    }
+  }
+  &--ok td:first-child {
+    border-left-color: var(--status-ok);
   }
 }
 

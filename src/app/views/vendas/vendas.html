@@ -13,28 +13,35 @@
       <section class="col-12" aria-label="Indicadores de vendas parceiros">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
           <div class="col">
-            <div class="vendas__kpi-card">
-              <span class="vendas__kpi-label">Total de Farmácias</span>
-              <strong class="vendas__kpi-value">{{ totalFarmacias() }}</strong>
-            </div>
+            <app-kpi
+              title="Total de Farmácias"
+              [value]="totalFarmacias()"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--ok">
-              <span class="vendas__kpi-label">Ativas</span>
-              <strong class="vendas__kpi-value">{{ farmaciasAtivas() }}</strong>
-            </div>
+            <app-kpi
+              title="Ativas"
+              [value]="farmaciasAtivas()"
+              tone="success"
+              badge="Ativas"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--danger">
-              <span class="vendas__kpi-label">Inativas</span>
-              <strong class="vendas__kpi-value">{{ farmaciasInativas() }}</strong>
-            </div>
+            <app-kpi
+              title="Inativas"
+              [value]="farmaciasInativas()"
+              tone="danger"
+              badge="Inativas"
+              [invertTrend]="true"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--info">
-              <span class="vendas__kpi-label">Venda nas últimas 24h</span>
-              <strong class="vendas__kpi-value">{{ comVendaRecente() }}</strong>
-            </div>
+            <app-kpi
+              title="Venda nas últimas 24h"
+              [value]="comVendaRecente()"
+              tone="nodata"
+              badge="24h"
+            ></app-kpi>
           </div>
         </div>
       </section>
@@ -76,21 +83,74 @@
               </div>
             }
 
+            <!-- ── Presets rápidos ──────────────────────── -->
+            <div class="vendas__presets mb-3">
+              <button
+                type="button"
+                class="vendas__preset-btn"
+                [class.vendas__preset-btn--active]="activePreset() === 'all'"
+                (click)="applyPreset('all')"
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                class="vendas__preset-btn vendas__preset-btn--ok"
+                [class.vendas__preset-btn--active]="activePreset() === 'ativas'"
+                (click)="applyPreset('ativas')"
+              >
+                <i class="bi bi-check-circle me-1"></i>Ativas
+              </button>
+              <button
+                type="button"
+                class="vendas__preset-btn vendas__preset-btn--danger"
+                [class.vendas__preset-btn--active]="activePreset() === 'inativas'"
+                (click)="applyPreset('inativas')"
+              >
+                <i class="bi bi-x-circle me-1"></i>Inativas
+              </button>
+              <button
+                type="button"
+                class="vendas__preset-btn vendas__preset-btn--venda"
+                [class.vendas__preset-btn--active]="activePreset() === 'venda24h'"
+                (click)="applyPreset('venda24h')"
+              >
+                <i class="bi bi-clock-history me-1"></i>Venda 24h
+              </button>
+            </div>
+
             <!-- ── Filtros ──────────────────────────────── -->
             <div class="vendas__filters-panel mb-3">
-              <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                <p class="vendas__filters-title mb-0">Filtros</p>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-secondary"
-                  [disabled]="!hasActiveFilters()"
-                  (click)="clearFilters()"
-                >
-                  Limpar filtros
-                </button>
+              <div
+                class="vendas__filters-header"
+                (click)="toggleFilters()"
+                [attr.aria-expanded]="filtersOpen()"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="toggleFilters()"
+                (keydown.space)="toggleFilters()"
+              >
+                <span class="vendas__filters-title">Filtros avançados</span>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                  @if (hasActiveFilters()) {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      (click)="$event.stopPropagation(); clearFilters()"
+                    >
+                      Limpar filtros
+                    </button>
+                  }
+                  <i
+                    class="bi"
+                    [class.bi-chevron-down]="!filtersOpen()"
+                    [class.bi-chevron-up]="filtersOpen()"
+                  ></i>
+                </div>
               </div>
 
-              <div class="row g-2">
+              @if (filtersOpen()) {
+              <div class="row g-2 mt-1">
                 <!-- Associação -->
                 <div class="col-12 col-sm-6 col-xl-3">
                   <label class="form-label vendas__filter-label mb-1">Associação</label>
@@ -184,6 +244,7 @@
                   />
                 </div>
               </div>
+              }
             </div>
 
             <!-- ── Table ────────────────────────────────── -->

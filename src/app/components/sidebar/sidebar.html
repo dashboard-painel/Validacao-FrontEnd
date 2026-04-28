@@ -69,7 +69,7 @@
           (click)="closeMobile()"
         >
           <i class="bi bi-speedometer2" aria-hidden="true"></i>
-          <span class="sidebar__label">Dashboard</span>
+          <span class="sidebar__label">Vendas</span>
         </a>
       </li>
       <li>
@@ -85,7 +85,7 @@
           (click)="closeMobile()"
         >
           <i class="bi bi-cart3" aria-hidden="true"></i>
-          <span class="sidebar__label">Vendas</span>
+          <span class="sidebar__label">Vendas Parceiros</span>
         </a>
       </li>
     </ul>
@@ -96,8 +96,12 @@
       class="sidebar__theme-toggle"
       type="button"
       (click)="toggleTheme()"
-      [attr.aria-label]="themeService.theme() === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'"
-      [attr.title]="collapsed() ? (themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro') : null"
+      [attr.aria-label]="
+        themeService.theme() === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro'
+      "
+      [attr.title]="
+        collapsed() ? (themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro') : null
+      "
     >
       <i
         class="bi"
@@ -105,7 +109,9 @@
         [class.bi-sun-fill]="themeService.theme() === 'dark'"
         aria-hidden="true"
       ></i>
-      <span class="sidebar__label">{{ themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro' }}</span>
+      <span class="sidebar__label">{{
+        themeService.theme() === 'light' ? 'Tema escuro' : 'Tema claro'
+      }}</span>
     </button>
   </div>
 

@@ -2,46 +2,6 @@
   display: block;
 }
 
-// ── KPI Cards ───────────────────────────────────────────────
-.vendas__kpi-card {
-  border-radius: 0.95rem;
-  border: 1px solid var(--painel-border);
-  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
-  box-shadow: var(--painel-shadow-soft);
-  padding: 1rem 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  border-left: 0.32rem solid var(--painel-primary);
-
-  &--ok {
-    border-left-color: var(--status-ok);
-  }
-
-  &--danger {
-    border-left-color: var(--status-danger);
-  }
-
-  &--info {
-    border-left-color: var(--status-silver);
-  }
-}
-
-.vendas__kpi-label {
-  color: var(--painel-muted);
-  font-size: 0.73rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.vendas__kpi-value {
-  color: var(--painel-text-strong);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
 // ── Main card ───────────────────────────────────────────────
 .vendas__card {
   border-radius: 0.95rem;
@@ -100,6 +60,76 @@
   border-radius: 0.78rem;
   background-color: var(--painel-filter-bg);
   padding: 0.7rem;
+}
+
+.vendas__filters-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.1rem 0.15rem;
+  border-radius: 0.35rem;
+  transition: background-color 0.1s;
+  user-select: none;
+
+  &:hover {
+    .vendas__filters-title {
+      color: var(--painel-text-strong);
+    }
+  }
+
+  i {
+    font-size: 0.78rem;
+    color: var(--painel-muted);
+  }
+}
+
+// ── Preset quick-filter bar ──────────────────────────────────
+.vendas__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: color-mix(in srgb, var(--painel-border) 30%, var(--painel-surface));
+  border: 1px solid var(--painel-border);
+  border-radius: 0.6rem;
+  padding: 0.25rem;
+  width: fit-content;
+}
+
+.vendas__preset-btn {
+  background: none;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--painel-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  white-space: nowrap;
+
+  &:hover:not(.vendas__preset-btn--active) {
+    background-color: rgb(255 255 255 / 55%);
+    color: var(--painel-text-strong);
+  }
+
+  &--active {
+    background-color: var(--painel-surface);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+    color: var(--painel-primary-strong);
+  }
+
+  &--ok.vendas__preset-btn--active {
+    color: var(--status-ok);
+  }
+
+  &--danger.vendas__preset-btn--active {
+    color: var(--status-danger);
+  }
+
+  &--venda.vendas__preset-btn--active {
+    color: var(--status-nodata);
+  }
 }
 
 .vendas__filters-title {
@@ -177,7 +207,7 @@
 
 // ── Table ───────────────────────────────────────────────────
 .vendas__table-wrap {
-  height: 24rem;
+  height: 40rem;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
