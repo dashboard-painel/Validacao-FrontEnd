@@ -1,3 +1,5 @@
+@use 'scrollbar';
+
 :host {
   display: block;
 }
@@ -60,27 +62,7 @@
 // ── Checklist ─────────────────────────────────────────────
 .global-filter__checklist {
   max-height: 12rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--painel-border) transparent;
-
-  &::-webkit-scrollbar {
-    width: 0.35rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--painel-border);
-    border-radius: 999px;
-    transition: background-color 0.15s;
-  }
-
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: var(--painel-muted);
-  }
+  @include scrollbar.thin-scrollbar;
 }
 
 // ── Chips row ─────────────────────────────────────────────

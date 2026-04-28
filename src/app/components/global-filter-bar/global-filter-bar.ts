@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 
 import { type GlobalFilterKey } from '../../models/shared/dashboard.model';
 import { SitContratoBadge } from '../sit-contrato-badge/sit-contrato-badge';
+import { toggleInArray } from '../../utils/array-toggle';
+import { filterSummary } from '../../utils/filter-summary';
 
 @Component({
   selector: 'app-global-filter-bar',
-  standalone: true,
   imports: [SitContratoBadge],
   templateUrl: './global-filter-bar.html',
   styleUrl: './global-filter-bar.scss',
@@ -67,10 +68,7 @@ export class GlobalFilterBar {
   }
 
   summary(key: GlobalFilterKey): string {
-    const selected = this.selectedGlobalFilters()[key];
-    if (selected.length === 0) return 'Todos';
-    if (selected.length === 1) return selected[0] ?? 'Todos';
-    return `${selected.length} selecionados`;
+    return filterSummary(this.selectedGlobalFilters()[key]);
   }
 
   // --- Event handlers ---
@@ -80,10 +78,7 @@ export class GlobalFilterBar {
 
   onAssociationCheckbox(value: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const current = this.selectedGlobalFilters()['associationCode'];
-    const next = checked
-      ? [...new Set([...current, value])]
-      : current.filter((v) => v !== value);
+    const next = toggleInArray(this.selectedGlobalFilters()['associationCode'], value, checked);
     this.filterChange.emit({ key: 'associationCode', values: next });
   }
 

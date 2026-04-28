@@ -1,11 +1,8 @@
 import { Routes } from '@angular/router';
 
-import { Dashboard } from './views/dashboard/dashboard';
-import { Vendas } from './views/vendas/vendas';
-
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: Dashboard },
-  { path: 'vendas', component: Vendas },
+  { path: 'dashboard', loadComponent: () => import('./views/dashboard/dashboard').then((m) => m.Dashboard) },
+  { path: 'vendas', loadComponent: () => import('./views/vendas/vendas').then((m) => m.Vendas) },
   { path: '**', redirectTo: '/dashboard' },
 ];

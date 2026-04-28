@@ -8,17 +8,23 @@
       </div>
     </div>
   } @else {
+    @if (loadError(); as error) {
+      <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ error }}</span>
+      </div>
+    }
     <!-- ── Filtro Global ──────────────────────────────────────────── -->
     <app-global-filter-bar
-      [selectedGlobalFilters]="selectedGlobalFilters()"
-      [globalFilterSearch]="globalFilterSearch()"
-      [openGlobalFilter]="openGlobalFilter()"
+      [selectedGlobalFilters]="fs.selectedGlobalFilters()"
+      [globalFilterSearch]="fs.globalFilterSearch()"
+      [openGlobalFilter]="fs.openGlobalFilter()"
       [associationOptions]="globalAssociationOptions()"
       (filterChange)="onGlobalFilterChange($event)"
       (searchChange)="onGlobalSearchChange($event)"
       (toggleDropdown)="onGlobalDropdownToggle($event)"
       (chipRemove)="onGlobalChipRemove($event)"
-      (clearAll)="clearGlobalFilters()"
+      (clearAll)="fs.clearGlobalFilters()"
     ></app-global-filter-bar>
 
     <div class="row g-4">
@@ -128,19 +134,19 @@
               [totalCount]="delayedStoreRows().length"
               [filteredCount]="filteredDelayedStoreCount()"
               [hasMoreRows]="hasMoreRows()"
-              [hasActiveFilters]="hasActiveFilters()"
-              [filtersOpen]="filtersOpen()"
-              [activePreset]="activePreset()"
-              [selectedMultiFilters]="selectedMultiFilters()"
-              [multiFilterSearch]="multiFilterSearch()"
-              [openMultiFilter]="openMultiFilter()"
-              [pharmacyNameFilter]="pharmacyNameFilter()"
-              [selectedProblemLayers]="selectedProblemLayers()"
-              [selectedStoreStatuses]="selectedStoreStatuses()"
-              [selectedSitContratosLocal]="selectedSitContratosLocal()"
-              [possivelCausaFilter]="possivelCausaFilter()"
-              [sortColumn]="sortColumn()"
-              [sortDir]="sortDir()"
+              [hasActiveFilters]="fs.hasActiveFilters()"
+              [filtersOpen]="fs.filtersOpen()"
+              [activePreset]="fs.activePreset()"
+              [selectedMultiFilters]="fs.selectedMultiFilters()"
+              [multiFilterSearch]="fs.multiFilterSearch()"
+              [openMultiFilter]="fs.openMultiFilter()"
+              [pharmacyNameFilter]="fs.pharmacyNameFilter()"
+              [selectedProblemLayers]="fs.selectedProblemLayers()"
+              [selectedStoreStatuses]="fs.selectedStoreStatuses()"
+              [selectedSitContratosLocal]="fs.selectedSitContratosLocal()"
+              [possivelCausaFilter]="fs.possivelCausaFilter()"
+              [sortColumn]="fs.sortColumn()"
+              [sortDir]="fs.sortDir()"
               [associationCodeOptions]="associationCodeOptions()"
               [farmaCodeOptions]="farmaCodeOptions()"
               [cnpjOptions]="cnpjOptions()"
@@ -157,7 +163,7 @@
               (multiFilterToggle)="onMultiFilterToggleChange($event)"
               (storeSelect)="openStoreModal($event)"
               (tableScroll)="onTableScroll()"
-              (clearFilters)="clearFilters()"
+              (clearFilters)="fs.clearFilters()"
               (sortChange)="onSortChange($event)"
               (presetChange)="onPresetChange($event)"
               (filtersToggle)="onFiltersToggle()"

@@ -1,0 +1,84 @@
+// Shared layer badge colors used in delayed-stores-table and store-detail-modal.
+.delayed-stores__layer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.1;
+  border: 1px solid transparent;
+}
+
+.delayed-stores__layer--gold {
+  color: var(--status-warning-strong);
+  background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
+}
+
+.delayed-stores__layer--silver {
+  color: var(--status-silver-strong);
+  background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
+}
+
+.delayed-stores__layer--coletor {
+  color: var(--status-danger);
+  background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
+}
+
+.delayed-stores__layer--ok {
+  color: var(--status-ok);
+  background-color: color-mix(in srgb, var(--status-ok) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-ok) 28%, transparent);
+}
+
+.delayed-stores__layer--nodata {
+  color: var(--status-nodata-strong);
+  background-color: color-mix(in srgb, var(--status-nodata) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-nodata) 28%, transparent);
+}
+
+.delayed-stores__layer--api {
+  color: var(--status-danger);
+  background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+  border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
+}
+
+// Delay-level badge colors.
+.delayed-stores__delay-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+
+  &--critical {
+    color: var(--status-danger);
+    background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
+  }
+
+  &--high {
+    color: var(--status-warning-strong);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
+  }
+
+  &--moderate {
+    color: var(--status-silver);
+    background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
+  }
+
+  &--ok {
+    color: var(--painel-muted);
+  }
+}

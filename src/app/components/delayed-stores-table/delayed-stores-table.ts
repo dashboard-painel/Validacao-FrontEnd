@@ -10,6 +10,9 @@ import {
 import { CnpjPipe } from '../../pipes/cnpj.pipe';
 import { ClassificacaoBadge } from '../classificacao-badge/classificacao-badge';
 import { SitContratoBadge } from '../sit-contrato-badge/sit-contrato-badge';
+import { toggleInArray } from '../../utils/array-toggle';
+import { urgencyClass, formatDelay, layerLastSale } from '../../utils/display-helpers';
+import { filterSummary } from '../../utils/filter-summary';
 
 const EMPTY_MULTI: Record<MultiFilterKey, string[]> = {
   associationCode: [],
@@ -25,7 +28,6 @@ const EMPTY_SEARCH: Record<MultiFilterKey, string> = {
 
 @Component({
   selector: 'app-delayed-stores-table',
-  standalone: true,
   imports: [CnpjPipe, SitContratoBadge, ClassificacaoBadge],
   templateUrl: './delayed-stores-table.html',
   styleUrl: './delayed-stores-table.scss',
@@ -105,53 +107,30 @@ export class DelayedStoresTable {
   // ── Display helpers ──────────────────────────────────────────
   /** Layers shown in the last-sale date columns (excludes 'Sem dados' — no timestamp available) */
   readonly LAYER_KEYS: ProblemLayer[] = ['Gold', 'Silver', 'Coletor'];
-  urgencyClass(hours: number): string {
-    if (hours >= 48) return 'critical';
-    if (hours >= 24) return 'high';
-    return 'moderate';
-  }
+  readonly urgencyClass = urgencyClass;
+  readonly formatDelay = formatDelay;
+  readonly layerLastSale = layerLastSale;
 
   rowUrgencyClass(row: DelayedStoreRow): string {
     if (row.problemLayers.includes('Sem dados')) return 'nodata';
     if (row.delayHours === 0) return 'ok';
-    return this.urgencyClass(row.delayHours);
-  }
-
-  formatDelay(hours: number): string {
-    if (hours >= 48) return `${Math.round(hours / 24)} dias`;
-    return `${hours} horas`;
-  }
-
-  layerLastSale(store: DelayedStoreRow, layer: ProblemLayer): string {
-    return store.lastSalesByLayer?.[layer] ?? 'Sem dados';
+    return urgencyClass(row.delayHours);
   }
 
   multiFilterSummary(key: MultiFilterKey): string {
-    const selected = this.selectedMultiFilters()[key];
-    if (selected.length === 0) return 'Todos';
-    if (selected.length === 1) return selected[0] ?? 'Todos';
-    return `${selected.length} selecionados`;
+    return filterSummary(this.selectedMultiFilters()[key]);
   }
 
   problemLayerSummary(): string {
-    const n = this.selectedProblemLayers().length;
-    if (n === 0) return 'Todas';
-    if (n === 1) return this.selectedProblemLayers()[0] ?? 'Todas';
-    return `${n} selecionadas`;
+    return filterSummary(this.selectedProblemLayers(), 'Todas');
   }
 
   storeStatusSummary(): string {
-    const n = this.selectedStoreStatuses().length;
-    if (n === 0) return 'Todos';
-    if (n === 1) return this.selectedStoreStatuses()[0] ?? 'Todos';
-    return `${n} selecionados`;
+    return filterSummary(this.selectedStoreStatuses());
   }
 
   sitContratoLocalSummary(): string {
-    const n = this.selectedSitContratosLocal().length;
-    if (n === 0) return 'Todos';
-    if (n === 1) return this.selectedSitContratosLocal()[0] ?? 'Todos';
-    return `${n} selecionados`;
+    return filterSummary(this.selectedSitContratosLocal());
   }
 
   isMultiFilterOpen(key: string): boolean {
@@ -165,10 +144,7 @@ export class DelayedStoresTable {
   // ── Event handlers ───────────────────────────────────────────
   onMultiCheckboxFilter(key: MultiFilterKey, value: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const current = this.selectedMultiFilters()[key];
-    const next = checked
-      ? [...new Set([...current, value])]
-      : current.filter((v) => v !== value);
+    const next = toggleInArray(this.selectedMultiFilters()[key], value, checked);
     this.multiCheckboxChange.emit({ key, values: next });
   }
 
@@ -182,23 +158,17 @@ export class DelayedStoresTable {
 
   onProblemLayerCheckbox(layer: ProblemLayer, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const current = this.selectedProblemLayers();
-    const next = checked ? [...current, layer] : current.filter((l) => l !== layer);
-    this.problemLayerChange.emit(next);
+    this.problemLayerChange.emit(toggleInArray(this.selectedProblemLayers(), layer, checked));
   }
 
   onStoreStatusCheckbox(status: StoreStatus, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const current = this.selectedStoreStatuses();
-    const next = checked ? [...current, status] : current.filter((s) => s !== status);
-    this.storeStatusChange.emit(next);
+    this.storeStatusChange.emit(toggleInArray(this.selectedStoreStatuses(), status, checked));
   }
 
   onSitContratoLocalCheckbox(value: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    const current = this.selectedSitContratosLocal();
-    const next = checked ? [...current, value] : current.filter((v) => v !== value);
-    this.sitContratoLocalChange.emit(next);
+    this.sitContratoLocalChange.emit(toggleInArray(this.selectedSitContratosLocal(), value, checked));
   }
 
   onPossivelCausaFilter(event: Event): void {
@@ -215,8 +185,11 @@ export class DelayedStoresTable {
     this.storeSelect.emit(row);
   }
 
-  onTableScroll(): void {
-    this.tableScroll.emit();
+  onTableScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
+      this.tableScroll.emit();
+    }
   }
 
   onClearFilters(): void {

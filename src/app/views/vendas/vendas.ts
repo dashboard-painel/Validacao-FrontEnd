@@ -5,42 +5,42 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { EMPTY, catchError, map, of, switchMap, timer } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EMPTY, catchError, switchMap, timer } from 'rxjs';
 
 import { Kpi } from '../../components/kpi/kpi';
+import { SitContratoBadge } from '../../components/sit-contrato-badge/sit-contrato-badge';
 import { VendasParceirosService } from '../../services/vendas-parceiros.service';
+import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.service';
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
+import { toggleInArray } from '../../utils/array-toggle';
+import { filterSummary } from '../../utils/filter-summary';
 
 type SortColumn = 'associacao' | 'cod_farmacia' | 'nome_farmacia' | 'ultima_venda_parceiros';
 type FilterKey = 'associacao' | 'sitContrato';
 
 @Component({
   selector: 'app-vendas',
-  imports: [Kpi],
+  imports: [Kpi, SitContratoBadge],
   templateUrl: './vendas.html',
   styleUrl: './vendas.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Vendas {
   private readonly pageSize = 60;
+  private readonly HOURS_24_MS = 24 * 60 * 60 * 1000;
+  private readonly POLL_INTERVAL_MS = 60_000;
+
   private readonly service = inject(VendasParceirosService);
+  private readonly atualizacaoService = inject(UltimaAtualizacaoService);
 
   readonly stores = signal<VendaParceiro[]>([]);
   readonly isLoading = signal(true);
+  readonly loadError = signal<string | null>(null);
   readonly isRefreshing = signal(false);
   readonly refreshError = signal<string | null>(null);
 
-  readonly ultimaAtualizacao = toSignal(
-    timer(0, 30_000).pipe(
-      switchMap(() =>
-        this.service.getUltimaAtualizacao().pipe(
-          map((r) => r.atualizado_em),
-          catchError(() => of(null)),
-        ),
-      ),
-    ),
-  );
+  readonly ultimaAtualizacao = this.atualizacaoService.ultimaAtualizacao;
 
   readonly sortColumn = signal<SortColumn>('associacao');
   readonly sortDir = signal<'asc' | 'desc'>('asc');
@@ -90,7 +90,7 @@ export class Vendas {
     const codQ = this.codFarmaciaFilter().toLowerCase();
     const onlyRecente = this.onlyVendaRecente();
     const now = Date.now();
-    const threshold24h = 24 * 60 * 60 * 1000;
+    const threshold24h = this.HOURS_24_MS;
 
     return all.filter((s) => {
       if (filters.associacao.length > 0 && !filters.associacao.includes(s.associacao))
@@ -150,7 +150,7 @@ export class Vendas {
 
   readonly comVendaRecente = computed(() => {
     const now = Date.now();
-    const threshold = 24 * 60 * 60 * 1000;
+    const threshold = this.HOURS_24_MS;
     return this.filteredStores().filter((s) => {
       if (!s.ultima_venda_parceiros) return false;
       return now - new Date(s.ultima_venda_parceiros).getTime() < threshold;
@@ -185,22 +185,14 @@ export class Vendas {
     return null;
   });
 
-  readonly sitContratoClassMap: Record<string, string> = {
-    ATIVO: 'vendas__sit-badge vendas__sit-badge--ativo',
-    INATIVO: 'vendas__sit-badge vendas__sit-badge--inativo',
-    IMPLANTACAO: 'vendas__sit-badge vendas__sit-badge--implantacao',
-    DESISTENTE: 'vendas__sit-badge vendas__sit-badge--desistente',
-    ISENTO: 'vendas__sit-badge vendas__sit-badge--isento',
-    PARCEIROS: 'vendas__sit-badge vendas__sit-badge--parceiros',
-  };
-
   constructor() {
-    timer(0, 60_000)
+    timer(0, this.POLL_INTERVAL_MS)
       .pipe(
         switchMap(() =>
           this.service.getHistorico().pipe(
             catchError(() => {
               this.isLoading.set(false);
+              this.loadError.set('Falha ao carregar dados. Tentando novamente...');
               return EMPTY;
             }),
           ),
@@ -210,6 +202,7 @@ export class Vendas {
       .subscribe((resp) => {
         this.stores.set(resp.resultados);
         this.isLoading.set(false);
+        this.loadError.set(null);
       });
   }
 
@@ -240,13 +233,10 @@ export class Vendas {
 
   onCheckboxFilter(key: FilterKey, value: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
-    this.selectedFilters.update((current) => {
-      const values = current[key];
-      const next = checked
-        ? [...new Set([...values, value])]
-        : values.filter((v) => v !== value);
-      return { ...current, [key]: next };
-    });
+    this.selectedFilters.update((current) => ({
+      ...current,
+      [key]: toggleInArray(current[key], value, checked),
+    }));
   }
 
   isSelected(key: FilterKey, value: string): boolean {
@@ -268,10 +258,7 @@ export class Vendas {
   }
 
   filterSummary(key: FilterKey): string {
-    const selected = this.selectedFilters()[key];
-    if (selected.length === 0) return 'Todos';
-    if (selected.length === 1) return selected[0];
-    return `${selected.length} selecionados`;
+    return filterSummary(this.selectedFilters()[key]);
   }
 
   onNameFilter(event: Event): void {
@@ -308,16 +295,10 @@ export class Vendas {
   onTableScroll(event: Event): void {
     const el = event.target as HTMLElement;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
-      this.renderedRowsCount.update((c) => c + this.pageSize);
+      this.renderedRowsCount.update((c) =>
+        Math.min(c + this.pageSize, this.sortedStores().length),
+      );
     }
-  }
-
-  sitContratoClass(sit: string | null): string {
-    if (!sit) return 'vendas__sit-badge vendas__sit-badge--inativo';
-    return (
-      this.sitContratoClassMap[sit.toUpperCase().trim()] ??
-      'vendas__sit-badge vendas__sit-badge--inativo'
-    );
   }
 
   formatDate(dateStr: string | null): string {
@@ -330,8 +311,7 @@ export class Vendas {
 
   vendaRecenciaBadge(dateStr: string | null): string {
     if (!dateStr) return 'vendas__recencia-badge vendas__recencia-badge--sem-dados';
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const hours = diff / (1000 * 60 * 60);
+    const hours = (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60);
     if (hours <= 24) return 'vendas__recencia-badge vendas__recencia-badge--ok';
     if (hours <= 72) return 'vendas__recencia-badge vendas__recencia-badge--warning';
     return 'vendas__recencia-badge vendas__recencia-badge--critical';
@@ -339,11 +319,9 @@ export class Vendas {
 
   vendaRecenciaLabel(dateStr: string | null): string {
     if (!dateStr) return 'Sem dados';
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const hours = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60));
     if (hours < 1) return 'Agora';
     if (hours < 24) return `${hours}h atrás`;
-    const days = Math.floor(hours / 24);
-    return `${days}d atrás`;
+    return `${Math.floor(hours / 24)}d atrás`;
   }
 }

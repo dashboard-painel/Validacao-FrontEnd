@@ -8,6 +8,12 @@
       </div>
     </div>
   } @else {
+    @if (loadError(); as error) {
+      <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ error }}</span>
+      </div>
+    }
     <div class="row g-4">
       <!-- ── KPIs ─────────────────────────────────────────── -->
       <section class="col-12" aria-label="Indicadores de vendas parceiros">
@@ -212,7 +218,7 @@
                               [checked]="isSelected('sitContrato', opt)"
                               (change)="onCheckboxFilter('sitContrato', opt, $event)"
                             />
-                            <span [class]="sitContratoClass(opt)" style="pointer-events:none">{{ opt }}</span>
+                            <app-sit-contrato-badge [value]="opt" style="pointer-events:none" />
                           </label>
                         }
                       </div>
@@ -310,13 +316,7 @@
                           <span class="vendas__store-name">{{ store.nome_farmacia ?? '—' }}</span>
                         </td>
                         <td>
-                          @if (store.sit_contrato) {
-                            <span [class]="sitContratoClass(store.sit_contrato)">
-                              {{ store.sit_contrato }}
-                            </span>
-                          } @else {
-                            <span class="text-body-secondary">—</span>
-                          }
+                          <app-sit-contrato-badge [value]="store.sit_contrato" />
                         </td>
                         <td class="vendas__td-date">
                           <span class="vendas__date-value">{{ formatDate(store.ultima_venda_parceiros) }}</span>
