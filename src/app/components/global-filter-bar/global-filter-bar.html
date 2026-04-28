@@ -1,0 +1,155 @@
+<div class="global-filter-bar">
+  <span class="global-filter-bar__label"> <i class="bi bi-funnel me-1"></i>Filtro global </span>
+
+  <div class="global-filter-bar__card">
+    <div class="d-flex align-items-end gap-2 flex-wrap justify-content-center">
+      <!-- Associação -->
+      <div class="global-filter__field">
+        <span class="global-filter__field-label">Associação</span>
+        <details
+          class="global-filter__dropdown"
+          [open]="isOpen('associationCode')"
+          (toggle)="onToggle('associationCode', $event)"
+        >
+          <summary class="form-select form-select-sm global-filter__trigger">
+            {{ summary('associationCode') }}
+          </summary>
+          <div class="global-filter__menu border rounded p-2 mt-1">
+            <input
+              type="text"
+              class="form-control form-control-sm mb-2"
+              placeholder="Buscar associação..."
+              [value]="globalFilterSearch()"
+              (input)="onAssociationSearch($event)"
+            />
+            <div class="global-filter__checklist">
+              @for (opt of filteredAssociationOptions(); track opt) {
+                <label class="form-check mb-1">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="isSelected('associationCode', opt)"
+                    (change)="onAssociationCheckbox(opt, $event)"
+                  />
+                  <span class="form-check-label">{{ opt }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Sit. Contrato -->
+      <div class="global-filter__field">
+        <span class="global-filter__field-label">Sit. Contrato</span>
+        <details
+          class="global-filter__dropdown"
+          [open]="isOpen('sitContrato')"
+          (toggle)="onToggle('sitContrato', $event)"
+        >
+          <summary class="form-select form-select-sm global-filter__trigger">
+            {{ summary('sitContrato') }}
+          </summary>
+          <div class="global-filter__menu border rounded p-2 mt-1">
+            <div class="global-filter__checklist">
+              <label class="form-check mb-1">
+                <input
+                  type="radio"
+                  name="sitContratoGlobal"
+                  class="form-check-input"
+                  [checked]="selectedGlobalFilters().sitContrato.length === 0"
+                  (change)="onSitContratoChange('', true)"
+                />
+                <span class="form-check-label text-secondary">Todos</span>
+              </label>
+              @for (opt of sitContratoOptions; track opt) {
+                <label class="form-check mb-1">
+                  <input
+                    type="radio"
+                    name="sitContratoGlobal"
+                    class="form-check-input"
+                    [checked]="isSelected('sitContrato', opt)"
+                    (change)="onSitContratoChange(opt, false)"
+                  />
+                  <app-sit-contrato-badge [value]="opt" style="pointer-events: none"></app-sit-contrato-badge>
+                </label>
+              }
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Classificação -->
+      <div class="global-filter__field">
+        <span class="global-filter__field-label">Classificação</span>
+        <details
+          class="global-filter__dropdown"
+          [open]="isOpen('classificacao')"
+          (toggle)="onToggle('classificacao', $event)"
+        >
+          <summary class="form-select form-select-sm global-filter__trigger">
+            {{ summary('classificacao') }}
+          </summary>
+          <div class="global-filter__menu border rounded p-2 mt-1">
+            <div class="global-filter__checklist">
+              <label class="form-check mb-1">
+                <input
+                  type="radio"
+                  name="classificacaoGlobal"
+                  class="form-check-input"
+                  [checked]="
+                    isSelected('classificacao', 'Todos') ||
+                    selectedGlobalFilters().classificacao.length === 0
+                  "
+                  (change)="onClassificacaoChange('', true)"
+                />
+                <span class="form-check-label text-secondary">Todos</span>
+              </label>
+              @for (opt of classificacaoGroupOptions; track opt) {
+                <label class="form-check mb-1">
+                  <input
+                    type="radio"
+                    name="classificacaoGlobal"
+                    class="form-check-input"
+                    [checked]="isSelected('classificacao', opt)"
+                    (change)="onClassificacaoChange(opt, false)"
+                  />
+                  <span class="form-check-label">{{ opt }}</span>
+                </label>
+              }
+            </div>
+          </div>
+        </details>
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary align-self-end"
+          (click)="onClearAll()"
+        >
+          <i class="bi bi-x me-1"></i>Limpar
+        </button>
+      }
+    </div>
+
+    <!-- chips de filtros ativos -->
+    @if (hasActiveFilters()) {
+      <div class="global-filter-bar__chips d-flex gap-1 flex-wrap justify-content-center">
+        @for (chip of activeChips(); track chip.key + chip.value) {
+          <button
+            type="button"
+            class="global-filter__chip"
+            (click)="onChipRemove(chip.key, chip.value)"
+          >
+            <span class="global-filter__chip-label">{{ chip.label }}</span>
+            @if (chip.value) {
+              {{ chip.value }}
+            }
+            <i class="bi bi-x"></i>
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

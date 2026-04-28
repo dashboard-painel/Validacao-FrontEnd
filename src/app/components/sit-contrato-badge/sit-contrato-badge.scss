@@ -1,0 +1,52 @@
+:host {
+  display: inline-block;
+}
+
+.sit-contrato-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+
+  &--ativo {
+    color: var(--status-ok);
+    background-color: color-mix(in srgb, var(--status-ok) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-ok) 28%, transparent);
+  }
+
+  &--ativo-pendente {
+    color: var(--status-warning-strong);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
+  }
+
+  &--em-processo {
+    color: var(--status-silver-strong);
+    background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
+  }
+
+  &--inativo {
+    color: var(--status-nodata-strong);
+    background-color: color-mix(in srgb, var(--status-nodata) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-nodata) 28%, transparent);
+  }
+
+  &--inadimplente {
+    color: var(--status-danger);
+    background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
+  }
+
+  &--suspenso {
+    color: var(--status-warning-alt, #b98312);
+    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
+  }
+}

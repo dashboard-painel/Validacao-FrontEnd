@@ -1,0 +1,5 @@
+@if (label() !== '—') {
+  <span [class]="badgeClass()" [title]="label()">{{ label() }}</span>
+} @else {
+  <span class="text-body-secondary">—</span>
+}

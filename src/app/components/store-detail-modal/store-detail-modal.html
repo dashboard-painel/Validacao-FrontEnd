@@ -1,0 +1,172 @@
+@if (store(); as s) {
+  <div class="store-modal__backdrop" (click)="close()"></div>
+  <div class="store-modal" role="dialog" aria-modal="true" aria-labelledby="store-modal-title">
+    <div class="store-modal__header">
+      <h2 id="store-modal-title" class="store-modal__title">
+        <i class="bi bi-shop me-2"></i>{{ s.pharmacyName }}
+      </h2>
+      <button
+        type="button"
+        class="store-modal__close"
+        aria-label="Fechar"
+        (click)="close()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="store-modal__body">
+      <div class="store-modal__section">
+        <p class="store-modal__section-title">Identificação</p>
+        <div class="store-modal__grid">
+          <div class="store-modal__field">
+            <span class="store-modal__label">Cód. Associação</span>
+            <span class="store-modal__value">{{ s.associationCode }}</span>
+          </div>
+          <div class="store-modal__field">
+            <span class="store-modal__label">Cód. Farma</span>
+            <span class="store-modal__value">{{ s.farmaCode }}</span>
+          </div>
+          <div class="store-modal__field">
+            <span class="store-modal__label">CNPJ</span>
+            <span class="store-modal__value">{{ s.cnpj | cnpj }}</span>
+          </div>
+          @if (s.codigoRede) {
+            <div class="store-modal__field">
+              <span class="store-modal__label">Cód. Rede</span>
+              <span class="store-modal__value">{{ s.codigoRede }}</span>
+            </div>
+          }
+          <div class="store-modal__field">
+            <span class="store-modal__label">Classificação</span>
+            <span class="store-modal__value">
+              <app-classificacao-badge [value]="s.classificacao"></app-classificacao-badge>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="store-modal__section">
+        <p class="store-modal__section-title">Status</p>
+        <div class="store-modal__grid">
+          <div class="store-modal__field">
+            <span class="store-modal__label">Status geral</span>
+            <span class="store-modal__value">
+              <span
+                [class]="
+                  'delayed-stores__layer delayed-stores__layer--' +
+                  (s.status === 'Sem atraso'
+                    ? 'ok'
+                    : s.status === 'Sem dados'
+                      ? 'nodata'
+                      : 'api')
+                "
+              >
+                {{ s.status }}
+              </span>
+            </span>
+          </div>
+          <div class="store-modal__field">
+            <span class="store-modal__label">Atraso</span>
+            <span class="store-modal__value">
+              @if (
+                s.problemLayers.length > 0 &&
+                !s.problemLayers.includes('Sem dados') &&
+                s.delayHours > 0
+              ) {
+                <span
+                  [class]="
+                    'delayed-stores__delay-badge delayed-stores__delay-badge--' +
+                    urgencyClass(s.delayHours)
+                  "
+                >
+                  {{ formatDelay(s.delayHours) }}
+                </span>
+              } @else {
+                <span class="text-body-secondary">—</span>
+              }
+            </span>
+          </div>
+          <div class="store-modal__field">
+            <span class="store-modal__label">Sit. Contrato</span>
+            <span class="store-modal__value">
+              <app-sit-contrato-badge [value]="s.sitContrato"></app-sit-contrato-badge>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="store-modal__section">
+        <p class="store-modal__section-title">Camadas com atraso</p>
+        <div class="d-flex flex-wrap gap-1 mb-2">
+          @for (layer of s.layerItems; track layer.label) {
+            <span [class]="layer.className">{{ layer.label }}</span>
+          }
+        </div>
+        <div class="store-modal__layers-detail">
+          @for (entry of ['Gold', 'Silver', 'Coletor']; track entry) {
+            <div
+              [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()"
+            >
+              <span class="store-modal__layer-name">{{ entry }}</span>
+              <span class="store-modal__layer-date">
+                {{ layerLastSale(s, entry) }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (s.possivelCausa) {
+        <div class="store-modal__section">
+          <p class="store-modal__section-title">Possível causa</p>
+          <p class="store-modal__causa-text">{{ s.possivelCausa }}</p>
+        </div>
+      }
+
+      <div class="store-modal__section">
+        <p class="store-modal__section-title">Informações do Coletor</p>
+        <div class="coletor-info-card">
+          <div class="coletor-info-row">
+            <span class="coletor-info-label">Versão instalada</span>
+            <span class="coletor-info-value">
+              @if (s.numVersao) {
+                <code class="coletor-info-code">{{ s.numVersao }}</code>
+              } @else {
+                <span class="text-body-secondary">Não informado</span>
+              }
+            </span>
+          </div>
+          <div class="coletor-info-row">
+            <span class="coletor-info-label">Horário de operação</span>
+            <span class="coletor-info-value">
+              @if (coletorSchedule(s.numVersao); as schedule) {
+                <span class="coletor-info-schedule">
+                  <span
+                    [class]="
+                      'coletor-info-dot coletor-info-dot--' +
+                      (schedule === 'horário comercial' ? 'comercial' : 'fora')
+                    "
+                  ></span>
+                  {{
+                    schedule === 'horário comercial'
+                      ? 'Horário comercial'
+                      : 'Fora do horário comercial'
+                  }}
+                </span>
+              } @else {
+                <span class="text-body-secondary">Não informado</span>
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="store-modal__footer">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="close()">
+        Fechar
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,23 @@
+<p class="status-chart__title mb-3">Status das lojas</p>
+
+<div class="d-flex flex-column gap-3">
+  @for (item of items(); track item.label) {
+    <div [class]="item.itemClass">
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+        <span class="status-chart__label">
+          <span class="status-chart__dot" aria-hidden="true"></span>
+          {{ item.label }}
+        </span>
+        <span class="status-chart__value">{{ item.value }} ({{ item.percent }}%)</span>
+      </div>
+
+      <div
+        class="progress status-chart__progress"
+        role="img"
+        [attr.aria-label]="item.label + ': ' + item.percent + '% do total de lojas'"
+      >
+        <div [class]="item.barClass" [style.width.%]="item.percent"></div>
+      </div>
+    </div>
+  }
+</div>
