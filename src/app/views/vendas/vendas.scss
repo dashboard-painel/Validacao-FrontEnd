@@ -2,46 +2,6 @@
   display: block;
 }
 
-// ── KPI Cards ───────────────────────────────────────────────
-.vendas__kpi-card {
-  border-radius: 0.95rem;
-  border: 1px solid var(--painel-border);
-  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
-  box-shadow: var(--painel-shadow-soft);
-  padding: 1rem 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  border-left: 0.32rem solid var(--painel-primary);
-
-  &--ok {
-    border-left-color: var(--status-ok);
-  }
-
-  &--danger {
-    border-left-color: var(--status-danger);
-  }
-
-  &--info {
-    border-left-color: var(--status-silver);
-  }
-}
-
-.vendas__kpi-label {
-  color: var(--painel-muted);
-  font-size: 0.73rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.vendas__kpi-value {
-  color: var(--painel-text-strong);
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
 // ── Main card ───────────────────────────────────────────────
 .vendas__card {
   border-radius: 0.95rem;
@@ -177,7 +137,7 @@
 
 // ── Table ───────────────────────────────────────────────────
 .vendas__table-wrap {
-  height: 24rem;
+  height: 40rem;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;

@@ -8,6 +8,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, map, of, switchMap, timer } from 'rxjs';
 
+import { Kpi } from '../../components/kpi/kpi';
 import { VendasParceirosService } from '../../services/vendas-parceiros.service';
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
 
@@ -16,6 +17,7 @@ type FilterKey = 'associacao' | 'sitContrato';
 
 @Component({
   selector: 'app-vendas',
+  imports: [Kpi],
   templateUrl: './vendas.html',
   styleUrl: './vendas.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

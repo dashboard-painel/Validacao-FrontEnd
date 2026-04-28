@@ -13,28 +13,35 @@
       <section class="col-12" aria-label="Indicadores de vendas parceiros">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
           <div class="col">
-            <div class="vendas__kpi-card">
-              <span class="vendas__kpi-label">Total de Farmácias</span>
-              <strong class="vendas__kpi-value">{{ totalFarmacias() }}</strong>
-            </div>
+            <app-kpi
+              title="Total de Farmácias"
+              [value]="totalFarmacias()"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--ok">
-              <span class="vendas__kpi-label">Ativas</span>
-              <strong class="vendas__kpi-value">{{ farmaciasAtivas() }}</strong>
-            </div>
+            <app-kpi
+              title="Ativas"
+              [value]="farmaciasAtivas()"
+              tone="success"
+              badge="Ativas"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--danger">
-              <span class="vendas__kpi-label">Inativas</span>
-              <strong class="vendas__kpi-value">{{ farmaciasInativas() }}</strong>
-            </div>
+            <app-kpi
+              title="Inativas"
+              [value]="farmaciasInativas()"
+              tone="danger"
+              badge="Inativas"
+              [invertTrend]="true"
+            ></app-kpi>
           </div>
           <div class="col">
-            <div class="vendas__kpi-card vendas__kpi-card--info">
-              <span class="vendas__kpi-label">Venda nas últimas 24h</span>
-              <strong class="vendas__kpi-value">{{ comVendaRecente() }}</strong>
-            </div>
+            <app-kpi
+              title="Venda nas últimas 24h"
+              [value]="comVendaRecente()"
+              tone="nodata"
+              badge="24h"
+            ></app-kpi>
           </div>
         </div>
       </section>
