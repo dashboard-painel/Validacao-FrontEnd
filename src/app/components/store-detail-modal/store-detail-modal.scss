@@ -2,7 +2,90 @@
   display: contents;
 }
 
-// ── Delay badge (também usado no modal) ─────────────────────
+// ── Dialog sizing & appearance ───────────────────────────────
+.store-modal__dialog {
+  max-width: min(92vw, 32rem);
+}
+
+.store-modal__content {
+  // Override Bootstrap modal CSS vars to use project theme tokens
+  --bs-modal-bg: var(--painel-surface);
+  --bs-modal-color: var(--painel-text);
+  --bs-modal-border-color: var(--painel-border);
+  --bs-modal-header-border-color: var(--painel-border);
+  --bs-modal-footer-border-color: var(--painel-border);
+  --bs-card-bg: var(--painel-surface-soft);
+  --bs-card-border-color: var(--painel-border);
+  --bs-secondary-color: var(--painel-muted);
+  --bs-body-color: var(--painel-text);
+  --bs-emphasis-color: var(--painel-text-strong);
+
+  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
+  border: 1px solid var(--painel-border);
+  box-shadow: 0 20px 48px rgb(16 32 55 / 22%);
+  border-radius: 0.85rem;
+  animation: storeModalSlideIn 0.2s ease-out;
+  color: var(--painel-text);
+}
+
+// ── Section titles ────────────────────────────────────────────
+.store-modal__section-title {
+  font-size: 0.73rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.55rem;
+}
+
+// ── Layer rows ────────────────────────────────────────────────
+.store-modal__layer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.45rem;
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-table-border);
+  border-left: 0.25rem solid var(--painel-muted);
+
+  &--gold {
+    border-left-color: var(--status-warning);
+  }
+  &--silver {
+    border-left-color: var(--status-silver);
+  }
+  &--coletor {
+    border-left-color: var(--status-danger);
+  }
+}
+
+// ── Coletor card ─────────────────────────────────────────────
+.store-modal__coletor-card {
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
+  border-left: 3px solid var(--painel-border);
+  border-radius: 0.5rem;
+
+  code {
+    color: var(--painel-text-strong);
+  }
+}
+
+// ── Coletor schedule dot ─────────────────────────────────────
+.coletor-info-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--comercial {
+    background-color: var(--status-ok-strong, #1a7a4a);
+  }
+  &--fora {
+    background-color: var(--painel-muted, #8a9ab0);
+  }
+}
+
+// ── Delay badge ──────────────────────────────────────────────
 .delayed-stores__delay-badge {
   display: inline-flex;
   align-items: center;
@@ -87,265 +170,14 @@
   border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
 }
 
-// ── Coletor info card ────────────────────────────────────────
-.coletor-versao-badge {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 0.25rem;
-  border-radius: 999px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--painel-muted, #6b7a90);
-  background-color: var(--painel-surface-soft, #f0f2f5);
-  border: 1px solid var(--painel-border, #d8dde6);
-}
-
-.coletor-info-card {
-  background-color: var(--painel-surface-soft);
-  border: 1px solid var(--painel-border);
-  border-left: 3px solid var(--painel-border);
-  border-radius: 0.5rem;
-  padding: 0.65rem 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.coletor-info-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.coletor-info-label {
-  font-size: 0.75rem;
-  color: var(--painel-muted);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.coletor-info-value {
-  font-size: 0.82rem;
-  color: var(--painel-text-strong);
-  font-weight: 600;
-  text-align: right;
-}
-
-.coletor-info-code {
-  font-family: monospace;
-  font-size: 0.8rem;
-  color: var(--painel-text-strong);
-  background: none;
-  padding: 0;
-}
-
-.coletor-info-schedule {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.coletor-info-dot {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  flex-shrink: 0;
-
-  &--comercial {
-    background-color: var(--status-ok-strong, #1a7a4a);
-  }
-
-  &--fora {
-    background-color: var(--painel-muted, #8a9ab0);
-  }
-}
-
-// ── Store detail modal ─────────────────────────────────────
-.store-modal__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1040;
-  background-color: rgb(0 0 0 / 45%);
-  animation: storeModalFadeIn 0.15s ease-out;
-}
-
-.store-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1050;
-  width: min(92vw, 32rem);
-  display: flex;
-  flex-direction: column;
-  border-radius: 0.85rem;
-  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
-  border: 1px solid var(--painel-border);
-  box-shadow: 0 20px 48px rgb(16 32 55 / 22%);
-  animation: storeModalSlideIn 0.2s ease-out;
-}
-
-.store-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--painel-table-border);
-}
-
-.store-modal__title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--painel-text-strong);
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.store-modal__close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  padding: 0.3rem;
-  border-radius: 50%;
-  color: var(--painel-muted);
-  font-size: 1rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition:
-    color 0.15s,
-    background-color 0.15s;
-
-  &:hover {
-    color: var(--painel-text-strong);
-    background-color: rgb(0 0 0 / 8%);
-  }
-}
-
-.store-modal__body {
-  padding: 1rem;
-  overflow-y: auto;
-  max-height: 70vh;
-}
-
-.store-modal__section {
-  & + & {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--painel-table-border);
-  }
-}
-
-.store-modal__section-title {
-  font-size: 0.73rem;
-  font-weight: 700;
-  color: var(--painel-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.55rem;
-}
-
-.store-modal__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.6rem 1.2rem;
-}
-
-.store-modal__field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.store-modal__label {
-  font-size: 0.72rem;
-  color: var(--painel-muted);
-  font-weight: 600;
-}
-
-.store-modal__value {
-  font-size: 0.84rem;
-  color: var(--painel-text-strong);
-  font-weight: 600;
-}
-
-.store-modal__layers-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.store-modal__layer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.35rem 0.55rem;
-  border-radius: 0.45rem;
-  background-color: var(--painel-surface-soft);
-  border: 1px solid var(--painel-table-border);
-  border-left: 0.25rem solid var(--painel-muted);
-
-  &--gold {
-    border-left-color: var(--status-warning);
-  }
-  &--silver {
-    border-left-color: var(--status-silver);
-  }
-  &--coletor {
-    border-left-color: var(--status-danger);
-  }
-}
-
-.store-modal__layer-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--painel-text-strong);
-}
-
-.store-modal__layer-date {
-  font-size: 0.78rem;
-  color: var(--painel-muted);
-  font-weight: 600;
-}
-
-.store-modal__causa-text {
-  font-size: 0.84rem;
-  color: var(--painel-text);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.store-modal__footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.65rem 1rem;
-  border-top: 1px solid var(--painel-table-border);
-}
-
-@keyframes storeModalFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+// ── Slide-in animation ────────────────────────────────────────
 @keyframes storeModalSlideIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -48%);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    transform: translateY(0);
   }
 }
