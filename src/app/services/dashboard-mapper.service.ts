@@ -104,15 +104,6 @@ export class DashboardMapperService {
     return 'Com atraso';
   }
 
-  toLayerTooltip(store: DelayedStoreItem): string {
-    return (['Gold', 'Silver', 'Coletor'] as const)
-      .map((layer) => {
-        const date = store.lastSalesByLayer?.[layer] ?? 'Sem dados';
-        return `Último dado de venda (${layer}): ${date}`;
-      })
-      .join('\n');
-  }
-
   parseRawDatetime(raw: string | null): Date | null {
     if (!raw) return null;
     const cleaned = raw.replace(/\.\d+/, '').replace('T', ' ').trim();

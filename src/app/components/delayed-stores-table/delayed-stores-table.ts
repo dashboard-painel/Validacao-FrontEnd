@@ -52,7 +52,6 @@ export class DelayedStoresTable {
   selectedStoreStatuses     = input<StoreStatus[]>([]);
   selectedSitContratosLocal = input<string[]>([]);
   possivelCausaFilter       = input<string>('');
-  minDelayHoursFilter       = input<number>(0);
   sortColumn                = input<string>('delayHours');
   sortDir                   = input<'asc' | 'desc'>('desc');
 
@@ -95,7 +94,6 @@ export class DelayedStoresTable {
   readonly storeStatusChange        = output<StoreStatus[]>();
   readonly sitContratoLocalChange   = output<string[]>();
   readonly possivelCausaChange      = output<string>();
-  readonly minDelayChange           = output<number>();
   readonly multiFilterToggle        = output<{ key: string; open: boolean }>();
   readonly storeSelect              = output<DelayedStoreRow>();
   readonly tableScroll              = output<void>();
@@ -105,6 +103,8 @@ export class DelayedStoresTable {
   readonly filtersToggle            = output<void>();
 
   // ── Display helpers ──────────────────────────────────────────
+  /** Layers shown in the last-sale date columns (excludes 'Sem dados' — no timestamp available) */
+  readonly LAYER_KEYS: ProblemLayer[] = ['Gold', 'Silver', 'Coletor'];
   urgencyClass(hours: number): string {
     if (hours >= 48) return 'critical';
     if (hours >= 24) return 'high';
@@ -118,12 +118,12 @@ export class DelayedStoresTable {
   }
 
   formatDelay(hours: number): string {
-    if (hours > 48) return `${Math.round(hours / 24)} dias`;
+    if (hours >= 48) return `${Math.round(hours / 24)} dias`;
     return `${hours} horas`;
   }
 
-  layerLastSale(store: DelayedStoreRow, layer: string): string {
-    return (store.lastSalesByLayer as Record<string, string> | undefined)?.[layer] ?? 'Sem dados';
+  layerLastSale(store: DelayedStoreRow, layer: ProblemLayer): string {
+    return store.lastSalesByLayer?.[layer] ?? 'Sem dados';
   }
 
   multiFilterSummary(key: MultiFilterKey): string {
@@ -205,12 +205,8 @@ export class DelayedStoresTable {
     this.possivelCausaChange.emit((event.target as HTMLInputElement).value);
   }
 
-  onMinDelayInput(event: Event): void {
-    this.minDelayChange.emit(Number((event.target as HTMLInputElement).value));
-  }
-
   onMultiFilterToggle(key: string, event: Event): void {
-    const details = event.target instanceof HTMLDetailsElement ? event.target : null;
+    const details = event.currentTarget instanceof HTMLDetailsElement ? event.currentTarget : null;
     if (!details) return;
     this.multiFilterToggle.emit({ key, open: details.open });
   }

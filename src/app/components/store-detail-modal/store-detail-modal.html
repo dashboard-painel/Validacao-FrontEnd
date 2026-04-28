@@ -5,6 +5,8 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="store-modal-title"
+    tabindex="-1"
+    #dialogRef
     (click)="close()"
   >
     <div
@@ -111,7 +113,7 @@
               }
             </div>
             <div class="d-flex flex-column gap-2">
-              @for (entry of ['Gold', 'Silver', 'Coletor']; track entry) {
+              @for (entry of layerEntries; track entry) {
                 <div
                   [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()"
                 >

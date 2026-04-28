@@ -36,6 +36,5 @@ export type DelayedStoreRow = {
   classificacao: string | null;
   possivelCausa: string | null;
   status: StoreStatus;
-  layerTooltip: string;
   layerItems: { label: string; className: string }[];
 };

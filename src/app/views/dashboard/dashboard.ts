@@ -285,7 +285,6 @@ export class Dashboard {
       })
       .map((store) => ({
         ...store,
-        layerTooltip: this.mapper.toLayerTooltip(store),
         status: this.mapper.toStoreStatus(store),
         layerItems:
           store.problemLayers.length === 0
@@ -748,7 +747,14 @@ export class Dashboard {
   }
 
   onMultiFilterToggleChange(e: { key: string; open: boolean }): void {
-    this.openMultiFilter.set(e.open ? e.key : null);
+    if (e.open) {
+      this.openMultiFilter.set(e.key);
+    } else if (this.openMultiFilter() === e.key) {
+      // Only clear when the currently-tracked key is the one closing.
+      // Prevents spurious close events triggered by Angular's [open] binding
+      // from collapsing a dropdown that was just opened.
+      this.openMultiFilter.set(null);
+    }
   }
 
   onSortChange(e: { column: string; dir: 'asc' | 'desc' }): void {
