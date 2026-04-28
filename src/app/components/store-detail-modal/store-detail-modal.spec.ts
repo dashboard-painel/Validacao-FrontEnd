@@ -17,7 +17,6 @@ const mockStore: DelayedStoreRow = {
   classificacao: 'GOLD',
   possivelCausa: 'Pipeline falhou',
   status: 'Com atraso',
-  layerTooltip: 'Último dado de venda (Gold): 01/01/2025 10:00:00',
   layerItems: [{ label: 'Gold em atraso', className: 'delayed-stores__layer--gold' }],
 };
 

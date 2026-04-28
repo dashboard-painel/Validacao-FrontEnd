@@ -20,7 +20,6 @@ const MOCK_ROW: DelayedStoreRow = {
   numVersao: null,
   lastSalesByLayer: { Gold: '2024-01-01 10:00' },
   status: 'Com atraso',
-  layerTooltip: 'Último dado de venda (Gold): 01/01/2024 10:00',
 };
 
 describe('DelayedStoresTable', () => {

@@ -416,7 +416,7 @@
                 </div>
               </div>
               <div class="delayed-stores__layers-dates">
-                @for (entry of ['Gold', 'Silver', 'Coletor']; track entry) {
+                @for (entry of LAYER_KEYS; track entry) {
                   <span
                     [class]="
                       'delayed-stores__date-row delayed-stores__date-row--' + entry.toLowerCase()
