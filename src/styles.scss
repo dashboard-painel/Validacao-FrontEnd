@@ -178,4 +178,29 @@ body {
   .spinner-border.text-primary {
     color: var(--painel-primary) !important;
   }
+
+  // Bootstrap modal dark overrides
+  .modal-content {
+    --bs-modal-bg: var(--painel-surface);
+    --bs-modal-color: var(--painel-text);
+    --bs-modal-border-color: var(--painel-border);
+    --bs-modal-header-border-color: var(--painel-border);
+    --bs-modal-footer-border-color: var(--painel-border);
+    color: var(--painel-text);
+  }
+
+  .card {
+    --bs-card-bg: var(--painel-surface-soft);
+    --bs-card-border-color: var(--painel-border);
+    --bs-card-color: var(--painel-text);
+    color: var(--painel-text);
+  }
+
+  code {
+    color: var(--painel-text-strong);
+  }
+
+  .text-muted {
+    color: var(--painel-muted) !important;
+  }
 }

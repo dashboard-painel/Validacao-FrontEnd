@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.status-chart__title {
+  color: var(--painel-text-strong);
+  font-size: 0.9rem;
+  line-height: 1.25rem;
+  font-weight: 650;
+}
+
+.status-chart__item {
+  --status-item-color: var(--painel-primary);
+  --status-item-bg: var(--painel-surface-soft);
+  --status-item-border: rgb(31 79 134 / 24%);
+
+  padding: 0.6rem 0.7rem 0.7rem;
+  border: 1px solid var(--status-item-border);
+  border-left: 0.32rem solid var(--status-item-color);
+  border-radius: 0.72rem;
+  background-color: var(--status-item-bg);
+}
+
+.status-chart__item--ok {
+  --status-item-color: var(--status-ok);
+  --status-item-bg: var(--status-ok-soft);
+  --status-item-border: rgb(47 143 91 / 30%);
+}
+.status-chart__item--warning {
+  --status-item-color: var(--status-warning);
+  --status-item-bg: var(--status-warning-soft);
+  --status-item-border: rgb(199 145 26 / 32%);
+}
+.status-chart__item--warning-alt {
+  --status-item-color: var(--status-silver);
+  --status-item-bg: var(--status-silver-soft);
+  --status-item-border: rgb(15 123 138 / 30%);
+}
+.status-chart__item--danger {
+  --status-item-color: var(--status-danger);
+  --status-item-bg: var(--status-danger-soft);
+  --status-item-border: rgb(201 72 72 / 32%);
+}
+.status-chart__item--nodata {
+  --status-item-color: var(--status-nodata);
+  --status-item-bg: var(--status-nodata-soft);
+  --status-item-border: rgb(138 149 166 / 32%);
+}
+
+.status-chart__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--status-item-color);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.status-chart__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background-color: var(--status-item-color);
+  flex-shrink: 0;
+}
+
+.status-chart__value {
+  color: var(--status-item-color);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.status-chart__progress {
+  height: 0.72rem;
+  border-radius: 999px;
+  background-color: var(--painel-progress-bg);
+  overflow: hidden;
+}
+
+.status-chart__progress .progress-bar {
+  border-radius: inherit;
+}
+
+.status-chart__progress .bg-success {
+  background-color: var(--status-ok) !important;
+}
+.status-chart__progress .bg-warning {
+  background-color: var(--status-warning) !important;
+}
+.status-chart__progress .bg-info {
+  background-color: var(--status-silver) !important;
+}
+.status-chart__progress .bg-danger {
+  background-color: var(--status-danger) !important;
+}
+.status-chart__progress .bg-secondary {
+  background-color: var(--status-nodata) !important;
+}

@@ -14,10 +14,23 @@ import { EMPTY, Subject, catchError, merge, switchMap, timer } from 'rxjs';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
-import { CnpjPipe } from '../../pipes/cnpj.pipe';
+import { DelayedStoresTable } from '../../components/delayed-stores-table/delayed-stores-table';
+import { GlobalFilterBar } from '../../components/global-filter-bar/global-filter-bar';
+import { StatusBar } from '../../components/status-bar/status-bar';
+import { StoreDetailModal } from '../../components/store-detail-modal/store-detail-modal';
 import { type FarmaciaHistorico } from '../../models/shared/farmacia.model';
 import { HistoricoService } from '../../services/historico.service';
-import { getColetorSchedule } from '../../data/coletor-schedule.data';
+
+import {
+  type CnpjOption,
+  type DelayedStoreRow,
+  type GlobalFilterKey,
+  type LayerBadge,
+  type MultiFilterKey,
+  type ProblemLayer,
+  type StatusBarItem,
+  type StoreStatus,
+} from '../../models/shared/dashboard.model';
 
 type DashboardData = {
   kpis: {
@@ -60,37 +73,11 @@ type DashboardData = {
   }[];
 };
 
-type StatusBarItem = {
-  label: string;
-  value: number;
-  percent: number;
-  barClass: string;
-  itemClass: string;
-};
-
 type DelayedStoreItem = DashboardData['delayedStores'][number];
-type ProblemLayer = 'Gold' | 'Silver' | 'Coletor' | 'Sem dados';
-type MultiFilterKey = 'associationCode' | 'farmaCode' | 'cnpj';
-type GlobalFilterKey = 'associationCode' | 'sitContrato' | 'classificacao';
-type LayerBadge = ProblemLayer | 'Sem atraso';
-type StoreStatus = 'Com atraso' | 'Sem atraso' | 'Sem dados';
-type CnpjOption = {
-  cnpj: string;
-  pharmacyName: string;
-};
-
-type DelayedStoreRow = DelayedStoreItem & {
-  status: StoreStatus;
-  layerTooltip: string;
-  layerItems: {
-    label: string;
-    className: string;
-  }[];
-};
 
 @Component({
   selector: 'app-dashboard',
-  imports: [Kpi, GaugeComponent, CnpjPipe],
+  imports: [Kpi, GaugeComponent, GlobalFilterBar, StatusBar, DelayedStoresTable, StoreDetailModal],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -440,17 +427,6 @@ export class Dashboard {
     );
   });
 
-  readonly urgencyClass = (hours: number): string => {
-    if (hours >= 48) return 'critical';
-    if (hours >= 24) return 'high';
-    return 'moderate';
-  };
-
-  readonly rowUrgencyClass = (store: DelayedStoreRow): string => {
-    if (store.problemLayers.includes('Sem dados')) return 'nodata';
-    if (store.problemLayers.length === 0) return 'ok';
-    return this.urgencyClass(store.delayHours);
-  };
 
   private readonly storeStatusOf= (f: FarmaciaHistorico): StoreStatus => {
     const semDados = f.camadas_sem_dados?.length ?? 0;
@@ -460,53 +436,8 @@ export class Dashboard {
     return 'Sem atraso';
   };
 
-  private readonly sitContratoClassMap: Record<string, string> = {
-    ATIVO: 'sit-contrato-badge sit-contrato-badge--ativo',
-    'ATIVO-RETIDO': 'sit-contrato-badge sit-contrato-badge--ativo-pendente',
-    'ATIVO-ACORDO FINANCEIRO': 'sit-contrato-badge sit-contrato-badge--ativo-pendente',
-    ISENTO: 'sit-contrato-badge sit-contrato-badge--em-processo',
-    IMPLANTACAO: 'sit-contrato-badge sit-contrato-badge--em-processo',
-    PARCEIROS: 'sit-contrato-badge sit-contrato-badge--em-processo',
-    INATIVO: 'sit-contrato-badge sit-contrato-badge--inativo',
-    INADIMPLENTE: 'sit-contrato-badge sit-contrato-badge--inadimplente',
-    DESISTENTE: 'sit-contrato-badge sit-contrato-badge--inadimplente',
-    'BAIXA TEMPORARIA': 'sit-contrato-badge sit-contrato-badge--suspenso',
-    CONGELADO: 'sit-contrato-badge sit-contrato-badge--suspenso',
-    'SUBSTITUIÇÃO': 'sit-contrato-badge sit-contrato-badge--inativo',
-    'DES MANIPULAÇÃO': 'sit-contrato-badge sit-contrato-badge--inativo',
-  };
 
-  private readonly classificacaoClassMap: Record<string, string> = {
-    'GOLD': 'classificacao-badge classificacao-badge--gold',
-    'SELECT1': 'classificacao-badge classificacao-badge--select',
-    'SELECT2': 'classificacao-badge classificacao-badge--select',
-    'PRIME': 'classificacao-badge classificacao-badge--prime',
-    'NEONATAL': 'classificacao-badge classificacao-badge--neonatal',
-    'NEONATAL CLOUD': 'classificacao-badge classificacao-badge--neonatal',
-    'IMPLANTACAO': 'classificacao-badge classificacao-badge--implantacao',
-    '100% BRASIL': 'classificacao-badge classificacao-badge--brasil',
-    'CLOUD': 'classificacao-badge classificacao-badge--cloud',
-    'SNGPC': 'classificacao-badge classificacao-badge--sngpc',
-    'INATIVO': 'classificacao-badge classificacao-badge--inativo',
-  };
-
-  readonly classificacaoClass = (classificacao: string | null): string => {
-    if (!classificacao) return 'classificacao-badge classificacao-badge--null';
-    return (
-      this.classificacaoClassMap[classificacao.toUpperCase().trim()] ??
-      'classificacao-badge classificacao-badge--null'
-    );
-  };
-
-  readonly sitContratoClass = (sit: string | null): string => {
-    if (!sit) return 'sit-contrato-badge sit-contrato-badge--inativo';
-    return (
-      this.sitContratoClassMap[sit.toUpperCase().trim()] ??
-      'sit-contrato-badge sit-contrato-badge--inativo'
-    );
-  };
-
-  private readonly classificacaoGroupOf = (classif: string | null): 'Padrão' | 'Cloud' => {
+  private readonly classificacaoGroupOf= (classif: string | null): 'Padrão' | 'Cloud' => {
     if (!classif) return 'Padrão';
     const upper = classif.toUpperCase().trim();
     if (upper === 'CLOUD' || upper === 'NEONATAL CLOUD') return 'Cloud';
@@ -527,13 +458,6 @@ export class Dashboard {
     return 'Inativo';
   };
 
-  readonly formatDelay= (hours: number): string => {
-    if (hours > 48) return `${Math.round(hours / 24)} dias`;
-    return `${hours} horas`;
-  };
-
-  readonly coletorSchedule = (numVersao: string | null): string | null =>
-    getColetorSchedule(numVersao);
 
   constructor() {
     const stored = localStorage.getItem(this.kpisStorageKey);
@@ -655,16 +579,6 @@ export class Dashboard {
     );
   }
 
-  tableMultiSummary(key: 'problemLayer' | 'storeStatus' | 'sitContratoLocal'): string {
-    let selected: string[];
-    if (key === 'problemLayer') selected = this.selectedProblemLayers();
-    else if (key === 'storeStatus') selected = this.selectedStoreStatuses();
-    else selected = this.selectedSitContratosLocal();
-
-    if (selected.length === 0) return 'Todos';
-    if (selected.length === 1) return selected[0] ?? 'Todos';
-    return `${selected.length} selecionados`;
-  }
 
   isGlobalSelected(key: GlobalFilterKey, value: string): boolean {
     return this.selectedGlobalFilters()[key].includes(value);
@@ -726,16 +640,8 @@ export class Dashboard {
     this.openMultiFilter.set(details.open ? key : null);
   }
 
-  onTableScroll(event: Event): void {
-    const host = event.target as HTMLElement | null;
-
-    if (!host) {
-      return;
-    }
-
-    const nearBottom = host.scrollTop + host.clientHeight >= host.scrollHeight - 120;
-
-    if (nearBottom && this.hasMoreRows()) {
+  onTableScroll(): void {
+    if (this.hasMoreRows()) {
       this.renderedRowsCount.update((current) =>
         Math.min(current + this.pageSize, this.filteredDelayedStoreRows().length),
       );
@@ -777,9 +683,6 @@ export class Dashboard {
     this.selectedStore.set(null);
   }
 
-  layerLastSale(store: DelayedStoreRow, layer: string): string {
-    return (store.lastSalesByLayer as Record<string, string> | undefined)?.[layer] ?? 'Sem dados';
-  }
 
   clearFilters(): void {
     this.selectedMultiFilters.set({
@@ -845,20 +748,6 @@ export class Dashboard {
 
   isMultiFilterOpen(key: string): boolean {
     return this.openMultiFilter() === key;
-  }
-
-  multiFilterSummary(key: MultiFilterKey): string {
-    const selected = this.selectedMultiFilters()[key];
-
-    if (selected.length === 0) {
-      return 'Todos';
-    }
-
-    if (selected.length === 1) {
-      return selected[0] ?? 'Todos';
-    }
-
-    return `${selected.length} selecionados`;
   }
 
   private toLayerClass(layer: LayerBadge): string {
@@ -1107,4 +996,79 @@ export class Dashboard {
     }
     return cleaned;
   }
+
+  // ── GlobalFilterBar output handlers ─────────────────────────
+  onGlobalFilterChange(e: { key: GlobalFilterKey; values: string[] }): void {
+    this.selectedGlobalFilters.update((f) => ({ ...f, [e.key]: e.values }));
+  }
+
+  onGlobalSearchChange(search: string): void {
+    this.globalFilterSearch.set(search);
+  }
+
+  onGlobalDropdownToggle(e: { key: GlobalFilterKey; open: boolean }): void {
+    this.openGlobalFilter.set(e.open ? e.key : null);
+  }
+
+  onGlobalChipRemove(e: { key: GlobalFilterKey; value: string }): void {
+    this.selectedGlobalFilters.update((f) => ({
+      ...f,
+      [e.key]: f[e.key].filter((v) => v !== e.value),
+    }));
+  }
+
+  // ── DelayedStoresTable output handlers ───────────────────────
+  onMultiCheckboxChange(e: { key: MultiFilterKey; values: string[] }): void {
+    this.selectedMultiFilters.update((f) => ({ ...f, [e.key]: e.values }));
+  }
+
+  onPharmacyNameChange(value: string): void {
+    this.pharmacyNameFilter.set(value);
+  }
+
+  onMultiSearchChange(e: { key: MultiFilterKey; search: string }): void {
+    this.multiFilterSearch.update((m) => ({ ...m, [e.key]: e.search }));
+  }
+
+  onProblemLayerChange(layers: ProblemLayer[]): void {
+    this.selectedProblemLayers.set(layers);
+  }
+
+  onStoreStatusChange(statuses: StoreStatus[]): void {
+    this.selectedStoreStatuses.set(statuses);
+  }
+
+  onSitContratoLocalChange(values: string[]): void {
+    this.selectedSitContratosLocal.set(values);
+  }
+
+  onPossivelCausaChange(value: string): void {
+    this.possivelCausaFilter.set(value);
+  }
+
+  onMinDelayChange(value: number): void {
+    this.minDelayHoursFilter.set(value);
+  }
+
+  onMultiFilterToggleChange(e: { key: string; open: boolean }): void {
+    this.openMultiFilter.set(e.open ? e.key : null);
+  }
+
+  onSortChange(e: { column: string; dir: 'asc' | 'desc' }): void {
+    this.sortColumn.set(e.column as 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours');
+    this.sortDir.set(e.dir);
+  }
+
+  onPresetChange(preset: string | null): void {
+    if (preset === null) {
+      this.clearFilters();
+    } else {
+      this.applyPreset(preset as 'all' | 'critical' | 'nodata' | 'ok');
+    }
+  }
+
+  onFiltersToggle(): void {
+    this.filtersOpen.update((v) => !v);
+  }
 }
+

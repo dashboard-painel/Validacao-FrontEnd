@@ -1,0 +1,70 @@
+:host {
+  display: inline-block;
+}
+
+.classificacao-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: 1px solid transparent;
+  color: var(--painel-text-strong);
+
+  &--gold {
+    background-color: color-mix(in srgb, #c7911a 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #c7911a 38%, transparent);
+  }
+
+  &--select {
+    background-color: color-mix(in srgb, var(--status-silver) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-silver) 38%, transparent);
+  }
+
+  &--prime {
+    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
+  }
+
+  &--neonatal {
+    background-color: color-mix(in srgb, var(--status-ok) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-ok) 38%, transparent);
+  }
+
+  &--implantacao {
+    background-color: color-mix(in srgb, var(--status-warning) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-warning) 38%, transparent);
+  }
+
+  &--inativo {
+    color: var(--status-nodata-strong);
+    background-color: color-mix(in srgb, var(--status-nodata) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--status-nodata) 38%, transparent);
+  }
+
+  &--brasil {
+    background-color: color-mix(in srgb, #2e7d32 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #2e7d32 38%, transparent);
+  }
+
+  &--cloud {
+    background-color: color-mix(in srgb, #1976d2 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #1976d2 38%, transparent);
+  }
+
+  &--sngpc {
+    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
+  }
+
+  &--null {
+    color: var(--painel-muted);
+    background-color: var(--painel-surface-soft);
+    border-color: var(--painel-border);
+  }
+}

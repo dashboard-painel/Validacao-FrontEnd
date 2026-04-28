@@ -1,0 +1,14 @@
+:host {
+  display: inline-block;
+}
+
+.causa-badge {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--painel-text);
+  cursor: default;
+  max-width: 14rem;
+}
