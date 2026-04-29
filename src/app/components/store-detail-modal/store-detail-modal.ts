@@ -17,10 +17,10 @@ import { type DelayedStoreRow, type ProblemLayer } from '../../models/shared/das
 import { getColetorSchedule } from '../../data/coletor-schedule.data';
 import { ClassificacaoBadge } from '../classificacao-badge/classificacao-badge';
 import { SitContratoBadge } from '../sit-contrato-badge/sit-contrato-badge';
+import { urgencyClass, formatDelay, layerLastSale } from '../../utils/display-helpers';
 
 @Component({
   selector: 'app-store-detail-modal',
-  standalone: true,
   imports: [CnpjPipe, SitContratoBadge, ClassificacaoBadge],
   templateUrl: './store-detail-modal.html',
   styleUrl: './store-detail-modal.scss',
@@ -90,20 +90,9 @@ export class StoreDetailModal {
 
   // --- Display helpers ---
 
-  layerLastSale(store: DelayedStoreRow, layer: ProblemLayer): string {
-    return store.lastSalesByLayer?.[layer] ?? 'Sem dados';
-  }
-
-  readonly urgencyClass = (hours: number): string => {
-    if (hours >= 48) return 'critical';
-    if (hours >= 24) return 'high';
-    return 'moderate';
-  };
-
-  readonly formatDelay = (hours: number): string => {
-    if (hours >= 48) return `${Math.round(hours / 24)} dias`;
-    return `${hours} horas`;
-  };
+  readonly layerLastSale = layerLastSale;
+  readonly urgencyClass = urgencyClass;
+  readonly formatDelay = formatDelay;
 
   readonly coletorSchedule = (numVersao: string | null): string | null =>
     getColetorSchedule(numVersao);

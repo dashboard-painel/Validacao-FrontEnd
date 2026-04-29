@@ -35,83 +35,38 @@ import {
   type StatusBarItem,
   type StoreStatus,
 } from '../../models/shared/dashboard.model';
+import { DashboardFilterState } from './dashboard-filter.state';
 
 @Component({
   selector: 'app-dashboard',
   imports: [Kpi, GaugeComponent, GlobalFilterBar, StatusBar, DelayedStoresTable, StoreDetailModal],
+  providers: [DashboardFilterState],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
-  private readonly pageSize = 60;
   private readonly historicoService = inject(HistoricoService);
   private readonly mapper = inject(DashboardMapperService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly kpisStorageKey = 'dashboard-kpis';
   private readonly forceRefresh$ = new Subject<void>();
 
+  readonly fs = inject(DashboardFilterState);
+
   readonly apiStores = signal<FarmaciaHistorico[]>([]);
   readonly isLoading = signal(true);
+  readonly loadError = signal<string | null>(null);
   readonly isComparing = signal(false);
   readonly compareError = signal<string | null>(null);
   private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
 
-  readonly selectedMultiFilters = signal<Record<MultiFilterKey, string[]>>({
-    associationCode: [],
-    farmaCode: [],
-    cnpj: [],
-  });
-  readonly multiFilterSearch = signal<Record<MultiFilterKey, string>>({
-    associationCode: '',
-    farmaCode: '',
-    cnpj: '',
-  });
-  readonly openMultiFilter = signal<string | null>(null);
-  readonly pharmacyNameFilter = signal('');
-  readonly selectedProblemLayers = signal<ProblemLayer[]>([]);
-  readonly selectedStoreStatuses = signal<StoreStatus[]>([]);
-  readonly selectedSitContratosLocal = signal<string[]>([]);
-  readonly selectedGlobalFilters = signal<Record<GlobalFilterKey, string[]>>({
-    associationCode: [],
-    sitContrato: ['Ativo'],
-    classificacao: ['Padrão'],
-  });
-  readonly globalFilterSearch = signal('');
-  readonly openGlobalFilter = signal<GlobalFilterKey | null>(null);
-  readonly possivelCausaFilter = signal('');
-  readonly minDelayHoursFilter = signal(0);
-  readonly filtersOpen = signal(false);
-
-  readonly activePreset = computed((): 'all' | 'critical' | 'nodata' | 'ok' | null => {
-    if (!this.hasActiveFilters()) return 'all';
-    const statuses = this.selectedStoreStatuses();
-    const minDelay = this.minDelayHoursFilter();
-    if (this.hasNonPresetFilters()) return null;
-    if (statuses.length === 1 && statuses[0] === 'Com atraso' && minDelay === 48) return 'critical';
-    if (statuses.length === 1 && statuses[0] === 'Sem dados' && minDelay === 0) return 'nodata';
-    if (statuses.length === 1 && statuses[0] === 'Sem atraso' && minDelay === 0) return 'ok';
-    return null;
-  });
-
-  readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
-    'associationCode',
-  );
-  readonly sortDir = signal<'asc' | 'desc'>('asc');
   readonly selectedStore = signal<DelayedStoreRow | null>(null);
 
-  sortBy(col: 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'): void {
-    if (this.sortColumn() === col) {
-      this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      this.sortColumn.set(col);
-      this.sortDir.set('asc');
-    }
-  }
-
+  // ── Data pipeline ─────────────────────────────────────────
   readonly globalFilteredStores = computed(() => {
     const stores = this.apiStores();
-    const gf = this.selectedGlobalFilters();
+    const gf = this.fs.selectedGlobalFilters();
     return stores.filter((f) => {
       if (gf.associationCode.length > 0 && !gf.associationCode.includes(f.associacao))
         return false;
@@ -186,9 +141,9 @@ export class Dashboard {
     return [...new Set(values)].sort((a, b) => a.localeCompare(b));
   });
   readonly comparableAssociation = computed(() => {
-    const globalSel = this.selectedGlobalFilters().associationCode;
+    const globalSel = this.fs.selectedGlobalFilters().associationCode;
     if (globalSel.length === 1) return globalSel[0] ?? null;
-    const localSel = this.selectedMultiFilters().associationCode;
+    const localSel = this.fs.selectedMultiFilters().associationCode;
     return localSel.length === 1 ? (localSel[0] ?? null) : null;
   });
 
@@ -204,42 +159,16 @@ export class Dashboard {
     const values = this.apiStores().map((f) => f.associacao).filter(Boolean);
     return [...new Set(values)].sort();
   });
-  readonly hasActiveGlobalFilters = computed(() =>
-    Object.values(this.selectedGlobalFilters()).some((v) => v.length > 0),
-  );
-
-  readonly activeGlobalFilterChips = computed(() => {
-    const gf = this.selectedGlobalFilters();
-    const labelMap: Record<GlobalFilterKey, string> = {
-      associationCode: 'Assoc.',
-      sitContrato: 'Sit.',
-      classificacao: 'Classif.',
-    };
-    return (Object.keys(gf) as GlobalFilterKey[]).flatMap((key) =>
-      gf[key].map((value) => ({
-        key,
-        value,
-        label: labelMap[key],
-      })),
-    );
-  });
-
-  removeGlobalFilterChip(key: GlobalFilterKey, value: string): void {
-    this.selectedGlobalFilters.update((current) => ({
-      ...current,
-      [key]: current[key].filter((v) => v !== value),
-    }));
-  }
 
   private readonly storesScopedForFarmaCode = computed(() => {
-    const selected = this.selectedMultiFilters().associationCode;
+    const selected = this.fs.selectedMultiFilters().associationCode;
     const stores = this.dashboardData().delayedStores;
     if (selected.length === 0) return stores;
     return stores.filter((s) => selected.includes(s.associationCode));
   });
 
   private readonly storesScopedForCnpj = computed(() => {
-    const { associationCode, farmaCode } = this.selectedMultiFilters();
+    const { associationCode, farmaCode } = this.fs.selectedMultiFilters();
     const stores = this.dashboardData().delayedStores;
     return stores.filter((s) => {
       if (associationCode.length > 0 && !associationCode.includes(s.associationCode)) return false;
@@ -271,8 +200,8 @@ export class Dashboard {
   readonly filteredCnpjOptions = computed(() => this.filterCnpjOptionsBySearch(this.cnpjOptions()));
 
   readonly delayedStoreRows = computed((): DelayedStoreRow[] => {
-    const col = this.sortColumn();
-    const dir = this.sortDir();
+    const col = this.fs.sortColumn();
+    const dir = this.fs.sortDir();
     return [...this.dashboardData().delayedStores]
       .sort((a, b) => {
         let cmp: number;
@@ -297,99 +226,59 @@ export class Dashboard {
   });
 
   readonly filteredDelayedStoreRows = computed(() => {
-    const selectedFilters = this.selectedMultiFilters();
-    const pharmacyNameQuery = this.pharmacyNameFilter().trim().toLowerCase();
-    const problemLayerFilters = this.selectedProblemLayers();
-    const statusFilters = this.selectedStoreStatuses();
-    const sitContratoFilters = this.selectedSitContratosLocal();
-    const possivelCausaQuery = this.possivelCausaFilter().trim().toLowerCase();
-    const minDelayHours = this.minDelayHoursFilter();
+    const selectedFilters = this.fs.selectedMultiFilters();
+    const pharmacyNameQuery = this.fs.pharmacyNameFilter().trim().toLowerCase();
+    const problemLayerFilters = this.fs.selectedProblemLayers();
+    const statusFilters = this.fs.selectedStoreStatuses();
+    const sitContratoFilters = this.fs.selectedSitContratosLocal();
+    const possivelCausaQuery = this.fs.possivelCausaFilter().trim().toLowerCase();
+    const minDelayHours = this.fs.minDelayHoursFilter();
 
     return this.delayedStoreRows().filter((store) => {
       if (
         selectedFilters.associationCode.length > 0 &&
         !selectedFilters.associationCode.includes(store.associationCode)
-      ) {
+      )
         return false;
-      }
-
       if (
         selectedFilters.farmaCode.length > 0 &&
         !selectedFilters.farmaCode.includes(store.farmaCode)
-      ) {
+      )
         return false;
-      }
-
-      if (selectedFilters.cnpj.length > 0 && !selectedFilters.cnpj.includes(store.cnpj)) {
+      if (selectedFilters.cnpj.length > 0 && !selectedFilters.cnpj.includes(store.cnpj))
         return false;
-      }
-
-      if (pharmacyNameQuery && !store.pharmacyName.toLowerCase().includes(pharmacyNameQuery)) {
+      if (pharmacyNameQuery && !store.pharmacyName.toLowerCase().includes(pharmacyNameQuery))
         return false;
-      }
-
       if (
         problemLayerFilters.length > 0 &&
         !store.problemLayers.some((l) => problemLayerFilters.includes(l))
-      ) {
+      )
         return false;
-      }
-
-      if (statusFilters.length > 0 && !statusFilters.includes(store.status)) {
+      if (statusFilters.length > 0 && !statusFilters.includes(store.status))
         return false;
-      }
-
       if (
         sitContratoFilters.length > 0 &&
         !sitContratoFilters.includes(store.sitContrato ?? '')
-      ) {
+      )
         return false;
-      }
-
       if (
         possivelCausaQuery &&
         !(store.possivelCausa ?? '').toLowerCase().includes(possivelCausaQuery)
-      ) {
+      )
         return false;
-      }
-
-      if (minDelayHours > 0 && store.delayHours < minDelayHours) {
+      if (minDelayHours > 0 && store.delayHours < minDelayHours)
         return false;
-      }
-
       return true;
     });
   });
 
   readonly filteredDelayedStoreCount = computed(() => this.filteredDelayedStoreRows().length);
-  readonly renderedRowsCount = signal(this.pageSize);
   readonly visibleDelayedStoreRows = computed(() =>
-    this.filteredDelayedStoreRows().slice(0, this.renderedRowsCount()),
+    this.filteredDelayedStoreRows().slice(0, this.fs.renderedRowsCount()),
   );
   readonly hasMoreRows = computed(
     () => this.visibleDelayedStoreRows().length < this.filteredDelayedStoreRows().length,
   );
-  /** Filters that are incompatible with named presets (excludes storeStatuses and minDelayHours). */
-  private readonly hasNonPresetFilters = computed(() => {
-    const selected = this.selectedMultiFilters();
-    return (
-      selected.associationCode.length > 0 ||
-      selected.farmaCode.length > 0 ||
-      selected.cnpj.length > 0 ||
-      this.pharmacyNameFilter().trim().length > 0 ||
-      this.selectedProblemLayers().length > 0 ||
-      this.selectedSitContratosLocal().length > 0 ||
-      this.possivelCausaFilter().trim().length > 0
-    );
-  });
-
-  readonly hasActiveFilters = computed(
-    () =>
-      this.hasNonPresetFilters() ||
-      this.selectedStoreStatuses().length > 0 ||
-      this.minDelayHoursFilter() > 0,
-  );
-
 
   constructor() {
     const stored = localStorage.getItem(this.kpisStorageKey);
@@ -425,31 +314,18 @@ export class Dashboard {
       });
     }
 
-    effect(() => {
-      this.selectedGlobalFilters();
-      this.selectedMultiFilters();
-      this.multiFilterSearch();
-      this.pharmacyNameFilter();
-      this.selectedProblemLayers();
-      this.selectedStoreStatuses();
-      this.selectedSitContratosLocal();
-      this.possivelCausaFilter();
-      this.minDelayHoursFilter();
-
-      this.renderedRowsCount.set(this.pageSize);
-    });
-
+    // Cascade: prune farmaCode/cnpj selections when upstream association changes.
     effect(() => {
       const availableFarmaSet = new Set(this.farmaCodeOptions());
       const availableCnpjSet = new Set(this.cnpjOptions().map((o) => o.cnpj));
 
-      const current = untracked(() => this.selectedMultiFilters());
+      const current = untracked(() => this.fs.selectedMultiFilters());
       const newFarmaCode = current.farmaCode.filter((c) => availableFarmaSet.has(c));
       const newCnpj = current.cnpj.filter((c) => availableCnpjSet.has(c));
 
       if (newFarmaCode.length < current.farmaCode.length || newCnpj.length < current.cnpj.length) {
         untracked(() => {
-          this.selectedMultiFilters.set({ ...current, farmaCode: newFarmaCode, cnpj: newCnpj });
+          this.fs.selectedMultiFilters.set({ ...current, farmaCode: newFarmaCode, cnpj: newCnpj });
         });
       }
     });
@@ -460,6 +336,7 @@ export class Dashboard {
           this.historicoService.getHistorico().pipe(
             catchError(() => {
               this.isLoading.set(false);
+              this.loadError.set('Falha ao carregar dados. Tentando novamente...');
               return EMPTY;
             }),
           ),
@@ -469,86 +346,27 @@ export class Dashboard {
       .subscribe((data) => {
         this.apiStores.set(data);
         this.isLoading.set(false);
+        this.loadError.set(null);
       });
   }
 
-  onMultiCheckboxFilter(key: MultiFilterKey, value: string, event: Event): void {
-    const checked = this.readCheckboxChecked(event);
-
-    this.selectedMultiFilters.update((current) => {
-      const currentValues = current[key];
-      const nextValues = checked
-        ? [...new Set([...currentValues, value])]
-        : currentValues.filter((item) => item !== value);
-
-      return { ...current, [key]: nextValues };
-    });
-  }
-
-  onPharmacyNameFilter(event: Event): void {
-    this.pharmacyNameFilter.set(this.readInputValue(event));
-  }
-
-  onMultiFilterSearch(key: MultiFilterKey, event: Event): void {
-    const value = this.readInputValue(event);
-    this.multiFilterSearch.update((current) => ({ ...current, [key]: value }));
-  }
-
-  onProblemLayerCheckbox(layer: ProblemLayer, event: Event): void {
-    const checked = this.readCheckboxChecked(event);
-    this.selectedProblemLayers.update((current) =>
-      checked ? [...new Set([...current, layer])] : current.filter((l) => l !== layer),
-    );
-  }
-
-  onStoreStatusCheckbox(status: StoreStatus, event: Event): void {
-    const checked = this.readCheckboxChecked(event);
-    this.selectedStoreStatuses.update((current) =>
-      checked ? [...new Set([...current, status])] : current.filter((s) => s !== status),
-    );
-  }
-
-  onSitContratoLocalCheckbox(value: string, event: Event): void {
-    const checked = this.readCheckboxChecked(event);
-    this.selectedSitContratosLocal.update((current) =>
-      checked ? [...new Set([...current, value])] : current.filter((s) => s !== value),
-    );
-  }
-
-
-  clearGlobalFilters(): void {
-    this.selectedGlobalFilters.set({ associationCode: [], sitContrato: [], classificacao: [] });
-    this.globalFilterSearch.set('');
-    this.openGlobalFilter.set(null);
-  }
-
-  onPossivelCausaFilter(event: Event): void {
-    this.possivelCausaFilter.set(this.readInputValue(event));
-  }
-
+  // ── Actions ───────────────────────────────────────────────
   onTableScroll(): void {
     if (this.hasMoreRows()) {
-      this.renderedRowsCount.update((current) =>
-        Math.min(current + this.pageSize, this.filteredDelayedStoreRows().length),
+      this.fs.renderedRowsCount.update((current) =>
+        Math.min(current + 60, this.filteredDelayedStoreRows().length),
       );
     }
   }
 
+  // Close open dropdowns when clicking outside them.
+  // Relies on CSS class names from child components (DelayedStoresTable and GlobalFilterBar).
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as Element | null;
-
-    if (!target) {
-      return;
-    }
-
-    if (!target.closest('.delayed-stores__dropdown')) {
-      this.openMultiFilter.set(null);
-    }
-
-    if (!target.closest('.global-filter__dropdown')) {
-      this.openGlobalFilter.set(null);
-    }
+    if (!target) return;
+    if (!target.closest('.delayed-stores__dropdown')) this.fs.openMultiFilter.set(null);
+    if (!target.closest('.global-filter__dropdown')) this.fs.openGlobalFilter.set(null);
   }
 
   @HostListener('document:keydown.escape')
@@ -557,8 +375,8 @@ export class Dashboard {
       this.closeStoreModal();
       return;
     }
-    this.openMultiFilter.set(null);
-    this.openGlobalFilter.set(null);
+    this.fs.openMultiFilter.set(null);
+    this.fs.openGlobalFilter.set(null);
   }
 
   openStoreModal(store: DelayedStoreRow): void {
@@ -567,43 +385,6 @@ export class Dashboard {
 
   closeStoreModal(): void {
     this.selectedStore.set(null);
-  }
-
-
-  clearFilters(): void {
-    this.selectedMultiFilters.set({
-      associationCode: [],
-      farmaCode: [],
-      cnpj: [],
-    });
-    this.multiFilterSearch.set({
-      associationCode: '',
-      farmaCode: '',
-      cnpj: '',
-    });
-    this.pharmacyNameFilter.set('');
-    this.selectedProblemLayers.set([]);
-    this.selectedStoreStatuses.set([]);
-    this.selectedSitContratosLocal.set([]);
-    this.possivelCausaFilter.set('');
-    this.minDelayHoursFilter.set(0);
-    this.openMultiFilter.set(null);
-  }
-
-  applyPreset(preset: 'all' | 'critical' | 'nodata' | 'ok'): void {
-    this.clearFilters();
-    if (preset === 'critical') {
-      this.selectedStoreStatuses.set(['Com atraso']);
-      this.minDelayHoursFilter.set(48);
-    } else if (preset === 'nodata') {
-      this.selectedStoreStatuses.set(['Sem dados']);
-    } else if (preset === 'ok') {
-      this.selectedStoreStatuses.set(['Sem atraso']);
-    }
-  }
-
-  toggleFilters(): void {
-    this.filtersOpen.update((v) => !v);
   }
 
   onComparar(): void {
@@ -628,18 +409,94 @@ export class Dashboard {
       });
   }
 
-  isMultiSelected(key: MultiFilterKey, value: string): boolean {
-    return this.selectedMultiFilters()[key].includes(value);
+  // ── GlobalFilterBar output handlers ─────────────────────────
+  onGlobalFilterChange(e: { key: GlobalFilterKey; values: string[] }): void {
+    this.fs.updateGlobalFilter(e.key, e.values);
   }
 
-  isMultiFilterOpen(key: string): boolean {
-    return this.openMultiFilter() === key;
+  onGlobalSearchChange(search: string): void {
+    this.fs.globalFilterSearch.set(search);
   }
 
-  private readInputValue(event: Event): string {
-    return (event.target as HTMLInputElement | null)?.value ?? '';
+  onGlobalDropdownToggle(e: { key: GlobalFilterKey; open: boolean }): void {
+    if (e.open) {
+      this.fs.openGlobalFilter.set(e.key);
+    } else if (this.fs.openGlobalFilter() === e.key) {
+      this.fs.openGlobalFilter.set(null);
+    }
   }
 
+  onGlobalChipRemove(e: { key: GlobalFilterKey; value: string }): void {
+    this.fs.removeGlobalFilterChip(e.key, e.value);
+  }
+
+  // ── DelayedStoresTable output handlers ───────────────────────
+  onMultiCheckboxChange(e: { key: MultiFilterKey; values: string[] }): void {
+    this.fs.selectedMultiFilters.update((f) => ({ ...f, [e.key]: e.values }));
+    this.fs.resetPagination();
+  }
+
+  onPharmacyNameChange(value: string): void {
+    this.fs.setPharmacyNameFilter(value);
+  }
+
+  onMultiSearchChange(e: { key: MultiFilterKey; search: string }): void {
+    this.fs.setMultiFilterSearch(e.key, e.search);
+  }
+
+  onProblemLayerChange(layers: ProblemLayer[]): void {
+    this.fs.selectedProblemLayers.set(layers);
+    this.fs.resetPagination();
+  }
+
+  onStoreStatusChange(statuses: StoreStatus[]): void {
+    this.fs.selectedStoreStatuses.set(statuses);
+    this.fs.resetPagination();
+  }
+
+  onSitContratoLocalChange(values: string[]): void {
+    this.fs.selectedSitContratosLocal.set(values);
+    this.fs.resetPagination();
+  }
+
+  onPossivelCausaChange(value: string): void {
+    this.fs.setPossivelCausaFilter(value);
+  }
+
+  onMinDelayChange(value: number): void {
+    this.fs.setMinDelayHoursFilter(value);
+  }
+
+  onMultiFilterToggleChange(e: { key: string; open: boolean }): void {
+    if (e.open) {
+      this.fs.openMultiFilter.set(e.key);
+    } else if (this.fs.openMultiFilter() === e.key) {
+      this.fs.openMultiFilter.set(null);
+    }
+  }
+
+  onSortChange(e: { column: string; dir: 'asc' | 'desc' }): void {
+    const validColumns = ['associationCode', 'farmaCode', 'cnpj', 'delayHours'] as const;
+    if (!(validColumns as readonly string[]).includes(e.column)) return;
+    this.fs.sortColumn.set(e.column as (typeof validColumns)[number]);
+    this.fs.sortDir.set(e.dir);
+  }
+
+  onPresetChange(preset: string | null): void {
+    if (preset === null) {
+      this.fs.clearFilters();
+      return;
+    }
+    if (preset === 'all' || preset === 'critical' || preset === 'nodata' || preset === 'ok') {
+      this.fs.applyPreset(preset);
+    }
+  }
+
+  onFiltersToggle(): void {
+    this.fs.toggleFilters();
+  }
+
+  // ── Private helpers ──────────────────────────────────────
   private uniqueSortedOptions(key: MultiFilterKey): string[] {
     return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort(
       (a, b) => a.localeCompare(b),
@@ -647,21 +504,14 @@ export class Dashboard {
   }
 
   private filterOptionsBySearch(key: MultiFilterKey, options: string[]): string[] {
-    const query = this.normalizeByFilterKey(key, this.multiFilterSearch()[key].trim());
-
-    if (!query) {
-      return options;
-    }
-
+    const query = this.normalizeByFilterKey(key, this.fs.multiFilterSearch()[key].trim());
+    if (!query) return options;
     return options.filter((option) => this.normalizeByFilterKey(key, option).includes(query));
   }
 
   private filterCnpjOptionsBySearch(options: CnpjOption[]): CnpjOption[] {
-    const query = this.multiFilterSearch().cnpj.trim();
-
-    if (!query) {
-      return options;
-    }
+    const query = this.fs.multiFilterSearch().cnpj.trim();
+    if (!query) return options;
 
     const normalizedDigits = query.replace(/\D/g, '');
     const normalizedText = query.toLowerCase();
@@ -675,107 +525,8 @@ export class Dashboard {
   }
 
   private normalizeByFilterKey(key: MultiFilterKey, value: string): string {
-    if (key === 'cnpj') {
-      return value.replace(/\D/g, '');
-    }
-
+    if (key === 'cnpj') return value.replace(/\D/g, '');
     return value.toLowerCase();
-  }
-
-  private readCheckboxChecked(event: Event): boolean {
-    return (event.target as HTMLInputElement | null)?.checked ?? false;
-  }
-
-  // ── GlobalFilterBar output handlers ─────────────────────────
-  onGlobalFilterChange(e: { key: GlobalFilterKey; values: string[] }): void {
-    this.selectedGlobalFilters.update((f) => ({ ...f, [e.key]: e.values }));
-  }
-
-  onGlobalSearchChange(search: string): void {
-    this.globalFilterSearch.set(search);
-  }
-
-  onGlobalDropdownToggle(e: { key: GlobalFilterKey; open: boolean }): void {
-    if (e.open) {
-      this.openGlobalFilter.set(e.key);
-    } else if (this.openGlobalFilter() === e.key) {
-      // Only clear when the key that is currently tracked as open emits a close.
-      // Ignores spurious close events triggered by Angular's [open] property binding
-      // when a previously-open dropdown is collapsed by change detection.
-      this.openGlobalFilter.set(null);
-    }
-  }
-
-  onGlobalChipRemove(e: { key: GlobalFilterKey; value: string }): void {
-    this.selectedGlobalFilters.update((f) => ({
-      ...f,
-      [e.key]: f[e.key].filter((v) => v !== e.value),
-    }));
-  }
-
-  // ── DelayedStoresTable output handlers ───────────────────────
-  onMultiCheckboxChange(e: { key: MultiFilterKey; values: string[] }): void {
-    this.selectedMultiFilters.update((f) => ({ ...f, [e.key]: e.values }));
-  }
-
-  onPharmacyNameChange(value: string): void {
-    this.pharmacyNameFilter.set(value);
-  }
-
-  onMultiSearchChange(e: { key: MultiFilterKey; search: string }): void {
-    this.multiFilterSearch.update((m) => ({ ...m, [e.key]: e.search }));
-  }
-
-  onProblemLayerChange(layers: ProblemLayer[]): void {
-    this.selectedProblemLayers.set(layers);
-  }
-
-  onStoreStatusChange(statuses: StoreStatus[]): void {
-    this.selectedStoreStatuses.set(statuses);
-  }
-
-  onSitContratoLocalChange(values: string[]): void {
-    this.selectedSitContratosLocal.set(values);
-  }
-
-  onPossivelCausaChange(value: string): void {
-    this.possivelCausaFilter.set(value);
-  }
-
-  onMinDelayChange(value: number): void {
-    this.minDelayHoursFilter.set(value);
-  }
-
-  onMultiFilterToggleChange(e: { key: string; open: boolean }): void {
-    if (e.open) {
-      this.openMultiFilter.set(e.key);
-    } else if (this.openMultiFilter() === e.key) {
-      // Only clear when the currently-tracked key is the one closing.
-      // Prevents spurious close events triggered by Angular's [open] binding
-      // from collapsing a dropdown that was just opened.
-      this.openMultiFilter.set(null);
-    }
-  }
-
-  onSortChange(e: { column: string; dir: 'asc' | 'desc' }): void {
-    const validColumns = ['associationCode', 'farmaCode', 'cnpj', 'delayHours'] as const;
-    if (!(validColumns as readonly string[]).includes(e.column)) return;
-    this.sortColumn.set(e.column as (typeof validColumns)[number]);
-    this.sortDir.set(e.dir);
-  }
-
-  onPresetChange(preset: string | null): void {
-    if (preset === null) {
-      this.clearFilters();
-      return;
-    }
-    if (preset === 'all' || preset === 'critical' || preset === 'nodata' || preset === 'ok') {
-      this.applyPreset(preset);
-    }
-  }
-
-  onFiltersToggle(): void {
-    this.filtersOpen.update((v) => !v);
   }
 }
 

@@ -18,8 +18,6 @@ const SIT_CONTRATO_CLASS_MAP: Record<string, string> = {
 
 @Component({
   selector: 'app-sit-contrato-badge',
-  standalone: true,
-  imports: [],
   templateUrl: './sit-contrato-badge.html',
   styleUrl: './sit-contrato-badge.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

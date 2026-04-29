@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'cnpj', standalone: true })
+@Pipe({ name: 'cnpj' })
 export class CnpjPipe implements PipeTransform {
   transform(value: string | null | undefined): string {
     if (!value) return '-';

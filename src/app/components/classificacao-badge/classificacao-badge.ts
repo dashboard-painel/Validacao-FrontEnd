@@ -16,8 +16,6 @@ const CLASSIFICACAO_CLASS_MAP: Record<string, string> = {
 
 @Component({
   selector: 'app-classificacao-badge',
-  standalone: true,
-  imports: [],
   templateUrl: './classificacao-badge.html',
   styleUrl: './classificacao-badge.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

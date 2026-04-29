@@ -1,3 +1,5 @@
+@use 'scrollbar';
+
 :host {
   display: block;
 }
@@ -182,27 +184,7 @@
   max-height: 8.8rem;
   overflow: auto;
   padding-right: 0.15rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--painel-border) transparent;
-
-  &::-webkit-scrollbar {
-    width: 0.35rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--painel-border);
-    border-radius: 999px;
-    transition: background-color 0.15s;
-  }
-
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: var(--painel-muted);
-  }
+  @include scrollbar.thin-scrollbar;
 }
 
 // ── Table ───────────────────────────────────────────────────
@@ -210,27 +192,7 @@
   height: 40rem;
   overflow-x: hidden;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--painel-border) transparent;
-
-  &::-webkit-scrollbar {
-    width: 0.35rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 999px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--painel-border);
-    border-radius: 999px;
-    transition: background-color 0.15s;
-  }
-
-  &:hover::-webkit-scrollbar-thumb {
-    background-color: var(--painel-muted);
-  }
+  @include scrollbar.thin-scrollbar;
 }
 
 .vendas__table {
@@ -331,56 +293,6 @@
 .vendas__empty {
   color: var(--painel-muted);
   font-size: 0.84rem;
-}
-
-// ── Sit. Contrato badges ────────────────────────────────────
-.vendas__sit-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 0.18rem 0.55rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.1;
-  text-transform: capitalize;
-  border: 1px solid transparent;
-
-  &--ativo {
-    color: var(--status-ok);
-    background-color: color-mix(in srgb, var(--status-ok) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-ok) 28%, transparent);
-  }
-
-  &--inativo {
-    color: var(--status-danger);
-    background-color: color-mix(in srgb, var(--status-danger) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-danger) 28%, transparent);
-  }
-
-  &--implantacao {
-    color: var(--status-silver-strong);
-    background-color: color-mix(in srgb, var(--status-silver) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-silver) 28%, transparent);
-  }
-
-  &--desistente {
-    color: var(--status-warning-strong);
-    background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
-  }
-
-  &--isento {
-    color: var(--status-nodata-strong);
-    background-color: color-mix(in srgb, var(--status-nodata) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-nodata) 28%, transparent);
-  }
-
-  &--parceiros {
-    color: var(--painel-primary);
-    background-color: color-mix(in srgb, var(--painel-primary) 9%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--painel-primary) 28%, transparent);
-  }
 }
 
 // ── Recência badges ─────────────────────────────────────────
