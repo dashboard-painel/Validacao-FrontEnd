@@ -44,14 +44,14 @@ export class DashboardFilterState {
   readonly filtersOpen = signal(false);
 
   readonly sortColumn = signal<'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours'>(
-    'associationCode',
+    'delayHours',
   );
-  readonly sortDir = signal<'asc' | 'desc'>('asc');
+  readonly sortDir = signal<'asc' | 'desc'>('desc');
   readonly renderedRowsCount = signal(this.pageSize);
 
   // ── Derived state ─────────────────────────────────────────
-  /** Filters incompatible with named presets (excludes storeStatuses and minDelayHours). */
-  readonly hasNonPresetFilters = computed(() => {
+  /** Filters that live in the advanced panel instead of the quick triage row. */
+  readonly hasAdvancedFilters = computed(() => {
     const selected = this.selectedMultiFilters();
     return (
       selected.associationCode.length > 0 ||
@@ -66,21 +66,10 @@ export class DashboardFilterState {
 
   readonly hasActiveFilters = computed(
     () =>
-      this.hasNonPresetFilters() ||
+      this.hasAdvancedFilters() ||
       this.selectedStoreStatuses().length > 0 ||
       this.minDelayHoursFilter() > 0,
   );
-
-  readonly activePreset = computed((): 'all' | 'critical' | 'nodata' | 'ok' | null => {
-    if (!this.hasActiveFilters()) return 'all';
-    const statuses = this.selectedStoreStatuses();
-    const minDelay = this.minDelayHoursFilter();
-    if (this.hasNonPresetFilters()) return null;
-    if (statuses.length === 1 && statuses[0] === 'Com atraso' && minDelay === 48) return 'critical';
-    if (statuses.length === 1 && statuses[0] === 'Sem dados' && minDelay === 0) return 'nodata';
-    if (statuses.length === 1 && statuses[0] === 'Sem atraso' && minDelay === 0) return 'ok';
-    return null;
-  });
 
   readonly hasActiveGlobalFilters = computed(() =>
     Object.values(this.selectedGlobalFilters()).some((v) => v.length > 0),
@@ -112,7 +101,7 @@ export class DashboardFilterState {
       this.sortDir.update((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
       this.sortColumn.set(col);
-      this.sortDir.set('asc');
+      this.sortDir.set(col === 'delayHours' ? 'desc' : 'asc');
     }
   }
 
@@ -197,18 +186,6 @@ export class DashboardFilterState {
     this.minDelayHoursFilter.set(0);
     this.openMultiFilter.set(null);
     this.resetPagination();
-  }
-
-  applyPreset(preset: 'all' | 'critical' | 'nodata' | 'ok'): void {
-    this.clearFilters();
-    if (preset === 'critical') {
-      this.selectedStoreStatuses.set(['Com atraso']);
-      this.minDelayHoursFilter.set(48);
-    } else if (preset === 'nodata') {
-      this.selectedStoreStatuses.set(['Sem dados']);
-    } else if (preset === 'ok') {
-      this.selectedStoreStatuses.set(['Sem atraso']);
-    }
   }
 
   toggleFilters(): void {

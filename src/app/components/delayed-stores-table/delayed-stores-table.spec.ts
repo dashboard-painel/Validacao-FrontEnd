@@ -38,11 +38,11 @@ describe('DelayedStoresTable', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('urgencyClass returns "critical" for >=48h, "high" for >=24h, "moderate" otherwise', () => {
+  it('urgencyClass retorna "critical" para >=48h, "high" para >=24h e "moderate" nos demais casos', () => {
     expect(component.urgencyClass(48)).toBe('critical');
     expect(component.urgencyClass(72)).toBe('critical');
     expect(component.urgencyClass(24)).toBe('high');
@@ -50,32 +50,32 @@ describe('DelayedStoresTable', () => {
     expect(component.urgencyClass(10)).toBe('moderate');
   });
 
-  it('rowUrgencyClass returns "nodata" for Sem dados rows', () => {
+  it('rowUrgencyClass retorna "nodata" para linhas Sem dados', () => {
     const nodataRow = { ...MOCK_ROW, problemLayers: ['Sem dados'] as ProblemLayer[], delayHours: 0 };
     expect(component.rowUrgencyClass(nodataRow as DelayedStoreRow)).toBe('nodata');
   });
 
-  it('rowUrgencyClass returns "ok" for zero delay without Sem dados', () => {
+  it('rowUrgencyClass retorna "ok" para atraso zero sem Sem dados', () => {
     const okRow = { ...MOCK_ROW, problemLayers: [] as ProblemLayer[], delayHours: 0 };
     expect(component.rowUrgencyClass(okRow as DelayedStoreRow)).toBe('ok');
   });
 
-  it('formatDelay returns days for >48h and hours otherwise', () => {
+  it('formatDelay retorna dias acima de 48h e horas nos demais casos', () => {
     expect(component.formatDelay(72)).toBe('3 dias');
     expect(component.formatDelay(24)).toBe('24 horas');
   });
 
-  it('multiFilterSummary returns "Todos" when nothing selected', () => {
+  it('multiFilterSummary retorna "Todos" quando nada foi selecionado', () => {
     expect(component.multiFilterSummary('associationCode')).toBe('Todos');
   });
 
-  it('isMultiFilterOpen returns true only for the matching key', () => {
+  it('isMultiFilterOpen retorna true apenas para a chave aberta', () => {
     fixture.componentRef.setInput('openMultiFilter', 'farmaCode');
     expect(component.isMultiFilterOpen('farmaCode')).toBe(true);
     expect(component.isMultiFilterOpen('cnpj')).toBe(false);
   });
 
-  it('filteredAssociationCodeOptions filters by search term', () => {
+  it('filteredAssociationCodeOptions filtra pelos termos buscados', () => {
     fixture.componentRef.setInput('associationCodeOptions', ['ASS001', 'ASS002', 'XYZ']);
     fixture.componentRef.setInput('multiFilterSearch', {
       associationCode: 'ass',
@@ -85,5 +85,44 @@ describe('DelayedStoresTable', () => {
     fixture.detectChanges();
     const result = component.filteredAssociationCodeOptions();
     expect(result).toEqual(['ASS001', 'ASS002']);
+  });
+
+  it('renderiza apenas os atalhos rapidos de atraso minimo', () => {
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botoes = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.delayed-stores__preset-btn--delay'),
+    );
+
+    expect(botoes.map((botao) => botao.textContent?.trim())).toEqual(['0h', '24h+', '48h+', '72h+']);
+  });
+
+  it('marca como ativo o preset selecionado de atraso minimo', () => {
+    fixture.componentRef.setInput('minDelayHours', 48);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botoes = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.delayed-stores__preset-btn--delay'),
+    );
+    const botaoAtivo = botoes.find((botao) => botao.textContent?.trim() === '48h+');
+    const botaoInativo = botoes.find((botao) => botao.textContent?.trim() === '0h');
+
+    expect(botaoAtivo?.classList.contains('delayed-stores__preset-btn--active')).toBe(true);
+    expect(botaoAtivo?.getAttribute('aria-pressed')).toBe('true');
+    expect(botaoInativo?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('emite minDelayChange ao clicar em um preset rapido', () => {
+    const emissoes: number[] = [];
+    component.minDelayChange.subscribe((value) => emissoes.push(value));
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botaoAlvo = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.delayed-stores__preset-btn--delay'),
+    ).find((botao) => botao.textContent?.trim() === '48h+');
+
+    botaoAlvo?.click();
+
+    expect(emissoes).toEqual([48]);
   });
 });

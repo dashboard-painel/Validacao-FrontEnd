@@ -1,4 +1,4 @@
-<section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
+﻿<section data-testid="page-dashboard" aria-labelledby="heading-dashboard">
   <h1 id="heading-dashboard" data-testid="heading-dashboard" class="visually-hidden">Dashboard</h1>
 
   @if (isLoading()) {
@@ -14,6 +14,7 @@
         <span>{{ error }}</span>
       </div>
     }
+
     <!-- ── Filtro Global ──────────────────────────────────────────── -->
     <app-global-filter-bar
       [selectedGlobalFilters]="fs.selectedGlobalFilters()"
@@ -32,14 +33,14 @@
         <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
           <div class="col">
             <app-kpi
-              title="Total de Lojas"
+              title="Total de Farmácias"
               [value]="dashboardData().kpis.totalStores"
               [previousValue]="dashboardData().previousKpis.totalStores"
             ></app-kpi>
           </div>
           <div class="col">
             <app-kpi
-              title="Quantidade de Lojas OK"
+              title="Quantidade de Farmácias OK"
               [value]="dashboardData().kpis.okStores"
               tone="success"
               badge="OK"
@@ -48,7 +49,7 @@
           </div>
           <div class="col">
             <app-kpi
-              title="Quantidade de Lojas com Atraso"
+              title="Quantidade de Farmácias com Atraso"
               [value]="dashboardData().kpis.divergentStores"
               tone="danger"
               badge="Alerta"
@@ -58,7 +59,7 @@
           </div>
           <div class="col">
             <app-kpi
-              title="Quantidade de Lojas Sem Dados"
+              title="Quantidade de Farmácias Sem Dados"
               [value]="dashboardData().kpis.storesWithoutData"
               tone="nodata"
               [previousValue]="dashboardData().previousKpis.storesWithoutData"
@@ -69,8 +70,8 @@
         </div>
       </section>
 
-      <section id="secao-indicador" class="col-12" aria-label="Indicador de lojas">
-        <article class="card status-chart-card" role="group" aria-label="Indicador de lojas">
+      <section id="secao-indicador" class="col-12" aria-label="Indicador de farmácias">
+        <article class="card status-chart-card" role="group" aria-label="Indicador de farmácias">
           <div class="card-body">
             <div class="row g-3 align-items-stretch">
               <div class="col-12 col-sm-5 col-xl-3 d-flex">
@@ -90,36 +91,22 @@
         </article>
       </section>
 
-      <section id="secao-lojas-monitoradas" class="col-12" aria-labelledby="heading-lojas-monitoradas">
+      <section
+        id="secao-farmacias-monitoradas"
+        class="col-12"
+        aria-labelledby="heading-farmacias-monitoradas"
+      >
         <article class="card delayed-stores-card">
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-              <p id="heading-lojas-monitoradas" class="delayed-stores__title mb-0">Lojas monitoradas</p>
+              <p id="heading-farmacias-monitoradas" class="delayed-stores__title mb-0">
+                Lista de farmácias
+              </p>
               <div class="d-flex align-items-center gap-2">
                 <span class="delayed-stores__count"
-                  >{{ filteredDelayedStoreCount() }} de {{ delayedStoreRows().length }} lojas</span
+                  >{{ filteredDelayedStoreCount() }} de
+                  {{ delayedStoreRows().length }} farmácias</span
                 >
-                <span id="compare-hint" class="visually-hidden">{{ compareButtonTitle() }}</span>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-primary"
-                  [disabled]="!comparableAssociation() || isComparing()"
-                  (click)="onComparar()"
-                  [title]="compareButtonTitle()"
-                  aria-describedby="compare-hint"
-                >
-                  @if (isComparing()) {
-                    <span
-                      class="spinner-border spinner-border-sm me-1"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Comparando...
-                  } @else {
-                    <i class="bi bi-arrow-clockwise me-1"></i>
-                    Atualizar
-                  }
-                </button>
               </div>
             </div>
             @if (compareError()) {
@@ -136,7 +123,7 @@
               [hasMoreRows]="hasMoreRows()"
               [hasActiveFilters]="fs.hasActiveFilters()"
               [filtersOpen]="fs.filtersOpen()"
-              [activePreset]="fs.activePreset()"
+              [minDelayHours]="fs.minDelayHoursFilter()"
               [selectedMultiFilters]="fs.selectedMultiFilters()"
               [multiFilterSearch]="fs.multiFilterSearch()"
               [openMultiFilter]="fs.openMultiFilter()"
@@ -160,12 +147,12 @@
               (storeStatusChange)="onStoreStatusChange($event)"
               (sitContratoLocalChange)="onSitContratoLocalChange($event)"
               (possivelCausaChange)="onPossivelCausaChange($event)"
+              (minDelayChange)="onMinDelayChange($event)"
               (multiFilterToggle)="onMultiFilterToggleChange($event)"
               (storeSelect)="openStoreModal($event)"
               (tableScroll)="onTableScroll()"
               (clearFilters)="fs.clearFilters()"
               (sortChange)="onSortChange($event)"
-              (presetChange)="onPresetChange($event)"
               (filtersToggle)="onFiltersToggle()"
             ></app-delayed-stores-table>
           </div>

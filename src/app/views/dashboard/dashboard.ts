@@ -24,7 +24,6 @@ import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.serv
 import {
   DashboardMapperService,
   type DashboardData,
-  type DelayedStoreItem,
 } from '../../services/dashboard-mapper.service';
 
 import {
@@ -210,9 +209,12 @@ export class Dashboard {
       .sort((a, b) => {
         let cmp: number;
         if (col === 'delayHours') {
-          cmp = a.delayHours - b.delayHours;
+          cmp = this.compareByDelayPriority(a, b);
         } else {
           cmp = a[col].localeCompare(b[col]);
+          if (cmp === 0) {
+            cmp = this.compareByDelayPriority(a, b);
+          }
         }
         return dir === 'asc' ? cmp : -cmp;
       })
@@ -336,7 +338,7 @@ export class Dashboard {
         return;
       }
 
-      if (latestTimestamp === appliedTimestamp) return;
+      if (this.timestampsMatch(latestTimestamp, appliedTimestamp)) return;
 
       untracked(() => this.loadHistorico(latestTimestamp));
     });
@@ -492,21 +494,32 @@ export class Dashboard {
     this.fs.sortDir.set(e.dir);
   }
 
-  onPresetChange(preset: string | null): void {
-    if (preset === null) {
-      this.fs.clearFilters();
-      return;
-    }
-    if (preset === 'all' || preset === 'critical' || preset === 'nodata' || preset === 'ok') {
-      this.fs.applyPreset(preset);
-    }
-  }
-
   onFiltersToggle(): void {
     this.fs.toggleFilters();
   }
 
   // ── Private helpers ──────────────────────────────────────
+  private compareByDelayPriority(
+    a: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
+    b: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
+  ): number {
+    const aMetric = this.delaySortMetric(a);
+    const bMetric = this.delaySortMetric(b);
+    const metricDiff = aMetric === bMetric ? 0 : aMetric < bMetric ? -1 : 1;
+    if (metricDiff !== 0) return metricDiff;
+
+    return (
+      a.associationCode.localeCompare(b.associationCode) ||
+      a.farmaCode.localeCompare(b.farmaCode) ||
+      a.cnpj.localeCompare(b.cnpj)
+    );
+  }
+
+  private delaySortMetric(store: Pick<DelayedStoreRow, 'delayHours' | 'problemLayers'>): number {
+    if (store.problemLayers.includes('Sem dados')) return Number.POSITIVE_INFINITY;
+    return store.delayHours;
+  }
+
   private loadHistorico(referenceTimestamp?: string | null): void {
     if (this.historicoRequestInFlight()) return;
 
@@ -531,11 +544,9 @@ export class Dashboard {
         this.loadError.set(null);
         this.historicoRequestInFlight.set(false);
         this.hasLoadedHistoricoOnce.set(true);
+        const historicoTimestamp = this.extractLatestHistoricoTimestamp(data);
         this.appliedHistoricoTimestamp.set(
-          this.extractLatestHistoricoTimestamp(data) ??
-            referenceTimestamp ??
-            this.atualizacaoService.ultimaAtualizacao() ??
-            null,
+          referenceTimestamp ?? historicoTimestamp ?? this.atualizacaoService.ultimaAtualizacao() ?? null,
         );
       },
       error: () => {
@@ -585,13 +596,29 @@ export class Dashboard {
 
     for (const store of data) {
       if (!store.atualizado_em) continue;
-      const timestamp = new Date(store.atualizado_em).getTime();
-      if (Number.isNaN(timestamp) || timestamp <= latestMillis) continue;
+      const timestamp = this.toTimestampMillis(store.atualizado_em);
+      if (timestamp === null || timestamp <= latestMillis) continue;
       latestMillis = timestamp;
       latestTimestamp = store.atualizado_em;
     }
 
     return latestTimestamp;
+  }
+
+  private timestampsMatch(left: string | null, right: string | null): boolean {
+    if (left === right) return true;
+
+    const leftMillis = this.toTimestampMillis(left);
+    const rightMillis = this.toTimestampMillis(right);
+
+    return leftMillis !== null && rightMillis !== null && leftMillis === rightMillis;
+  }
+
+  private toTimestampMillis(value: string | null): number | null {
+    if (!value) return null;
+
+    const millis = new Date(value).getTime();
+    return Number.isNaN(millis) ? null : millis;
   }
 }
 

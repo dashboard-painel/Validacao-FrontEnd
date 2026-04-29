@@ -15,23 +15,23 @@ describe('ClassificacaoBadge', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should return --null class for null value', () => {
+  it('deve retornar a classe --null para valor null', () => {
     fixture.componentRef.setInput('value', null);
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('classificacao-badge--null');
   });
 
-  it('should return --gold class for GOLD value', () => {
+  it('deve retornar a classe --gold para o valor GOLD', () => {
     fixture.componentRef.setInput('value', 'GOLD');
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('classificacao-badge--gold');
   });
 
-  it('should be case-insensitive', () => {
+  it('deve ignorar diferencas entre maiusculas e minusculas', () => {
     fixture.componentRef.setInput('value', 'gold');
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('classificacao-badge--gold');

@@ -1,7 +1,29 @@
 @use 'scrollbar';
 @use 'layer-badges';
 
-// ── Quick Presets ──────────────────────────────────────────
+// ── Quick Controls ────────────────────────────────────────
+.delayed-stores__quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.delayed-stores__quick-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.delayed-stores__quick-label {
+  color: var(--painel-text-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 .delayed-stores__presets {
   display: flex;
   align-items: center;
@@ -12,6 +34,7 @@
   border: 1px solid var(--painel-border);
   border-radius: 0.6rem;
   width: fit-content;
+  max-width: 100%;
 }
 
 .delayed-stores__preset-btn {
@@ -49,39 +72,6 @@
     border-color: var(--painel-primary);
     box-shadow: var(--painel-shadow-interactive);
   }
-
-  &--critical.delayed-stores__preset-btn--active {
-    color: var(--status-danger);
-    border-color: color-mix(in srgb, var(--status-danger) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-danger) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-danger) 16%, transparent);
-  }
-
-  &--nodata.delayed-stores__preset-btn--active {
-    color: var(--status-nodata-strong);
-    border-color: color-mix(in srgb, var(--status-nodata) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-nodata) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-nodata) 16%, transparent);
-  }
-
-  &--ok.delayed-stores__preset-btn--active {
-    color: var(--status-ok);
-    border-color: color-mix(in srgb, var(--status-ok) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-ok) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-ok) 16%, transparent);
-  }
-}
-
-.delayed-stores__preset-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.1rem 0.35rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  line-height: 1;
-  background-color: color-mix(in srgb, currentColor 12%, transparent);
-  margin-left: 0.1rem;
 }
 
 // ── Filter panel ──────────────────────────────────────────

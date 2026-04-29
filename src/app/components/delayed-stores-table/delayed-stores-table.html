@@ -1,37 +1,20 @@
-<div class="delayed-stores__presets mb-3">
-  <button
-    type="button"
-    class="delayed-stores__preset-btn"
-    [class.delayed-stores__preset-btn--active]="activePreset() === 'all'"
-    (click)="applyPreset('all')"
-  >
-    Todos
-  </button>
-  <button
-    type="button"
-    class="delayed-stores__preset-btn delayed-stores__preset-btn--critical"
-    [class.delayed-stores__preset-btn--active]="activePreset() === 'critical'"
-    (click)="applyPreset('critical')"
-  >
-    <i class="bi bi-exclamation-triangle me-1"></i>Críticos
-    <span class="delayed-stores__preset-badge">+48h</span>
-  </button>
-  <button
-    type="button"
-    class="delayed-stores__preset-btn delayed-stores__preset-btn--nodata"
-    [class.delayed-stores__preset-btn--active]="activePreset() === 'nodata'"
-    (click)="applyPreset('nodata')"
-  >
-    <i class="bi bi-dash-circle me-1"></i>Sem dados
-  </button>
-  <button
-    type="button"
-    class="delayed-stores__preset-btn delayed-stores__preset-btn--ok"
-    [class.delayed-stores__preset-btn--active]="activePreset() === 'ok'"
-    (click)="applyPreset('ok')"
-  >
-    <i class="bi bi-check-circle me-1"></i>OK
-  </button>
+<div class="delayed-stores__quick-filters mb-3">
+  <div class="delayed-stores__quick-group">
+    <span class="delayed-stores__quick-label">Atraso mínimo</span>
+    <div class="delayed-stores__presets" role="group" aria-label="Filtro rápido por atraso mínimo">
+      @for (option of MIN_DELAY_OPTIONS; track option.value) {
+        <button
+          type="button"
+          class="delayed-stores__preset-btn delayed-stores__preset-btn--delay"
+          [class.delayed-stores__preset-btn--active]="minDelayHours() === option.value"
+          [attr.aria-pressed]="minDelayHours() === option.value"
+          (click)="onMinDelaySelect(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
 </div>
 
 <div class="delayed-stores__filters-panel mb-3">
@@ -360,7 +343,7 @@
       @if (filteredCount() === 0) {
         <tr>
           <td class="delayed-stores__empty text-center py-3" colspan="8">
-            Nenhuma loja encontrada com os filtros selecionados.
+            Nenhuma farmácia encontrada com os filtros selecionados.
           </td>
         </tr>
       } @else {
@@ -458,7 +441,7 @@
         @if (hasMoreRows()) {
           <tr>
             <td class="text-body-secondary text-center py-2" colspan="8">
-              Role para carregar mais lojas...
+              Role para carregar mais farmácias...
             </td>
           </tr>
         }

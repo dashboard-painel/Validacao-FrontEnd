@@ -1,4 +1,4 @@
-<p class="status-chart__title mb-3">Status das lojas</p>
+<p class="status-chart__title mb-3">Status das farmácias</p>
 
 <div class="d-flex flex-column gap-3">
   @for (item of items(); track item.label) {
@@ -14,7 +14,7 @@
       <div
         class="progress status-chart__progress"
         role="img"
-        [attr.aria-label]="item.label + ': ' + item.percent + '% do total de lojas'"
+        [attr.aria-label]="item.label + ': ' + item.percent + '% do total de farmácias'"
       >
         <div [class]="item.barClass" [style.width.%]="item.percent"></div>
       </div>
