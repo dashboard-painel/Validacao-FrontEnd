@@ -12,7 +12,7 @@
 .status-chart__item {
   --status-item-color: var(--painel-primary);
   --status-item-bg: var(--painel-surface-soft);
-  --status-item-border: rgb(31 79 134 / 24%);
+  --status-item-border: var(--painel-primary-border-soft);
 
   padding: 0.6rem 0.7rem 0.7rem;
   border: 1px solid var(--status-item-border);
@@ -24,27 +24,27 @@
 .status-chart__item--ok {
   --status-item-color: var(--status-ok);
   --status-item-bg: var(--status-ok-soft);
-  --status-item-border: rgb(47 143 91 / 30%);
+  --status-item-border: var(--status-ok-border);
 }
 .status-chart__item--warning {
   --status-item-color: var(--status-warning);
   --status-item-bg: var(--status-warning-soft);
-  --status-item-border: rgb(199 145 26 / 32%);
+  --status-item-border: var(--status-warning-border);
 }
 .status-chart__item--warning-alt {
   --status-item-color: var(--status-silver);
   --status-item-bg: var(--status-silver-soft);
-  --status-item-border: rgb(15 123 138 / 30%);
+  --status-item-border: var(--status-silver-border);
 }
 .status-chart__item--danger {
   --status-item-color: var(--status-danger);
   --status-item-bg: var(--status-danger-soft);
-  --status-item-border: rgb(201 72 72 / 32%);
+  --status-item-border: var(--status-danger-border);
 }
 .status-chart__item--nodata {
   --status-item-color: var(--status-nodata);
   --status-item-bg: var(--status-nodata-soft);
-  --status-item-border: rgb(138 149 166 / 32%);
+  --status-item-border: var(--status-nodata-border);
 }
 
 .status-chart__label {

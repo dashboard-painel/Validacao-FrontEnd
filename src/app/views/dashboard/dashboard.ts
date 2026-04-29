@@ -10,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, Subject, catchError, merge, switchMap, timer } from 'rxjs';
+import { type Observable } from 'rxjs';
 
 import { Gauge as GaugeComponent } from '../../components/gauge/gauge';
 import { Kpi } from '../../components/kpi/kpi';
@@ -20,6 +20,7 @@ import { StatusBar } from '../../components/status-bar/status-bar';
 import { StoreDetailModal } from '../../components/store-detail-modal/store-detail-modal';
 import { type FarmaciaHistorico } from '../../models/shared/farmacia.model';
 import { HistoricoService } from '../../services/historico.service';
+import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.service';
 import {
   DashboardMapperService,
   type DashboardData,
@@ -47,10 +48,13 @@ import { DashboardFilterState } from './dashboard-filter.state';
 })
 export class Dashboard {
   private readonly historicoService = inject(HistoricoService);
+  private readonly atualizacaoService = inject(UltimaAtualizacaoService);
   private readonly mapper = inject(DashboardMapperService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly kpisStorageKey = 'dashboard-kpis';
-  private readonly forceRefresh$ = new Subject<void>();
+  private readonly historicoRequestInFlight = signal(false);
+  private readonly hasLoadedHistoricoOnce = signal(false);
+  private readonly appliedHistoricoTimestamp = signal<string | null>(null);
 
   readonly fs = inject(DashboardFilterState);
 
@@ -314,6 +318,29 @@ export class Dashboard {
       });
     }
 
+    effect(() => {
+      this.atualizacaoService.ultimaAtualizacaoPollSequence();
+
+      const latestTimestamp = this.atualizacaoService.ultimaAtualizacao();
+      const appliedTimestamp = this.appliedHistoricoTimestamp();
+      const hasLoadedHistorico = this.hasLoadedHistoricoOnce();
+      const requestInFlight = this.historicoRequestInFlight();
+      const hasVisibleData = this.apiStores().length > 0;
+
+      if (!hasLoadedHistorico || requestInFlight) return;
+
+      if (!latestTimestamp) {
+        if (!hasVisibleData) {
+          untracked(() => this.loadHistorico());
+        }
+        return;
+      }
+
+      if (latestTimestamp === appliedTimestamp) return;
+
+      untracked(() => this.loadHistorico(latestTimestamp));
+    });
+
     // Cascade: prune farmaCode/cnpj selections when upstream association changes.
     effect(() => {
       const availableFarmaSet = new Set(this.farmaCodeOptions());
@@ -330,24 +357,7 @@ export class Dashboard {
       }
     });
 
-    merge(timer(0, 30_000), this.forceRefresh$)
-      .pipe(
-        switchMap(() =>
-          this.historicoService.getHistorico().pipe(
-            catchError(() => {
-              this.isLoading.set(false);
-              this.loadError.set('Falha ao carregar dados. Tentando novamente...');
-              return EMPTY;
-            }),
-          ),
-        ),
-        takeUntilDestroyed(),
-      )
-      .subscribe((data) => {
-        this.apiStores.set(data);
-        this.isLoading.set(false);
-        this.loadError.set(null);
-      });
+    this.loadHistorico();
   }
 
   // ── Actions ───────────────────────────────────────────────
@@ -399,7 +409,7 @@ export class Dashboard {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.forceRefresh$.next();
+          this.loadHistorico();
           this.isComparing.set(false);
         },
         error: () => {
@@ -497,6 +507,46 @@ export class Dashboard {
   }
 
   // ── Private helpers ──────────────────────────────────────
+  private loadHistorico(referenceTimestamp?: string | null): void {
+    if (this.historicoRequestInFlight()) return;
+
+    const isInitialLoad = !this.hasLoadedHistoricoOnce();
+    const appliedReferenceTimestamp = referenceTimestamp ?? this.atualizacaoService.ultimaAtualizacao() ?? null;
+    this.historicoRequestInFlight.set(true);
+    if (isInitialLoad) {
+      this.isLoading.set(true);
+    }
+
+    this.subscribeToHistorico(this.historicoService.getHistorico(), appliedReferenceTimestamp);
+  }
+
+  private subscribeToHistorico(
+    request$: Observable<FarmaciaHistorico[]>,
+    referenceTimestamp: string | null,
+  ): void {
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (data) => {
+        this.apiStores.set(data);
+        this.isLoading.set(false);
+        this.loadError.set(null);
+        this.historicoRequestInFlight.set(false);
+        this.hasLoadedHistoricoOnce.set(true);
+        this.appliedHistoricoTimestamp.set(
+          this.extractLatestHistoricoTimestamp(data) ??
+            referenceTimestamp ??
+            this.atualizacaoService.ultimaAtualizacao() ??
+            null,
+        );
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('Falha ao carregar dados. Tentando novamente...');
+        this.historicoRequestInFlight.set(false);
+        this.hasLoadedHistoricoOnce.set(true);
+      },
+    });
+  }
+
   private uniqueSortedOptions(key: MultiFilterKey): string[] {
     return [...new Set(this.dashboardData().delayedStores.map((store) => store[key]))].sort(
       (a, b) => a.localeCompare(b),
@@ -527,6 +577,21 @@ export class Dashboard {
   private normalizeByFilterKey(key: MultiFilterKey, value: string): string {
     if (key === 'cnpj') return value.replace(/\D/g, '');
     return value.toLowerCase();
+  }
+
+  private extractLatestHistoricoTimestamp(data: FarmaciaHistorico[]): string | null {
+    let latestTimestamp: string | null = null;
+    let latestMillis = Number.NEGATIVE_INFINITY;
+
+    for (const store of data) {
+      if (!store.atualizado_em) continue;
+      const timestamp = new Date(store.atualizado_em).getTime();
+      if (Number.isNaN(timestamp) || timestamp <= latestMillis) continue;
+      latestMillis = timestamp;
+      latestTimestamp = store.atualizado_em;
+    }
+
+    return latestTimestamp;
   }
 }
 

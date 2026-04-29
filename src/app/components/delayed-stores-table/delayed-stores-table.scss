@@ -47,7 +47,7 @@
     background-color: var(--painel-surface);
     color: var(--painel-primary-strong);
     border-color: var(--painel-primary);
-    box-shadow: 0 1px 4px rgb(31 79 134 / 12%);
+    box-shadow: var(--painel-shadow-interactive);
   }
 
   &--critical.delayed-stores__preset-btn--active {
@@ -114,7 +114,7 @@
   justify-content: center;
   border-radius: 999px;
   padding: 0.22rem 0.6rem;
-  background-color: rgb(31 79 134 / 14%);
+  background-color: var(--painel-primary-soft-strong);
   color: var(--painel-primary-strong);
   font-size: 0.72rem;
   line-height: 1;
@@ -172,7 +172,7 @@
   z-index: 40;
   max-height: 15rem;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
+  box-shadow: var(--painel-shadow-popover);
   background-color: var(--painel-dropdown-bg);
   color: var(--painel-text);
   border-color: var(--painel-border) !important;
@@ -266,7 +266,7 @@
   }
 
   &:hover td {
-    background-color: rgb(31 79 134 / 4%);
+    background-color: var(--painel-primary-soft-subtle);
   }
 
   &--critical {
@@ -367,9 +367,9 @@
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--painel-muted, #6b7a90);
-  background-color: var(--painel-surface-soft, #f0f2f5);
-  border: 1px solid var(--painel-border, #d8dde6);
+  color: var(--painel-muted);
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
 }
 
 .delayed-stores__empty {

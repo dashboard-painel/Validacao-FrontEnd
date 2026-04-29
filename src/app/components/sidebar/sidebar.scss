@@ -10,9 +10,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background-color: var(--painel-sidebar-bg, #1f4f86);
-  box-shadow: 0 2px 12px rgb(15 45 90 / 28%);
-  border-bottom: 3px solid rgb(255 255 255 / 12%);
+  background-color: var(--painel-sidebar-bg);
+  box-shadow: var(--painel-sidebar-shadow);
+  border-bottom: 3px solid var(--painel-sidebar-border-strong);
 }
 
 .sidebar-topbar__brand {
@@ -20,16 +20,16 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  color: white;
+  color: var(--painel-sidebar-text);
   font-weight: 600;
   font-size: 1rem;
 }
 
 .sidebar-topbar__toggle {
   background: none;
-  border: 1px solid rgb(255 255 255 / 25%);
+  border: 1px solid var(--painel-sidebar-border-strong);
   border-radius: 0.4rem;
-  color: white;
+  color: var(--painel-sidebar-text);
   padding: 0.3rem 0.5rem;
   font-size: 1.1rem;
   cursor: pointer;
@@ -37,7 +37,7 @@
   transition: background 0.15s;
 
   &:hover {
-    background: rgb(255 255 255 / 10%);
+    background: var(--painel-sidebar-ghost-hover);
   }
 }
 
@@ -46,17 +46,17 @@
   position: fixed;
   inset: 0;
   z-index: 1039;
-  background: rgb(0 0 0 / 45%);
+  background: var(--painel-sidebar-overlay);
 }
 
 // ── Sidebar panel ──────────────────────────────────────────
 .sidebar {
   width: 240px;
-  background-color: var(--painel-sidebar-bg, #1f4f86);
+  background-color: var(--painel-sidebar-bg);
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 18px rgb(15 45 90 / 22%);
-  border-right: 1px solid rgb(255 255 255 / 10%);
+  box-shadow: var(--painel-sidebar-panel-shadow);
+  border-right: 1px solid var(--painel-sidebar-border);
   flex-shrink: 0;
   position: sticky;
   top: 0;
@@ -139,7 +139,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1rem;
-  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  border-bottom: 1px solid var(--painel-sidebar-border);
   transition: padding 0.25s ease, flex-direction 0.25s ease;
 }
 
@@ -148,14 +148,14 @@
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
-  color: white;
+  color: var(--painel-sidebar-text);
   font-weight: 600;
   font-size: 1.05rem;
   transition: opacity 0.15s;
 
   &:hover {
     opacity: 0.85;
-    color: white;
+    color: var(--painel-sidebar-text);
   }
 
   .bi {
@@ -180,20 +180,20 @@
   padding: 0.6rem 0.85rem;
   border-radius: 0.5rem;
   text-decoration: none;
-  color: rgb(255 255 255 / 72%);
+  color: var(--painel-sidebar-text-muted);
   font-size: 0.9rem;
   transition:
     background 0.15s,
     color 0.15s;
 
   &:hover {
-    background: rgb(255 255 255 / 10%);
-    color: white;
+    background: var(--painel-sidebar-ghost-hover);
+    color: var(--painel-sidebar-text);
   }
 
   &.is-active {
-    background: rgb(255 255 255 / 16%);
-    color: white;
+    background: var(--painel-sidebar-ghost-active);
+    color: var(--painel-sidebar-text);
     font-weight: 500;
   }
 
@@ -212,17 +212,17 @@
   width: 28px;
   height: 28px;
   border-radius: 0.4rem;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 18%);
-  color: rgb(255 255 255 / 65%);
+  background: var(--painel-sidebar-ghost);
+  border: 1px solid var(--painel-sidebar-border-strong);
+  color: var(--painel-sidebar-text-subtle);
   cursor: pointer;
   transition:
     background 0.15s,
     color 0.15s;
 
   &:hover {
-    background: rgb(255 255 255 / 18%);
-    color: white;
+    background: var(--painel-sidebar-ghost-active);
+    color: var(--painel-sidebar-text);
   }
 
   .bi {
@@ -233,13 +233,13 @@
 
 .sidebar__footer {
   padding: 1rem;
-  border-top: 1px solid rgb(255 255 255 / 10%);
+  border-top: 1px solid var(--painel-sidebar-border);
   display: flex;
   justify-content: center;
   align-items: center;
 
   &:first-of-type {
-    border-top: 1px solid rgb(255 255 255 / 10%);
+    border-top: 1px solid var(--painel-sidebar-border);
   }
 
   & + .sidebar__footer {
@@ -254,19 +254,19 @@
   justify-content: center;
   gap: 0.4rem;
   padding: 0.4rem 0.75rem;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 16%);
+  background: var(--painel-sidebar-ghost);
+  border: 1px solid var(--painel-sidebar-border);
   border-radius: 2rem;
   font-size: 0.78rem;
-  color: rgb(255 255 255 / 72%);
+  color: var(--painel-sidebar-text-muted);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
   white-space: nowrap;
   overflow: hidden;
 
   &:hover {
-    background: rgb(255 255 255 / 18%);
-    color: white;
+    background: var(--painel-sidebar-ghost-active);
+    color: var(--painel-sidebar-text);
   }
 
   .bi {
@@ -282,14 +282,14 @@
   justify-content: center;
   gap: 0.2rem;
   padding: 0.3rem 0.75rem;
-  background: rgb(255 255 255 / 8%);
-  border: 1px solid rgb(255 255 255 / 16%);
+  background: var(--painel-sidebar-ghost);
+  border: 1px solid var(--painel-sidebar-border);
   border-radius: 2rem;
   font-size: 0.7rem;
-  color: rgb(255 255 255 / 68%);
+  color: var(--painel-sidebar-text-subtle);
 
   strong {
-    color: rgb(255 255 255 / 88%);
+    color: var(--painel-sidebar-text);
     font-weight: 600;
   }
 

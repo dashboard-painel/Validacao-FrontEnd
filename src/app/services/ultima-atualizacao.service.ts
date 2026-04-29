@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, filter, map, of, startWith, switchMap, timer } from 'rxjs';
+import { catchError, filter, finalize, map, of, startWith, switchMap, timer } from 'rxjs';
 
 import { HistoricoService } from './historico.service';
 import { VendasParceirosService } from './vendas-parceiros.service';
@@ -18,6 +18,7 @@ export class UltimaAtualizacaoService {
   private readonly router = inject(Router);
   private readonly historicoService = inject(HistoricoService);
   private readonly vendasService = inject(VendasParceirosService);
+  readonly ultimaAtualizacaoPollSequence = signal(0);
 
   readonly ultimaAtualizacao = toSignal(
     this.router.events.pipe(
@@ -31,7 +32,12 @@ export class UltimaAtualizacaoService {
             const call$ = isVendas
               ? this.vendasService.getUltimaAtualizacao().pipe(map((r) => r.atualizado_em))
               : this.historicoService.getUltimaAtualizacao().pipe(map((r) => r.atualizado_em));
-            return call$.pipe(catchError(() => of(null)));
+            return call$.pipe(
+              catchError(() => of(null)),
+              finalize(() =>
+                this.ultimaAtualizacaoPollSequence.update((sequence) => sequence + 1),
+              ),
+            );
           }),
         );
       }),

@@ -24,7 +24,7 @@
 
   background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
   border: 1px solid var(--painel-border);
-  box-shadow: 0 20px 48px rgb(16 32 55 / 22%);
+  box-shadow: var(--painel-shadow);
   border-radius: 0.85rem;
   color: var(--painel-text);
 }
@@ -85,10 +85,10 @@
   flex-shrink: 0;
 
   &--comercial {
-    background-color: var(--status-ok-strong, #1a7a4a);
+    background-color: var(--status-ok-strong);
   }
   &--fora {
-    background-color: var(--painel-muted, #8a9ab0);
+    background-color: var(--painel-muted);
   }
 }
 

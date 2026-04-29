@@ -11,27 +11,53 @@
   --painel-border: #d3deeb;
   --painel-shadow: 0 12px 28px rgb(16 32 55 / 10%);
   --painel-shadow-soft: 0 4px 14px rgb(16 32 55 / 8%);
+  --painel-shadow-interactive: 0 1px 4px rgb(16 32 55 / 12%);
+  --painel-shadow-popover: 0 10px 24px rgb(16 32 55 / 12%);
 
   --status-ok: #2f8f5b;
   --status-ok-strong: #20613d;
   --status-ok-soft: #e8f4ed;
+  --status-ok-border: rgb(47 143 91 / 28%);
+  --status-ok-chip-bg: rgb(47 143 91 / 16%);
   --status-warning: #c7911a;
   --status-warning-strong: #825d05;
   --status-warning-soft: #fdf4df;
-  --status-silver: #0f7b8a;
-  --status-silver-strong: #095e6b;
-  --status-silver-soft: #d4f5f9;
+  --status-warning-border: rgb(199 145 26 / 30%);
+  --status-warning-chip-bg: rgb(199 145 26 / 18%);
+  --status-silver: #356f8a;
+  --status-silver-strong: #204f64;
+  --status-silver-soft: #dbe9f2;
+  --status-silver-border: rgb(53 111 138 / 28%);
+  --status-silver-chip-bg: rgb(53 111 138 / 16%);
   --status-warning-alt: #b98312;
   --status-danger: #c94848;
   --status-danger-strong: #872a2a;
   --status-danger-soft: #fdeceb;
+  --status-danger-border: rgb(201 72 72 / 28%);
+  --status-danger-chip-bg: rgb(201 72 72 / 15%);
   --status-nodata: #8a95a6;
   --status-nodata-strong: #616b79;
   --status-nodata-soft: #eef1f5;
+  --status-nodata-border: rgb(138 149 166 / 30%);
+  --status-nodata-chip-bg: rgb(138 149 166 / 18%);
 
+  --painel-primary-soft-subtle: rgb(31 79 134 / 4%);
   --painel-primary-soft: rgb(31 79 134 / 12%);
+  --painel-primary-soft-strong: rgb(31 79 134 / 14%);
+  --painel-primary-border-soft: rgb(31 79 134 / 22%);
 
-  --painel-sidebar-bg: #1f4f86;
+  --painel-sidebar-bg: #183b61;
+  --painel-sidebar-shadow: 0 2px 12px rgb(10 28 58 / 22%);
+  --painel-sidebar-panel-shadow: 2px 0 18px rgb(10 28 58 / 18%);
+  --painel-sidebar-border: rgb(255 255 255 / 10%);
+  --painel-sidebar-border-strong: rgb(255 255 255 / 14%);
+  --painel-sidebar-ghost: rgb(255 255 255 / 8%);
+  --painel-sidebar-ghost-hover: rgb(255 255 255 / 12%);
+  --painel-sidebar-ghost-active: rgb(255 255 255 / 16%);
+  --painel-sidebar-text: rgb(255 255 255 / 92%);
+  --painel-sidebar-text-muted: rgb(255 255 255 / 72%);
+  --painel-sidebar-text-subtle: rgb(255 255 255 / 66%);
+  --painel-sidebar-overlay: rgb(0 0 0 / 42%);
   --painel-filter-bg: #f7fafd;
   --painel-filter-border: #d8e3f0;
   --painel-dropdown-bg: #ffffff;
@@ -41,7 +67,13 @@
   --painel-popover-text: #f4f8fd;
   --painel-input-border: #c5d5ea;
   --painel-input-focus: #6e94be;
+  --painel-input-focus-shadow: rgb(31 79 134 / 14%);
   --painel-selection: rgb(15 94 168 / 22%);
+  --classificacao-gold: var(--status-warning);
+  --classificacao-select: var(--status-silver);
+  --classificacao-premium: #6e5ac7;
+  --classificacao-brasil: var(--status-ok);
+  --classificacao-cloud: #3d6da7;
 }
 
 [data-theme='dark'] {
@@ -50,43 +82,75 @@
   --painel-surface-soft: #1a2438;
   --painel-text: #e2e8f0;
   --painel-text-strong: #f1f5f9;
-  --painel-muted: #94a3b8;
+  --painel-muted: #a8b5c7;
   --painel-primary: #60a5fa;
   --painel-primary-strong: #93c5fd;
-  --painel-border: #334155;
+  --painel-border: #42536a;
   --painel-shadow: 0 12px 28px rgb(0 0 0 / 30%);
   --painel-shadow-soft: 0 4px 14px rgb(0 0 0 / 25%);
+  --painel-shadow-interactive: 0 1px 4px rgb(0 0 0 / 24%);
+  --painel-shadow-popover: 0 10px 24px rgb(0 0 0 / 28%);
 
   --status-ok: #4ade80;
   --status-ok-strong: #86efac;
   --status-ok-soft: #14532d;
+  --status-ok-border: rgb(74 222 128 / 28%);
+  --status-ok-chip-bg: rgb(74 222 128 / 16%);
   --status-warning: #fbbf24;
   --status-warning-strong: #fcd34d;
   --status-warning-soft: #422006;
-  --status-silver: #22d3ee;
-  --status-silver-strong: #67e8f9;
-  --status-silver-soft: #083344;
+  --status-warning-border: rgb(251 191 36 / 30%);
+  --status-warning-chip-bg: rgb(251 191 36 / 18%);
+  --status-silver: #63b1d0;
+  --status-silver-strong: #a7d7ea;
+  --status-silver-soft: #0f3446;
+  --status-silver-border: rgb(99 177 208 / 30%);
+  --status-silver-chip-bg: rgb(99 177 208 / 18%);
   --status-warning-alt: #f59e0b;
   --status-danger: #ff4d4d;
   --status-danger-strong: #ff7a7a;
   --status-danger-soft: #6b2020;
+  --status-danger-border: rgb(255 77 77 / 30%);
+  --status-danger-chip-bg: rgb(255 77 77 / 16%);
   --status-nodata: #94a3b8;
   --status-nodata-strong: #cbd5e1;
   --status-nodata-soft: #2d3b50;
+  --status-nodata-border: rgb(148 163 184 / 30%);
+  --status-nodata-chip-bg: rgb(148 163 184 / 18%);
 
+  --painel-primary-soft-subtle: rgb(96 165 250 / 8%);
   --painel-primary-soft: rgb(96 165 250 / 18%);
+  --painel-primary-soft-strong: rgb(96 165 250 / 22%);
+  --painel-primary-border-soft: rgb(96 165 250 / 28%);
 
-  --painel-sidebar-bg: #0c1524;
+  --painel-sidebar-bg: #101a2a;
+  --painel-sidebar-shadow: 0 2px 12px rgb(0 0 0 / 34%);
+  --painel-sidebar-panel-shadow: 2px 0 18px rgb(0 0 0 / 30%);
+  --painel-sidebar-border: rgb(255 255 255 / 10%);
+  --painel-sidebar-border-strong: rgb(255 255 255 / 14%);
+  --painel-sidebar-ghost: rgb(255 255 255 / 7%);
+  --painel-sidebar-ghost-hover: rgb(255 255 255 / 12%);
+  --painel-sidebar-ghost-active: rgb(255 255 255 / 17%);
+  --painel-sidebar-text: rgb(255 255 255 / 92%);
+  --painel-sidebar-text-muted: rgb(255 255 255 / 76%);
+  --painel-sidebar-text-subtle: rgb(255 255 255 / 70%);
+  --painel-sidebar-overlay: rgb(0 0 0 / 52%);
   --painel-filter-bg: #1e293b;
-  --painel-filter-border: #334155;
+  --painel-filter-border: #42536a;
   --painel-dropdown-bg: #1e293b;
-  --painel-progress-bg: #334155;
-  --painel-table-border: #334155;
+  --painel-progress-bg: #465975;
+  --painel-table-border: #42536a;
   --painel-popover-bg: #0f172a;
   --painel-popover-text: #e2e8f0;
-  --painel-input-border: #475569;
+  --painel-input-border: #5a6f89;
   --painel-input-focus: #60a5fa;
+  --painel-input-focus-shadow: rgb(96 165 250 / 24%);
   --painel-selection: rgb(96 165 250 / 30%);
+  --classificacao-gold: var(--status-warning);
+  --classificacao-select: var(--status-silver);
+  --classificacao-premium: #a999ef;
+  --classificacao-brasil: var(--status-ok);
+  --classificacao-cloud: #83b5f7;
 }
 
 * {
@@ -129,7 +193,7 @@ body {
 .form-control:focus,
 .form-select:focus {
   border-color: var(--painel-input-focus);
-  box-shadow: 0 0 0 0.25rem rgb(31 79 134 / 14%);
+  box-shadow: 0 0 0 0.25rem var(--painel-input-focus-shadow);
   background-color: var(--painel-surface);
   color: var(--painel-text);
 }
