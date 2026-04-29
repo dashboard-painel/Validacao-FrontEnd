@@ -79,12 +79,16 @@ export class DelayedStoresTable {
   });
 
   readonly filteredCnpjOptions = computed(() => {
-    const search = this.multiFilterSearch().cnpj.toLowerCase();
-    if (!search) return this.cnpjOptions();
+    const raw = this.multiFilterSearch().cnpj.trim();
+    if (!raw) return this.cnpjOptions();
+
+    const normalizedDigits = raw.replace(/\D/g, '');
+    const normalizedText = raw.toLowerCase();
+
     return this.cnpjOptions().filter(
       (o) =>
-        o.cnpj.toLowerCase().includes(search) ||
-        o.pharmacyName.toLowerCase().includes(search),
+        (normalizedDigits.length > 0 && o.cnpj.replace(/\D/g, '').includes(normalizedDigits)) ||
+        o.pharmacyName.toLowerCase().includes(normalizedText),
     );
   });
 

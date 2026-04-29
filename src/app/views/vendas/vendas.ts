@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   computed,
   inject,
   signal,
@@ -33,6 +34,7 @@ export class Vendas {
 
   private readonly service = inject(VendasParceirosService);
   private readonly atualizacaoService = inject(UltimaAtualizacaoService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly stores = signal<VendaParceiro[]>([]);
   readonly isLoading = signal(true);
@@ -209,16 +211,18 @@ export class Vendas {
   onAtualizar(): void {
     this.isRefreshing.set(true);
     this.refreshError.set(null);
-    this.service.atualizar().subscribe({
-      next: (resp) => {
-        this.stores.set(resp.resultados);
-        this.isRefreshing.set(false);
-      },
-      error: () => {
-        this.refreshError.set('Erro ao atualizar dados do Redshift.');
-        this.isRefreshing.set(false);
-      },
-    });
+    this.service.atualizar()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (resp) => {
+          this.stores.set(resp.resultados);
+          this.isRefreshing.set(false);
+        },
+        error: () => {
+          this.refreshError.set('Erro ao atualizar dados do Redshift.');
+          this.isRefreshing.set(false);
+        },
+      });
   }
 
   // ── Actions ───────────────────────────────────────────────
