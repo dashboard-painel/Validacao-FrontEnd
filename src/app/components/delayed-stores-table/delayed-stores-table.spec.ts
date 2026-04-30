@@ -95,6 +95,26 @@ describe('DelayedStoresTable', () => {
     expect(emissoes).toEqual([{ column: 'delayHours', dir: 'desc' }]);
   });
 
+  it('associa labels programaticamente aos filtros avancados', () => {
+    fixture.componentRef.setInput('filtersOpen', true);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const campoNome = elemento.querySelector<HTMLInputElement>('#pharmacy-name-filter');
+    const labelNome = elemento.querySelector<HTMLLabelElement>('label[for="pharmacy-name-filter"]');
+    const resumoAssociacao = elemento.querySelector<HTMLElement>(
+      'summary[aria-labelledby="association-code-filter-label association-code-filter-value"]',
+    );
+    const buscaAssociacao = elemento.querySelector<HTMLInputElement>(
+      'input[aria-label="Buscar por código de associação"]',
+    );
+
+    expect(labelNome?.textContent?.trim()).toBe('Nome');
+    expect(campoNome).toBeTruthy();
+    expect(resumoAssociacao?.textContent).toContain('Todos');
+    expect(buscaAssociacao).toBeTruthy();
+  });
+
   it('filteredAssociationCodeOptions filtra pelos termos buscados', () => {
     fixture.componentRef.setInput('associationCodeOptions', ['ASS001', 'ASS002', 'XYZ']);
     fixture.componentRef.setInput('multiFilterSearch', {
