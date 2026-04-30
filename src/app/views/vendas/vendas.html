@@ -19,10 +19,7 @@
       <section class="col-12" aria-label="Indicadores de vendas parceiros">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
           <div class="col">
-            <app-kpi
-              title="Total de Farmácias"
-              [value]="totalFarmacias()"
-            ></app-kpi>
+            <app-kpi title="Total de Farmácias" [value]="totalFarmacias()"></app-kpi>
           </div>
           <div class="col">
             <app-kpi
@@ -65,8 +62,14 @@
                     Atualizado: {{ formatDate(ts) }}
                   </span>
                 }
-                <span class="vendas__count">{{ filteredStores().length }} de {{ stores().length }} farmácias</span>
-                <div class="painel-export-group" role="group" aria-label="Exportar tabela de vendas">
+                <span class="vendas__count"
+                  >{{ filteredStores().length }} de {{ stores().length }} farmácias</span
+                >
+                <div
+                  class="painel-export-group"
+                  role="group"
+                  aria-label="Exportar tabela de vendas"
+                >
                   <button
                     type="button"
                     class="painel-export-btn painel-export-btn--excel"
@@ -75,7 +78,11 @@
                     title="Exportar farmácias filtradas para Excel"
                   >
                     @if (exportingFormat() === 'excel') {
-                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       Excel...
                     } @else {
                       <i class="bi bi-file-earmark-excel"></i>
@@ -90,7 +97,11 @@
                     title="Exportar farmácias filtradas para PDF"
                   >
                     @if (exportingFormat() === 'pdf') {
-                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
                       PDF...
                     } @else {
                       <i class="bi bi-file-earmark-pdf"></i>
@@ -98,28 +109,9 @@
                     }
                   </button>
                 </div>
-                <button
-                  type="button"
-                  class="btn btn-sm btn-primary"
-                  [disabled]="isRefreshing()"
-                  (click)="onAtualizar()"
-                  title="Consultar Redshift e atualizar dados"
-                >
-                  @if (isRefreshing()) {
-                    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                    Atualizando...
-                  } @else {
-                    <i class="bi bi-arrow-clockwise me-1"></i>
-                    Atualizar
-                  }
-                </button>
               </div>
             </div>
-            @if (refreshError()) {
-              <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
-                <i class="bi bi-exclamation-triangle me-1"></i>{{ refreshError() }}
-              </div>
-            }
+
             @if (exportError()) {
               <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
                 <i class="bi bi-exclamation-triangle me-1"></i>{{ exportError() }}
@@ -193,100 +185,102 @@
               </div>
 
               @if (filtersOpen()) {
-              <div class="row g-2 mt-1">
-                <!-- Associação -->
-                <div class="col-12 col-sm-6 col-xl-3">
-                  <label class="form-label vendas__filter-label mb-1">Associação</label>
-                  <details
-                    class="vendas__dropdown"
-                    [open]="isFilterOpen('associacao')"
-                    (toggle)="onFilterToggle('associacao', $event)"
-                  >
-                    <summary class="form-select form-select-sm vendas__dropdown-trigger">
-                      {{ filterSummary('associacao') }}
-                    </summary>
-                    <div class="vendas__dropdown-menu border rounded p-2 mt-1">
-                      <input
-                        type="text"
-                        class="form-control form-control-sm mb-2"
-                        placeholder="Buscar associação..."
-                        [value]="filterSearch().associacao"
-                        (input)="onFilterSearch('associacao', $event)"
-                      />
-                      <div class="vendas__checklist">
-                        @if (filteredAssociacaoOptions().length === 0) {
-                          <small class="text-body-secondary d-block">Nenhuma associação encontrada.</small>
-                        } @else {
-                          @for (opt of filteredAssociacaoOptions(); track opt) {
+                <div class="row g-2 mt-1">
+                  <!-- Associação -->
+                  <div class="col-12 col-sm-6 col-xl-3">
+                    <label class="form-label vendas__filter-label mb-1">Associação</label>
+                    <details
+                      class="vendas__dropdown"
+                      [open]="isFilterOpen('associacao')"
+                      (toggle)="onFilterToggle('associacao', $event)"
+                    >
+                      <summary class="form-select form-select-sm vendas__dropdown-trigger">
+                        {{ filterSummary('associacao') }}
+                      </summary>
+                      <div class="vendas__dropdown-menu border rounded p-2 mt-1">
+                        <input
+                          type="text"
+                          class="form-control form-control-sm mb-2"
+                          placeholder="Buscar associação..."
+                          [value]="filterSearch().associacao"
+                          (input)="onFilterSearch('associacao', $event)"
+                        />
+                        <div class="vendas__checklist">
+                          @if (filteredAssociacaoOptions().length === 0) {
+                            <small class="text-body-secondary d-block"
+                              >Nenhuma associação encontrada.</small
+                            >
+                          } @else {
+                            @for (opt of filteredAssociacaoOptions(); track opt) {
+                              <label class="form-check mb-1">
+                                <input
+                                  type="checkbox"
+                                  class="form-check-input"
+                                  [checked]="isSelected('associacao', opt)"
+                                  (change)="onCheckboxFilter('associacao', opt, $event)"
+                                />
+                                <span class="form-check-label">{{ opt }}</span>
+                              </label>
+                            }
+                          }
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+
+                  <!-- Sit. Contrato -->
+                  <div class="col-12 col-sm-6 col-xl-3">
+                    <label class="form-label vendas__filter-label mb-1">Sit. Contrato</label>
+                    <details
+                      class="vendas__dropdown"
+                      [open]="isFilterOpen('sitContrato')"
+                      (toggle)="onFilterToggle('sitContrato', $event)"
+                    >
+                      <summary class="form-select form-select-sm vendas__dropdown-trigger">
+                        {{ filterSummary('sitContrato') }}
+                      </summary>
+                      <div class="vendas__dropdown-menu border rounded p-2 mt-1">
+                        <div class="vendas__checklist">
+                          @for (opt of sitContratoOptions(); track opt) {
                             <label class="form-check mb-1">
                               <input
                                 type="checkbox"
                                 class="form-check-input"
-                                [checked]="isSelected('associacao', opt)"
-                                (change)="onCheckboxFilter('associacao', opt, $event)"
+                                [checked]="isSelected('sitContrato', opt)"
+                                (change)="onCheckboxFilter('sitContrato', opt, $event)"
                               />
-                              <span class="form-check-label">{{ opt }}</span>
+                              <app-sit-contrato-badge [value]="opt" style="pointer-events: none" />
                             </label>
                           }
-                        }
+                        </div>
                       </div>
-                    </div>
-                  </details>
-                </div>
+                    </details>
+                  </div>
 
-                <!-- Sit. Contrato -->
-                <div class="col-12 col-sm-6 col-xl-3">
-                  <label class="form-label vendas__filter-label mb-1">Sit. Contrato</label>
-                  <details
-                    class="vendas__dropdown"
-                    [open]="isFilterOpen('sitContrato')"
-                    (toggle)="onFilterToggle('sitContrato', $event)"
-                  >
-                    <summary class="form-select form-select-sm vendas__dropdown-trigger">
-                      {{ filterSummary('sitContrato') }}
-                    </summary>
-                    <div class="vendas__dropdown-menu border rounded p-2 mt-1">
-                      <div class="vendas__checklist">
-                        @for (opt of sitContratoOptions(); track opt) {
-                          <label class="form-check mb-1">
-                            <input
-                              type="checkbox"
-                              class="form-check-input"
-                              [checked]="isSelected('sitContrato', opt)"
-                              (change)="onCheckboxFilter('sitContrato', opt, $event)"
-                            />
-                            <app-sit-contrato-badge [value]="opt" style="pointer-events:none" />
-                          </label>
-                        }
-                      </div>
-                    </div>
-                  </details>
-                </div>
+                  <!-- Nome -->
+                  <div class="col-12 col-sm-6 col-xl-3">
+                    <label class="form-label vendas__filter-label mb-1">Nome</label>
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      placeholder="Ex.: Farmácia Central"
+                      [value]="nameFilter()"
+                      (input)="onNameFilter($event)"
+                    />
+                  </div>
 
-                <!-- Nome -->
-                <div class="col-12 col-sm-6 col-xl-3">
-                  <label class="form-label vendas__filter-label mb-1">Nome</label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    placeholder="Ex.: Farmácia Central"
-                    [value]="nameFilter()"
-                    (input)="onNameFilter($event)"
-                  />
+                  <!-- Cód Farmácia -->
+                  <div class="col-12 col-sm-6 col-xl-3">
+                    <label class="form-label vendas__filter-label mb-1">Cód. Farmácia</label>
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      placeholder="Ex.: 12345"
+                      [value]="codFarmaciaFilter()"
+                      (input)="onCodFarmaciaFilter($event)"
+                    />
+                  </div>
                 </div>
-
-                <!-- Cód Farmácia -->
-                <div class="col-12 col-sm-6 col-xl-3">
-                  <label class="form-label vendas__filter-label mb-1">Cód. Farmácia</label>
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    placeholder="Ex.: 12345"
-                    [value]="codFarmaciaFilter()"
-                    (input)="onCodFarmaciaFilter($event)"
-                  />
-                </div>
-              </div>
               }
             </div>
 
@@ -297,32 +291,58 @@
                   <tr>
                     <th scope="col" class="vendas__th--sortable" (click)="sortBy('associacao')">
                       Associação
-                      <i class="bi"
+                      <i
+                        class="bi"
                         [class.bi-chevron-up]="sortColumn() === 'associacao' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'associacao' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'associacao'"></i>
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'associacao' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'associacao'"
+                      ></i>
                     </th>
                     <th scope="col" class="vendas__th--sortable" (click)="sortBy('cod_farmacia')">
                       Cód. Farmácia
-                      <i class="bi"
-                        [class.bi-chevron-up]="sortColumn() === 'cod_farmacia' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'cod_farmacia' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'cod_farmacia'"></i>
+                      <i
+                        class="bi"
+                        [class.bi-chevron-up]="
+                          sortColumn() === 'cod_farmacia' && sortDir() === 'asc'
+                        "
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'cod_farmacia' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'cod_farmacia'"
+                      ></i>
                     </th>
                     <th scope="col" class="vendas__th--sortable" (click)="sortBy('nome_farmacia')">
                       Nome
-                      <i class="bi"
-                        [class.bi-chevron-up]="sortColumn() === 'nome_farmacia' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'nome_farmacia' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'nome_farmacia'"></i>
+                      <i
+                        class="bi"
+                        [class.bi-chevron-up]="
+                          sortColumn() === 'nome_farmacia' && sortDir() === 'asc'
+                        "
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'nome_farmacia' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'nome_farmacia'"
+                      ></i>
                     </th>
                     <th scope="col">Sit. Contrato</th>
-                    <th scope="col" class="vendas__th--sortable" (click)="sortBy('ultima_venda_parceiros')">
+                    <th
+                      scope="col"
+                      class="vendas__th--sortable"
+                      (click)="sortBy('ultima_venda_parceiros')"
+                    >
                       Última Venda
-                      <i class="bi"
-                        [class.bi-chevron-up]="sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'asc'"
-                        [class.bi-chevron-down]="sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'desc'"
-                        [class.bi-chevron-expand]="sortColumn() !== 'ultima_venda_parceiros'"></i>
+                      <i
+                        class="bi"
+                        [class.bi-chevron-up]="
+                          sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'asc'
+                        "
+                        [class.bi-chevron-down]="
+                          sortColumn() === 'ultima_venda_parceiros' && sortDir() === 'desc'
+                        "
+                        [class.bi-chevron-expand]="sortColumn() !== 'ultima_venda_parceiros'"
+                      ></i>
                     </th>
                     <th scope="col">Recência</th>
                   </tr>
@@ -339,8 +359,13 @@
                       <tr class="vendas__table-row">
                         <td class="vendas__td-identity">
                           <span class="vendas__code-primary">{{ store.associacao }}</span>
-                          @if (store.associacao_parceiro && store.associacao_parceiro !== store.associacao) {
-                            <small class="vendas__code-sub">Parceiro {{ store.associacao_parceiro }}</small>
+                          @if (
+                            store.associacao_parceiro &&
+                            store.associacao_parceiro !== store.associacao
+                          ) {
+                            <small class="vendas__code-sub"
+                              >Parceiro {{ store.associacao_parceiro }}</small
+                            >
                           }
                         </td>
                         <td class="vendas__td-identity">
@@ -356,7 +381,9 @@
                           <app-sit-contrato-badge [value]="store.sit_contrato" />
                         </td>
                         <td class="vendas__td-date">
-                          <span class="vendas__date-value">{{ formatDate(store.ultima_venda_parceiros) }}</span>
+                          <span class="vendas__date-value">{{
+                            formatDate(store.ultima_venda_parceiros)
+                          }}</span>
                         </td>
                         <td>
                           <span [class]="vendaRecenciaBadge(store.ultima_venda_parceiros)">

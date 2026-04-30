@@ -83,19 +83,28 @@
   @if (filtersOpen()) {
     <div class="row g-2 delayed-stores__filters">
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Cód Assoc.</label>
+        <label
+          id="association-code-filter-label"
+          class="form-label delayed-stores__filter-label mb-1"
+        >
+          Cód Assoc.
+        </label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('associationCode')"
           (toggle)="onMultiFilterToggle('associationCode', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ multiFilterSummary('associationCode') }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="association-code-filter-label association-code-filter-value"
+          >
+            <span id="association-code-filter-value">{{ multiFilterSummary('associationCode') }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <input
               type="text"
               class="form-control form-control-sm mb-2"
+              aria-label="Buscar por código de associação"
               placeholder="Digite para buscar"
               [value]="multiFilterSearch().associationCode"
               (input)="onMultiFilterSearch('associationCode', $event)"
@@ -122,19 +131,25 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Cód. Farma</label>
+        <label id="farma-code-filter-label" class="form-label delayed-stores__filter-label mb-1">
+          Cód. Farma
+        </label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('farmaCode')"
           (toggle)="onMultiFilterToggle('farmaCode', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ multiFilterSummary('farmaCode') }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="farma-code-filter-label farma-code-filter-value"
+          >
+            <span id="farma-code-filter-value">{{ multiFilterSummary('farmaCode') }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <input
               type="text"
               class="form-control form-control-sm mb-2"
+              aria-label="Buscar por código Farma"
               placeholder="Digite para buscar"
               [value]="multiFilterSearch().farmaCode"
               (input)="onMultiFilterSearch('farmaCode', $event)"
@@ -161,19 +176,23 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">CNPJ</label>
+        <label id="cnpj-filter-label" class="form-label delayed-stores__filter-label mb-1">CNPJ</label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('cnpj')"
           (toggle)="onMultiFilterToggle('cnpj', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ multiFilterSummary('cnpj') }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="cnpj-filter-label cnpj-filter-value"
+          >
+            <span id="cnpj-filter-value">{{ multiFilterSummary('cnpj') }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <input
               type="text"
               class="form-control form-control-sm mb-2"
+              aria-label="Buscar por CNPJ ou nome da farmácia"
               placeholder="Digite CNPJ ou nome"
               [value]="multiFilterSearch().cnpj"
               (input)="onMultiFilterSearch('cnpj', $event)"
@@ -203,8 +222,11 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Nome</label>
+        <label class="form-label delayed-stores__filter-label mb-1" for="pharmacy-name-filter">
+          Nome
+        </label>
         <input
+          id="pharmacy-name-filter"
           type="text"
           class="form-control form-control-sm"
           placeholder="Ex.: Farma Centro"
@@ -214,14 +236,19 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Camada com atraso</label>
+        <label id="problem-layer-filter-label" class="form-label delayed-stores__filter-label mb-1">
+          Camada com atraso
+        </label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('problemLayer')"
           (toggle)="onMultiFilterToggle('problemLayer', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ problemLayerSummary() }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="problem-layer-filter-label problem-layer-filter-value"
+          >
+            <span id="problem-layer-filter-value">{{ problemLayerSummary() }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <div class="delayed-stores__checklist">
@@ -242,14 +269,19 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Status</label>
+        <label id="store-status-filter-label" class="form-label delayed-stores__filter-label mb-1">
+          Status
+        </label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('storeStatus')"
           (toggle)="onMultiFilterToggle('storeStatus', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ storeStatusSummary() }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="store-status-filter-label store-status-filter-value"
+          >
+            <span id="store-status-filter-value">{{ storeStatusSummary() }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <div class="delayed-stores__checklist">
@@ -270,14 +302,22 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Sit. Contrato</label>
+        <label
+          id="sit-contrato-local-filter-label"
+          class="form-label delayed-stores__filter-label mb-1"
+        >
+          Sit. Contrato
+        </label>
         <details
           class="delayed-stores__dropdown"
           [open]="isMultiFilterOpen('sitContratoLocal')"
           (toggle)="onMultiFilterToggle('sitContratoLocal', $event)"
         >
-          <summary class="form-select form-select-sm delayed-stores__dropdown-trigger">
-            {{ sitContratoLocalSummary() }}
+          <summary
+            class="form-select form-select-sm delayed-stores__dropdown-trigger"
+            aria-labelledby="sit-contrato-local-filter-label sit-contrato-local-filter-value"
+          >
+            <span id="sit-contrato-local-filter-value">{{ sitContratoLocalSummary() }}</span>
           </summary>
           <div class="delayed-stores__dropdown-menu border rounded p-2 mt-1">
             <div class="delayed-stores__checklist">
@@ -298,8 +338,11 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-2">
-        <label class="form-label delayed-stores__filter-label mb-1">Possível Causa</label>
+        <label class="form-label delayed-stores__filter-label mb-1" for="possivel-causa-filter">
+          Possível Causa
+        </label>
         <input
+          id="possivel-causa-filter"
           type="text"
           class="form-control form-control-sm"
           placeholder="Ex.: Pipeline falhou"
@@ -322,61 +365,74 @@
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('associationCode')"
+          [attr.aria-sort]="ariaSort('associationCode')"
         >
-          Cód Assoc.
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('associationCode')">
+            Cód Assoc.
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"
+            ></i>
+          </button>
         </th>
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('farmaCode')"
+          [attr.aria-sort]="ariaSort('farmaCode')"
         >
-          Cód. Farma
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('farmaCode')">
+            Cód. Farma
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"
+            ></i>
+          </button>
         </th>
-        <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('cnpj')">
-          CNPJ
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"
-          ></i>
+        <th scope="col" class="delayed-stores__th--sortable" [attr.aria-sort]="ariaSort('cnpj')">
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('cnpj')">
+            CNPJ
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"
+            ></i>
+          </button>
         </th>
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('delayHours')"
+          [attr.aria-sort]="ariaSort('delayHours')"
         >
-          Atraso
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('delayHours')">
+            Atraso
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"
+            ></i>
+          </button>
         </th>
         <th scope="col">Camada com atraso</th>
         <th scope="col">Sit. Contrato</th>
         <th scope="col">Classificação</th>
         <th scope="col">Possível Causa</th>
+        <th scope="col">Ações</th>
       </tr>
     </thead>
     <tbody>
       @if (filteredCount() === 0) {
         <tr>
-          <td class="delayed-stores__empty text-center py-3" colspan="8">
+          <td class="delayed-stores__empty text-center py-3" colspan="9">
             Nenhuma farmácia encontrada com os filtros selecionados.
           </td>
         </tr>
@@ -470,11 +526,21 @@
                 <span class="text-body-secondary">—</span>
               }
             </td>
+            <td class="delayed-stores__td-action">
+              <button
+                type="button"
+                class="delayed-stores__row-action"
+                [attr.aria-label]="'Ver detalhes de ' + store.pharmacyName"
+                (click)="$event.stopPropagation(); openStoreModal(store)"
+              >
+                Ver detalhes
+              </button>
+            </td>
           </tr>
         }
         @if (hasMoreRows()) {
           <tr>
-            <td class="text-body-secondary text-center py-2" colspan="8">
+            <td class="text-body-secondary text-center py-2" colspan="9">
               Role para carregar mais farmácias...
             </td>
           </tr>

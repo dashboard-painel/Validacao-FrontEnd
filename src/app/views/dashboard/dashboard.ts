@@ -38,10 +38,7 @@ import {
 import { DashboardFilterState } from './dashboard-filter.state';
 import { CnpjPipe } from '../../pipes/cnpj.pipe';
 import { formatDelay } from '../../utils/display-helpers';
-import {
-  TableExportService,
-  type ExportTableConfig,
-} from '../../services/table-export.service';
+import { TableExportService, type ExportTableConfig } from '../../services/table-export.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -69,7 +66,6 @@ export class Dashboard {
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
   readonly isComparing = signal(false);
-  readonly compareError = signal<string | null>(null);
   readonly exportError = signal<string | null>(null);
   readonly exportingFormat = signal<'excel' | 'pdf' | null>(null);
   private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
@@ -81,8 +77,7 @@ export class Dashboard {
     const stores = this.apiStores();
     const gf = this.fs.selectedGlobalFilters();
     return stores.filter((f) => {
-      if (gf.associationCode.length > 0 && !gf.associationCode.includes(f.associacao))
-        return false;
+      if (gf.associationCode.length > 0 && !gf.associationCode.includes(f.associacao)) return false;
       if (
         gf.sitContrato.length > 0 &&
         !gf.sitContrato.includes(this.mapper.sitContratoGroupOf(f.sit_contrato))
@@ -148,8 +143,8 @@ export class Dashboard {
   readonly delayedLayerOptions: ProblemLayer[] = ['Gold', 'Silver', 'Coletor'];
   readonly storeStatusOptions: StoreStatus[] = ['Com atraso', 'Sem atraso', 'Sem dados'];
   readonly sitContratoOptions = computed(() => {
-    const values = this.dashboardData().delayedStores
-      .map((s) => s.sitContrato)
+    const values = this.dashboardData()
+      .delayedStores.map((s) => s.sitContrato)
       .filter((v): v is string => v !== null && v !== '');
     return [...new Set(values)].sort((a, b) => a.localeCompare(b));
   });
@@ -160,16 +155,12 @@ export class Dashboard {
     return localSel.length === 1 ? (localSel[0] ?? null) : null;
   });
 
-  readonly compareButtonTitle = computed(() => {
-    const assoc = this.comparableAssociation();
-    return assoc
-      ? `Comparar associação ${assoc}`
-      : 'Selecione exatamente 1 associação para comparar';
-  });
   readonly associationCodeOptions = computed(() => this.uniqueSortedOptions('associationCode'));
 
   readonly globalAssociationOptions = computed(() => {
-    const values = this.apiStores().map((f) => f.associacao).filter(Boolean);
+    const values = this.apiStores()
+      .map((f) => f.associacao)
+      .filter(Boolean);
     return [...new Set(values)].sort();
   });
 
@@ -270,20 +261,15 @@ export class Dashboard {
         !store.problemLayers.some((l) => problemLayerFilters.includes(l))
       )
         return false;
-      if (statusFilters.length > 0 && !statusFilters.includes(store.status))
-        return false;
-      if (
-        sitContratoFilters.length > 0 &&
-        !sitContratoFilters.includes(store.sitContrato ?? '')
-      )
+      if (statusFilters.length > 0 && !statusFilters.includes(store.status)) return false;
+      if (sitContratoFilters.length > 0 && !sitContratoFilters.includes(store.sitContrato ?? ''))
         return false;
       if (
         possivelCausaQuery &&
         !(store.possivelCausa ?? '').toLowerCase().includes(possivelCausaQuery)
       )
         return false;
-      if (minDelayHours > 0 && store.delayHours < minDelayHours)
-        return false;
+      if (minDelayHours > 0 && store.delayHours < minDelayHours) return false;
       return true;
     });
   });
@@ -414,7 +400,6 @@ export class Dashboard {
     if (!associacao || this.isComparing()) return;
 
     this.isComparing.set(true);
-    this.compareError.set(null);
 
     this.historicoService
       .comparar(associacao)
@@ -425,7 +410,6 @@ export class Dashboard {
           this.isComparing.set(false);
         },
         error: () => {
-          this.compareError.set('Falha ao comparar. Verifique a conexão e tente novamente.');
           this.isComparing.set(false);
         },
       });
@@ -534,8 +518,14 @@ export class Dashboard {
   }
 
   private compareByDelayPriority(
-    a: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
-    b: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
+    a: Pick<
+      DelayedStoreRow,
+      'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'
+    >,
+    b: Pick<
+      DelayedStoreRow,
+      'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'
+    >,
   ): number {
     const aMetric = this.delaySortMetric(a);
     const bMetric = this.delaySortMetric(b);
@@ -558,7 +548,8 @@ export class Dashboard {
     if (this.historicoRequestInFlight()) return;
 
     const isInitialLoad = !this.hasLoadedHistoricoOnce();
-    const appliedReferenceTimestamp = referenceTimestamp ?? this.atualizacaoService.ultimaAtualizacao() ?? null;
+    const appliedReferenceTimestamp =
+      referenceTimestamp ?? this.atualizacaoService.ultimaAtualizacao() ?? null;
     this.historicoRequestInFlight.set(true);
     if (isInitialLoad) {
       this.isLoading.set(true);
@@ -580,7 +571,10 @@ export class Dashboard {
         this.hasLoadedHistoricoOnce.set(true);
         const historicoTimestamp = this.extractLatestHistoricoTimestamp(data);
         this.appliedHistoricoTimestamp.set(
-          referenceTimestamp ?? historicoTimestamp ?? this.atualizacaoService.ultimaAtualizacao() ?? null,
+          referenceTimestamp ??
+            historicoTimestamp ??
+            this.atualizacaoService.ultimaAtualizacao() ??
+            null,
         );
       },
       error: () => {
@@ -666,15 +660,31 @@ export class Dashboard {
       rows,
       summary: [
         { label: 'Total exportado', value: rows.length },
-        { label: 'Com atraso', value: rows.filter((store) => store.status === 'Com atraso').length },
-        { label: 'Sem atraso', value: rows.filter((store) => store.status === 'Sem atraso').length },
+        {
+          label: 'Com atraso',
+          value: rows.filter((store) => store.status === 'Com atraso').length,
+        },
+        {
+          label: 'Sem atraso',
+          value: rows.filter((store) => store.status === 'Sem atraso').length,
+        },
         { label: 'Sem dados', value: rows.filter((store) => store.status === 'Sem dados').length },
       ],
       columns: [
-        { header: 'Associacao', value: (store) => store.associationCode, align: 'center', width: 14 },
+        {
+          header: 'Associacao',
+          value: (store) => store.associationCode,
+          align: 'center',
+          width: 14,
+        },
         { header: 'Cod. Farma', value: (store) => store.farmaCode, align: 'center', width: 14 },
         { header: 'Farmacia', value: (store) => store.pharmacyName, width: 26 },
-        { header: 'CNPJ', value: (store) => this.cnpjPipe.transform(store.cnpj), align: 'center', width: 20 },
+        {
+          header: 'CNPJ',
+          value: (store) => this.cnpjPipe.transform(store.cnpj),
+          align: 'center',
+          width: 20,
+        },
         { header: 'Status', value: (store) => store.status, align: 'center', width: 14 },
         {
           header: 'Atraso',
@@ -691,8 +701,18 @@ export class Dashboard {
           value: (store) => store.layerItems.map((item) => item.label).join(', '),
           width: 22,
         },
-        { header: 'Sit. Contrato', value: (store) => store.sitContrato ?? '—', align: 'center', width: 16 },
-        { header: 'Classificacao', value: (store) => store.classificacao ?? '—', align: 'center', width: 16 },
+        {
+          header: 'Sit. Contrato',
+          value: (store) => store.sitContrato ?? '—',
+          align: 'center',
+          width: 16,
+        },
+        {
+          header: 'Classificacao',
+          value: (store) => store.classificacao ?? '—',
+          align: 'center',
+          width: 16,
+        },
         { header: 'Possivel causa', value: (store) => store.possivelCausa ?? '—', width: 28 },
       ],
     };
@@ -705,4 +725,3 @@ export class Dashboard {
     return `Não foi possível exportar o arquivo em ${format.toUpperCase()}.`;
   }
 }
-

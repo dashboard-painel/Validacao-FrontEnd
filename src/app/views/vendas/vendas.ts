@@ -16,10 +16,7 @@ import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.serv
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
 import { toggleInArray } from '../../utils/array-toggle';
 import { filterSummary } from '../../utils/filter-summary';
-import {
-  TableExportService,
-  type ExportTableConfig,
-} from '../../services/table-export.service';
+import { TableExportService, type ExportTableConfig } from '../../services/table-export.service';
 
 type SortColumn = 'associacao' | 'cod_farmacia' | 'nome_farmacia' | 'ultima_venda_parceiros';
 type FilterKey = 'associacao' | 'sitContrato';
@@ -44,8 +41,6 @@ export class Vendas {
   readonly stores = signal<VendaParceiro[]>([]);
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
-  readonly isRefreshing = signal(false);
-  readonly refreshError = signal<string | null>(null);
   readonly exportError = signal<string | null>(null);
   readonly exportingFormat = signal<'excel' | 'pdf' | null>(null);
 
@@ -71,7 +66,9 @@ export class Vendas {
 
   // ── Derived data ──────────────────────────────────────────
   readonly associacaoOptions = computed(() => {
-    const values = this.stores().map((s) => s.associacao).filter(Boolean);
+    const values = this.stores()
+      .map((s) => s.associacao)
+      .filter(Boolean);
     return [...new Set(values)].sort();
   });
 
@@ -102,12 +99,8 @@ export class Vendas {
     const threshold24h = this.HOURS_24_MS;
 
     return all.filter((s) => {
-      if (filters.associacao.length > 0 && !filters.associacao.includes(s.associacao))
-        return false;
-      if (
-        filters.sitContrato.length > 0 &&
-        !filters.sitContrato.includes(s.sit_contrato ?? '')
-      )
+      if (filters.associacao.length > 0 && !filters.associacao.includes(s.associacao)) return false;
+      if (filters.sitContrato.length > 0 && !filters.sitContrato.includes(s.sit_contrato ?? ''))
         return false;
       if (nameQ && !(s.nome_farmacia ?? '').toLowerCase().includes(nameQ)) return false;
       if (codQ && !s.cod_farmacia.toLowerCase().includes(codQ)) return false;
@@ -132,29 +125,22 @@ export class Vendas {
     });
   });
 
-  readonly visibleRows = computed(() =>
-    this.sortedStores().slice(0, this.renderedRowsCount()),
-  );
+  readonly visibleRows = computed(() => this.sortedStores().slice(0, this.renderedRowsCount()));
 
-  readonly hasMoreRows = computed(
-    () => this.renderedRowsCount() < this.sortedStores().length,
-  );
+  readonly hasMoreRows = computed(() => this.renderedRowsCount() < this.sortedStores().length);
 
   // ── KPIs ──────────────────────────────────────────────────
   readonly totalFarmacias = computed(() => this.filteredStores().length);
 
   readonly farmaciasAtivas = computed(
     () =>
-      this.filteredStores().filter(
-        (s) => s.sit_contrato?.toUpperCase().trim() === 'ATIVO',
-      ).length,
+      this.filteredStores().filter((s) => s.sit_contrato?.toUpperCase().trim() === 'ATIVO').length,
   );
 
   readonly farmaciasInativas = computed(
     () =>
-      this.filteredStores().filter(
-        (s) => s.sit_contrato?.toUpperCase().trim() === 'INATIVO',
-      ).length,
+      this.filteredStores().filter((s) => s.sit_contrato?.toUpperCase().trim() === 'INATIVO')
+        .length,
   );
 
   readonly comVendaRecente = computed(() => {
@@ -182,9 +168,7 @@ export class Vendas {
     if (!this.hasActiveFilters()) return 'all';
     const f = this.selectedFilters();
     const hasOtherFilters =
-      f.associacao.length > 0 ||
-      this.nameFilter() !== '' ||
-      this.codFarmaciaFilter() !== '';
+      f.associacao.length > 0 || this.nameFilter() !== '' || this.codFarmaciaFilter() !== '';
     if (hasOtherFilters) return null;
     if (this.onlyVendaRecente() && f.sitContrato.length === 0) return 'venda24h';
     if (f.sitContrato.length === 1 && f.sitContrato[0] === 'ATIVO' && !this.onlyVendaRecente())
@@ -212,23 +196,6 @@ export class Vendas {
         this.stores.set(resp.resultados);
         this.isLoading.set(false);
         this.loadError.set(null);
-      });
-  }
-
-  onAtualizar(): void {
-    this.isRefreshing.set(true);
-    this.refreshError.set(null);
-    this.service.atualizar()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (resp) => {
-          this.stores.set(resp.resultados);
-          this.isRefreshing.set(false);
-        },
-        error: () => {
-          this.refreshError.set('Erro ao atualizar dados do Redshift.');
-          this.isRefreshing.set(false);
-        },
       });
   }
 
@@ -330,9 +297,7 @@ export class Vendas {
   onTableScroll(event: Event): void {
     const el = event.target as HTMLElement;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
-      this.renderedRowsCount.update((c) =>
-        Math.min(c + this.pageSize, this.sortedStores().length),
-      );
+      this.renderedRowsCount.update((c) => Math.min(c + this.pageSize, this.sortedStores().length));
     }
   }
 
@@ -371,11 +336,13 @@ export class Vendas {
         { label: 'Total exportado', value: rows.length },
         {
           label: 'Ativas',
-          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'ATIVO').length,
+          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'ATIVO')
+            .length,
         },
         {
           label: 'Inativas',
-          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'INATIVO').length,
+          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'INATIVO')
+            .length,
         },
         {
           label: 'Venda 24h',
@@ -393,10 +360,20 @@ export class Vendas {
           align: 'center',
           width: 16,
         },
-        { header: 'Cod. farmacia', value: (store) => store.cod_farmacia, align: 'center', width: 14 },
+        {
+          header: 'Cod. farmacia',
+          value: (store) => store.cod_farmacia,
+          align: 'center',
+          width: 14,
+        },
         { header: 'Farmacia', value: (store) => store.farmacia ?? '—', align: 'center', width: 14 },
         { header: 'Nome', value: (store) => store.nome_farmacia ?? '—', width: 26 },
-        { header: 'Sit. contrato', value: (store) => store.sit_contrato ?? '—', align: 'center', width: 16 },
+        {
+          header: 'Sit. contrato',
+          value: (store) => store.sit_contrato ?? '—',
+          align: 'center',
+          width: 16,
+        },
         {
           header: 'Ultima venda',
           value: (store) => this.formatDate(store.ultima_venda_parceiros),

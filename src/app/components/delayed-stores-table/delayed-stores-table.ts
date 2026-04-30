@@ -147,6 +147,11 @@ export class DelayedStoresTable {
     return filterSummary(this.selectedSitContratosLocal());
   }
 
+  ariaSort(column: string): 'ascending' | 'descending' | 'none' {
+    if (this.sortColumn() !== column) return 'none';
+    return this.sortDir() === 'asc' ? 'ascending' : 'descending';
+  }
+
   isMultiFilterOpen(key: string): boolean {
     return this.openMultiFilter() === key;
   }
@@ -200,6 +205,8 @@ export class DelayedStoresTable {
   }
 
   onTableScroll(event: Event): void {
+    if (!this.hasMoreRows() || this.filteredCount() === 0) return;
+
     const el = event.target as HTMLElement;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
       this.tableScroll.emit();
