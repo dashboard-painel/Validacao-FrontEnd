@@ -200,6 +200,8 @@ export class DelayedStoresTable {
   }
 
   onTableScroll(event: Event): void {
+    if (!this.hasMoreRows() || this.filteredCount() === 0) return;
+
     const el = event.target as HTMLElement;
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
       this.tableScroll.emit();

@@ -139,4 +139,36 @@ describe('DelayedStoresTable', () => {
 
     expect(emissoes).toEqual(['excel']);
   });
+
+  it('nao emite tableScroll quando nao ha mais linhas para carregar', () => {
+    const emissoes: number[] = [];
+    component.tableScroll.subscribe(() => emissoes.push(1));
+
+    component.onTableScroll({
+      target: {
+        scrollTop: 400,
+        clientHeight: 200,
+        scrollHeight: 550,
+      },
+    } as unknown as Event);
+
+    expect(emissoes).toEqual([]);
+  });
+
+  it('emite tableScroll ao atingir o fim quando ainda ha mais linhas', () => {
+    const emissoes: number[] = [];
+    component.tableScroll.subscribe(() => emissoes.push(1));
+    fixture.componentRef.setInput('hasMoreRows', true);
+    fixture.componentRef.setInput('filteredCount', 10);
+
+    component.onTableScroll({
+      target: {
+        scrollTop: 400,
+        clientHeight: 200,
+        scrollHeight: 650,
+      },
+    } as unknown as Event);
+
+    expect(emissoes).toEqual([1]);
+  });
 });
