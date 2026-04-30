@@ -371,12 +371,13 @@
         <th scope="col">Sit. Contrato</th>
         <th scope="col">Classificação</th>
         <th scope="col">Possível Causa</th>
+        <th scope="col">Ações</th>
       </tr>
     </thead>
     <tbody>
       @if (filteredCount() === 0) {
         <tr>
-          <td class="delayed-stores__empty text-center py-3" colspan="8">
+          <td class="delayed-stores__empty text-center py-3" colspan="9">
             Nenhuma farmácia encontrada com os filtros selecionados.
           </td>
         </tr>
@@ -470,11 +471,21 @@
                 <span class="text-body-secondary">—</span>
               }
             </td>
+            <td class="delayed-stores__td-action">
+              <button
+                type="button"
+                class="delayed-stores__row-action"
+                [attr.aria-label]="'Ver detalhes de ' + store.pharmacyName"
+                (click)="$event.stopPropagation(); openStoreModal(store)"
+              >
+                Ver detalhes
+              </button>
+            </td>
           </tr>
         }
         @if (hasMoreRows()) {
           <tr>
-            <td class="text-body-secondary text-center py-2" colspan="8">
+            <td class="text-body-secondary text-center py-2" colspan="9">
               Role para carregar mais farmácias...
             </td>
           </tr>

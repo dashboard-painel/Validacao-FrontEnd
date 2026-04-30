@@ -140,6 +140,24 @@ describe('DelayedStoresTable', () => {
     expect(emissoes).toEqual(['excel']);
   });
 
+  it('renderiza uma acao de detalhes acessivel por linha', () => {
+    const emissoes: DelayedStoreRow[] = [];
+    component.storeSelect.subscribe((value) => emissoes.push(value));
+    fixture.componentRef.setInput('visibleRows', [MOCK_ROW]);
+    fixture.componentRef.setInput('filteredCount', 1);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botaoDetalhes = elemento.querySelector<HTMLButtonElement>('.delayed-stores__row-action');
+
+    expect(botaoDetalhes?.textContent?.trim()).toBe('Ver detalhes');
+    expect(botaoDetalhes?.getAttribute('aria-label')).toBe('Ver detalhes de Farma Teste');
+
+    botaoDetalhes?.click();
+
+    expect(emissoes).toEqual([MOCK_ROW]);
+  });
+
   it('nao emite tableScroll quando nao ha mais linhas para carregar', () => {
     const emissoes: number[] = [];
     component.tableScroll.subscribe(() => emissoes.push(1));

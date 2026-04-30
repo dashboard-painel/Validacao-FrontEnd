@@ -348,6 +348,33 @@
   min-width: 10rem;
 }
 
+.delayed-stores__td-action {
+  white-space: nowrap;
+}
+
+.delayed-stores__row-action {
+  border: 1px solid var(--painel-primary);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--painel-primary-strong);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.3rem 0.75rem;
+  transition:
+    background-color 0.12s,
+    color 0.12s,
+    box-shadow 0.12s;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--painel-primary-soft-subtle);
+    color: var(--painel-primary-strong);
+    box-shadow: var(--painel-shadow-interactive);
+    outline: none;
+  }
+}
+
 .delayed-stores__store-name {
   display: block;
   color: var(--painel-text-strong);
