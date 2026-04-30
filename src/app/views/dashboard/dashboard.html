@@ -107,38 +107,6 @@
                   >{{ filteredDelayedStoreCount() }} de
                   {{ delayedStoreRows().length }} farmácias</span
                 >
-                <div class="painel-export-group" role="group" aria-label="Exportar lista de farmácias">
-                  <button
-                    type="button"
-                    class="painel-export-btn painel-export-btn--excel"
-                    [disabled]="exportingFormat() !== null || filteredDelayedStoreCount() === 0"
-                    (click)="onExportDelayedStores('excel')"
-                    title="Exportar farmácias filtradas para Excel"
-                  >
-                    @if (exportingFormat() === 'excel') {
-                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      Excel...
-                    } @else {
-                      <i class="bi bi-file-earmark-excel"></i>
-                      Excel
-                    }
-                  </button>
-                  <button
-                    type="button"
-                    class="painel-export-btn painel-export-btn--pdf"
-                    [disabled]="exportingFormat() !== null || filteredDelayedStoreCount() === 0"
-                    (click)="onExportDelayedStores('pdf')"
-                    title="Exportar farmácias filtradas para PDF"
-                  >
-                    @if (exportingFormat() === 'pdf') {
-                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      PDF...
-                    } @else {
-                      <i class="bi bi-file-earmark-pdf"></i>
-                      PDF
-                    }
-                  </button>
-                </div>
               </div>
             </div>
             @if (compareError()) {
@@ -159,6 +127,7 @@
               [filteredCount]="filteredDelayedStoreCount()"
               [hasMoreRows]="hasMoreRows()"
               [hasActiveFilters]="fs.hasActiveFilters()"
+              [exportingFormat]="exportingFormat()"
               [filtersOpen]="fs.filtersOpen()"
               [minDelayHours]="fs.minDelayHoursFilter()"
               [selectedMultiFilters]="fs.selectedMultiFilters()"
@@ -189,6 +158,7 @@
               (storeSelect)="openStoreModal($event)"
               (tableScroll)="onTableScroll()"
               (clearFilters)="fs.clearFilters()"
+              (exportRequest)="onExportDelayedStores($event)"
               (sortChange)="onSortChange($event)"
               (filtersToggle)="onFiltersToggle()"
             ></app-delayed-stores-table>

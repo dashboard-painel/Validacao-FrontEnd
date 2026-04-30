@@ -48,6 +48,7 @@ export class DelayedStoresTable {
   filteredCount    = input<number>(0);
   hasMoreRows      = input<boolean>(false);
   hasActiveFilters = input<boolean>(false);
+  exportingFormat  = input<'excel' | 'pdf' | null>(null);
 
   // ── Filter-state inputs ──────────────────────────────────────
   filtersOpen               = input<boolean>(false);
@@ -114,6 +115,7 @@ export class DelayedStoresTable {
   readonly sortChange               = output<{ column: string; dir: 'asc' | 'desc' }>();
   readonly minDelayChange           = output<number>();
   readonly filtersToggle            = output<void>();
+  readonly exportRequest            = output<'excel' | 'pdf'>();
 
   // ── Display helpers ──────────────────────────────────────────
   /** Layers shown in the last-sale date columns (excludes 'Sem dados' — no timestamp available) */
@@ -210,6 +212,10 @@ export class DelayedStoresTable {
 
   onMinDelaySelect(value: number): void {
     this.minDelayChange.emit(value);
+  }
+
+  onExport(format: 'excel' | 'pdf'): void {
+    this.exportRequest.emit(format);
   }
 
   sortBy(column: string): void {

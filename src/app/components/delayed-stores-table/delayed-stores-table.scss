@@ -6,13 +6,19 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem;
-  align-items: flex-start;
+  align-items: flex-end;
 }
 
 .delayed-stores__quick-group {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.delayed-stores__quick-actions {
+  display: flex;
+  align-items: flex-end;
+  margin-left: auto;
 }
 
 .delayed-stores__quick-label {
@@ -35,6 +41,13 @@
   border-radius: 0.6rem;
   width: fit-content;
   max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .delayed-stores__quick-actions {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 
 .delayed-stores__preset-btn {

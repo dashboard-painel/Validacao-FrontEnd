@@ -15,6 +15,40 @@
       }
     </div>
   </div>
+  <div class="delayed-stores__quick-actions">
+    <div class="painel-export-group" role="group" aria-label="Exportar lista de farmácias">
+      <button
+        type="button"
+        class="painel-export-btn painel-export-btn--excel"
+        [disabled]="exportingFormat() !== null || filteredCount() === 0"
+        (click)="onExport('excel')"
+        title="Exportar farmácias filtradas para Excel"
+      >
+        @if (exportingFormat() === 'excel') {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Excel...
+        } @else {
+          <i class="bi bi-file-earmark-excel"></i>
+          Excel
+        }
+      </button>
+      <button
+        type="button"
+        class="painel-export-btn painel-export-btn--pdf"
+        [disabled]="exportingFormat() !== null || filteredCount() === 0"
+        (click)="onExport('pdf')"
+        title="Exportar farmácias filtradas para PDF"
+      >
+        @if (exportingFormat() === 'pdf') {
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          PDF...
+        } @else {
+          <i class="bi bi-file-earmark-pdf"></i>
+          PDF
+        }
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="delayed-stores__filters-panel mb-3">

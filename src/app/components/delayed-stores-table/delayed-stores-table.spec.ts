@@ -125,4 +125,18 @@ describe('DelayedStoresTable', () => {
 
     expect(emissoes).toEqual([48]);
   });
+
+  it('emite exportRequest ao clicar no botao de exportacao Excel', () => {
+    const emissoes: Array<'excel' | 'pdf'> = [];
+    component.exportRequest.subscribe((value) => emissoes.push(value));
+    fixture.componentRef.setInput('filteredCount', 3);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botaoExcel = elemento.querySelector<HTMLButtonElement>('.painel-export-btn--excel');
+
+    botaoExcel?.click();
+
+    expect(emissoes).toEqual(['excel']);
+  });
 });
