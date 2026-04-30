@@ -235,18 +235,40 @@
 }
 
 .delayed-stores__th--sortable {
-  cursor: pointer;
-  user-select: none;
+  padding: 0;
+}
+
+.delayed-stores__sort-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  padding: 0.5rem;
+  text-align: left;
+  text-transform: inherit;
 
   i {
     font-size: 0.65rem;
-    margin-left: 0.25rem;
     opacity: 0.5;
-    vertical-align: middle;
   }
 
   &:hover {
     color: var(--painel-text-strong);
+
+    i {
+      opacity: 1;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--painel-primary);
+    outline-offset: -2px;
 
     i {
       opacity: 1;

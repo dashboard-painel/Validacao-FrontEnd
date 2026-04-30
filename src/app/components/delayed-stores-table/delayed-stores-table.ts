@@ -147,6 +147,11 @@ export class DelayedStoresTable {
     return filterSummary(this.selectedSitContratosLocal());
   }
 
+  ariaSort(column: string): 'ascending' | 'descending' | 'none' {
+    if (this.sortColumn() !== column) return 'none';
+    return this.sortDir() === 'asc' ? 'ascending' : 'descending';
+  }
+
   isMultiFilterOpen(key: string): boolean {
     return this.openMultiFilter() === key;
   }

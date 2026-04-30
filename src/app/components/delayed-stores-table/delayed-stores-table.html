@@ -322,50 +322,62 @@
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('associationCode')"
+          [attr.aria-sort]="ariaSort('associationCode')"
         >
-          Cód Assoc.
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('associationCode')">
+            Cód Assoc.
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'associationCode' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'associationCode' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'associationCode'"
+            ></i>
+          </button>
         </th>
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('farmaCode')"
+          [attr.aria-sort]="ariaSort('farmaCode')"
         >
-          Cód. Farma
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('farmaCode')">
+            Cód. Farma
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'farmaCode' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'farmaCode' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'farmaCode'"
+            ></i>
+          </button>
         </th>
-        <th scope="col" class="delayed-stores__th--sortable" (click)="sortBy('cnpj')">
-          CNPJ
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"
-          ></i>
+        <th scope="col" class="delayed-stores__th--sortable" [attr.aria-sort]="ariaSort('cnpj')">
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('cnpj')">
+            CNPJ
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'cnpj' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'cnpj' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'cnpj'"
+            ></i>
+          </button>
         </th>
         <th
           scope="col"
           class="delayed-stores__th--sortable"
-          (click)="sortBy('delayHours')"
+          [attr.aria-sort]="ariaSort('delayHours')"
         >
-          Atraso
-          <i
-            class="bi"
-            [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
-            [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
-            [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"
-          ></i>
+          <button type="button" class="delayed-stores__sort-button" (click)="sortBy('delayHours')">
+            Atraso
+            <i
+              class="bi"
+              aria-hidden="true"
+              [class.bi-chevron-up]="sortColumn() === 'delayHours' && sortDir() === 'asc'"
+              [class.bi-chevron-down]="sortColumn() === 'delayHours' && sortDir() === 'desc'"
+              [class.bi-chevron-expand]="sortColumn() !== 'delayHours'"
+            ></i>
+          </button>
         </th>
         <th scope="col">Camada com atraso</th>
         <th scope="col">Sit. Contrato</th>

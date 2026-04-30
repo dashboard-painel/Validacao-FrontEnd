@@ -75,6 +75,26 @@ describe('DelayedStoresTable', () => {
     expect(component.isMultiFilterOpen('cnpj')).toBe(false);
   });
 
+  it('expõe botoes de ordenacao com aria-sort e emite sortChange ao clicar', () => {
+    const emissoes: Array<{ column: string; dir: 'asc' | 'desc' }> = [];
+    component.sortChange.subscribe((value) => emissoes.push(value));
+    fixture.componentRef.setInput('sortColumn', 'associationCode');
+    fixture.componentRef.setInput('sortDir', 'asc');
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const cabecalhoAssociacao = elemento.querySelector<HTMLElement>('th[aria-sort="ascending"]');
+    const botaoAtraso = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.delayed-stores__sort-button'),
+    ).find((botao) => botao.textContent?.includes('Atraso'));
+
+    expect(cabecalhoAssociacao?.textContent).toContain('Cód Assoc.');
+
+    botaoAtraso?.click();
+
+    expect(emissoes).toEqual([{ column: 'delayHours', dir: 'desc' }]);
+  });
+
   it('filteredAssociationCodeOptions filtra pelos termos buscados', () => {
     fixture.componentRef.setInput('associationCodeOptions', ['ASS001', 'ASS002', 'XYZ']);
     fixture.componentRef.setInput('multiFilterSearch', {
