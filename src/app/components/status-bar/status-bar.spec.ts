@@ -7,7 +7,7 @@ describe('StatusBar', () => {
   let component: StatusBar;
   let fixture: ComponentFixture<StatusBar>;
 
-  const mockItems: StatusBarItem[] = [
+  const itensMock: StatusBarItem[] = [
     {
       label: 'OK',
       value: 50,
@@ -34,19 +34,19 @@ describe('StatusBar', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render empty list by default', () => {
+  it('deve renderizar lista vazia por padrao', () => {
     fixture.detectChanges();
     expect(component.items()).toEqual([]);
   });
 
-  it('should render items when provided', () => {
-    fixture.componentRef.setInput('items', mockItems);
+  it('deve renderizar os itens quando forem informados', () => {
+    fixture.componentRef.setInput('items', itensMock);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelectorAll('.status-chart__item').length).toBe(2);
+    const elemento = fixture.nativeElement as HTMLElement;
+    expect(elemento.querySelectorAll('.status-chart__item').length).toBe(2);
   });
 });

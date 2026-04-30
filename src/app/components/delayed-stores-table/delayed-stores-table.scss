@@ -1,7 +1,35 @@
 @use 'scrollbar';
 @use 'layer-badges';
 
-// ── Quick Presets ──────────────────────────────────────────
+// ── Quick Controls ────────────────────────────────────────
+.delayed-stores__quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: flex-end;
+}
+
+.delayed-stores__quick-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.delayed-stores__quick-actions {
+  display: flex;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.delayed-stores__quick-label {
+  color: var(--painel-text-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
 .delayed-stores__presets {
   display: flex;
   align-items: center;
@@ -12,6 +40,14 @@
   border: 1px solid var(--painel-border);
   border-radius: 0.6rem;
   width: fit-content;
+  max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .delayed-stores__quick-actions {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 
 .delayed-stores__preset-btn {
@@ -47,41 +83,8 @@
     background-color: var(--painel-surface);
     color: var(--painel-primary-strong);
     border-color: var(--painel-primary);
-    box-shadow: 0 1px 4px rgb(31 79 134 / 12%);
+    box-shadow: var(--painel-shadow-interactive);
   }
-
-  &--critical.delayed-stores__preset-btn--active {
-    color: var(--status-danger);
-    border-color: color-mix(in srgb, var(--status-danger) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-danger) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-danger) 16%, transparent);
-  }
-
-  &--nodata.delayed-stores__preset-btn--active {
-    color: var(--status-nodata-strong);
-    border-color: color-mix(in srgb, var(--status-nodata) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-nodata) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-nodata) 16%, transparent);
-  }
-
-  &--ok.delayed-stores__preset-btn--active {
-    color: var(--status-ok);
-    border-color: color-mix(in srgb, var(--status-ok) 40%, transparent);
-    background-color: color-mix(in srgb, var(--status-ok) 8%, var(--painel-surface));
-    box-shadow: 0 1px 4px color-mix(in srgb, var(--status-ok) 16%, transparent);
-  }
-}
-
-.delayed-stores__preset-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.1rem 0.35rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  line-height: 1;
-  background-color: color-mix(in srgb, currentColor 12%, transparent);
-  margin-left: 0.1rem;
 }
 
 // ── Filter panel ──────────────────────────────────────────
@@ -114,7 +117,7 @@
   justify-content: center;
   border-radius: 999px;
   padding: 0.22rem 0.6rem;
-  background-color: rgb(31 79 134 / 14%);
+  background-color: var(--painel-primary-soft-strong);
   color: var(--painel-primary-strong);
   font-size: 0.72rem;
   line-height: 1;
@@ -172,7 +175,7 @@
   z-index: 40;
   max-height: 15rem;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
+  box-shadow: var(--painel-shadow-popover);
   background-color: var(--painel-dropdown-bg);
   color: var(--painel-text);
   border-color: var(--painel-border) !important;
@@ -199,7 +202,7 @@
 // ── Table ──────────────────────────────────────────────────
 .delayed-stores__table-wrap {
   height: 40rem;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: auto;
   @include scrollbar.thin-scrollbar;
 }
@@ -213,6 +216,8 @@
   --bs-table-bg: transparent;
   --bs-table-color: var(--painel-text);
   --bs-table-border-color: var(--painel-table-border);
+  min-width: 100%;
+  width: max-content;
 }
 
 .delayed-stores__table thead th {
@@ -226,6 +231,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom-width: 1px;
+  white-space: nowrap;
 }
 
 .delayed-stores__th--sortable {
@@ -266,7 +272,7 @@
   }
 
   &:hover td {
-    background-color: rgb(31 79 134 / 4%);
+    background-color: var(--painel-primary-soft-subtle);
   }
 
   &--critical {
@@ -367,9 +373,9 @@
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1.2;
-  color: var(--painel-muted, #6b7a90);
-  background-color: var(--painel-surface-soft, #f0f2f5);
-  border: 1px solid var(--painel-border, #d8dde6);
+  color: var(--painel-muted);
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
 }
 
 .delayed-stores__empty {

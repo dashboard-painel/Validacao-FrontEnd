@@ -15,29 +15,29 @@ describe('SitContratoBadge', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should return inativo class for null value', () => {
+  it('deve retornar a classe inativo para valor null', () => {
     fixture.componentRef.setInput('value', null);
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('sit-contrato-badge--inativo');
   });
 
-  it('should return ativo class for ATIVO value', () => {
+  it('deve retornar a classe ativo para o valor ATIVO', () => {
     fixture.componentRef.setInput('value', 'ATIVO');
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('sit-contrato-badge--ativo');
   });
 
-  it('should be case-insensitive', () => {
+  it('deve ignorar diferencas entre maiusculas e minusculas', () => {
     fixture.componentRef.setInput('value', 'ativo');
     fixture.detectChanges();
     expect(component.badgeClass()).toContain('sit-contrato-badge--ativo');
   });
 
-  it('should show — for null value', () => {
+  it('deve exibir — para valor null', () => {
     fixture.componentRef.setInput('value', null);
     fixture.detectChanges();
     expect(component.label()).toBe('—');

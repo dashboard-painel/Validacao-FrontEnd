@@ -4,7 +4,7 @@
   --kpi-border: var(--painel-border);
   --kpi-accent: var(--painel-primary);
   --kpi-accent-strong: var(--painel-primary-strong);
-  --kpi-chip-bg: rgb(31 79 134 / 14%);
+  --kpi-chip-bg: var(--painel-primary-soft-strong);
 
   position: relative;
   overflow: hidden;
@@ -76,44 +76,44 @@
 .kpi-card--neutral {
   --kpi-bg-from: var(--painel-surface-soft);
   --kpi-bg-to: var(--painel-surface-soft);
-  --kpi-border: rgb(31 79 134 / 22%);
+  --kpi-border: var(--painel-primary-border-soft);
   --kpi-accent: var(--painel-primary);
   --kpi-accent-strong: var(--painel-primary-strong);
-  --kpi-chip-bg: rgb(31 79 134 / 14%);
+  --kpi-chip-bg: var(--painel-primary-soft-strong);
 }
 
 .kpi-card--success {
   --kpi-bg-from: var(--status-ok-soft);
   --kpi-bg-to: var(--status-ok-soft);
-  --kpi-border: rgb(47 143 91 / 28%);
+  --kpi-border: var(--status-ok-border);
   --kpi-accent: var(--status-ok);
   --kpi-accent-strong: var(--status-ok-strong);
-  --kpi-chip-bg: rgb(47 143 91 / 16%);
+  --kpi-chip-bg: var(--status-ok-chip-bg);
 }
 
 .kpi-card--warning {
   --kpi-bg-from: var(--status-warning-soft);
   --kpi-bg-to: var(--status-warning-soft);
-  --kpi-border: rgb(199 145 26 / 30%);
+  --kpi-border: var(--status-warning-border);
   --kpi-accent: var(--status-warning);
   --kpi-accent-strong: var(--status-warning-strong);
-  --kpi-chip-bg: rgb(199 145 26 / 18%);
+  --kpi-chip-bg: var(--status-warning-chip-bg);
 }
 
 .kpi-card--danger {
   --kpi-bg-from: var(--status-danger-soft);
   --kpi-bg-to: var(--status-danger-soft);
-  --kpi-border: rgb(201 72 72 / 28%);
+  --kpi-border: var(--status-danger-border);
   --kpi-accent: var(--status-danger);
   --kpi-accent-strong: var(--status-danger-strong);
-  --kpi-chip-bg: rgb(201 72 72 / 15%);
+  --kpi-chip-bg: var(--status-danger-chip-bg);
 }
 
 .kpi-card--nodata {
   --kpi-bg-from: var(--status-nodata-soft);
   --kpi-bg-to: var(--status-nodata-soft);
-  --kpi-border: rgb(138 149 166 / 30%);
+  --kpi-border: var(--status-nodata-border);
   --kpi-accent: var(--status-nodata);
   --kpi-accent-strong: var(--status-nodata-strong);
-  --kpi-chip-bg: rgb(138 149 166 / 18%);
+  --kpi-chip-bg: var(--status-nodata-chip-bg);
 }

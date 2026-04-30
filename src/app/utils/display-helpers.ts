@@ -1,6 +1,6 @@
 import { type DelayedStoreRow, type ProblemLayer } from '../models/shared/dashboard.model';
 
-export function urgencyClass(hours: number): string {
+export function urgencyClass(hours: number): 'critical' | 'high' | 'moderate' {
   if (hours >= 48) return 'critical';
   if (hours >= 24) return 'high';
   return 'moderate';

@@ -1,4 +1,4 @@
-<article [class]="gaugeCardClass()" role="group" aria-label="Status de lojas OK">
+<article [class]="gaugeCardClass()" role="group" aria-label="Status de farmácias OK">
   <div
     [class]="embedded()
       ? 'd-flex flex-column align-items-center justify-content-center gap-3 text-center h-100'
@@ -10,18 +10,18 @@
       [style.--gauge-value]="okStoresPercent() + '%'"
       [style.--gauge-color]="gaugeColor()"
       [style.--gauge-percent-color]="gaugePercentColor()"
-      [attr.aria-label]="okStoresPercent() + '% de lojas OK'"
+      [attr.aria-label]="okStoresPercent() + '% de farmácias OK'"
     >
       <div class="gauge__inner">
         <span class="gauge__percent">{{ okStoresPercent() }}%</span>
-        <span class="gauge__caption">de lojas OK</span>
+        <span class="gauge__caption">de farmácias OK</span>
       </div>
     </div>
 
     <span class="gauge__status">{{ gaugeSignalLabel() }}</span>
 
     <div class="gauge__details">
-      <span class="gauge__label d-block">Lojas com dados atrasados</span>
+      <span class="gauge__label d-block">Farmácias com dados atrasados</span>
       <span class="gauge__value gauge__value--danger d-block">{{ nonOkStores() }}</span>
     </div>
   </div>

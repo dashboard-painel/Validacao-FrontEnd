@@ -17,18 +17,18 @@
   color: var(--painel-text-strong);
 
   &--gold {
-    background-color: color-mix(in srgb, #c7911a 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, #c7911a 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-gold) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-gold) 38%, transparent);
   }
 
   &--select {
-    background-color: color-mix(in srgb, var(--status-silver) 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, var(--status-silver) 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-select) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-select) 38%, transparent);
   }
 
   &--prime {
-    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-premium) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-premium) 38%, transparent);
   }
 
   &--neonatal {
@@ -48,18 +48,18 @@
   }
 
   &--brasil {
-    background-color: color-mix(in srgb, #2e7d32 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, #2e7d32 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-brasil) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-brasil) 38%, transparent);
   }
 
   &--cloud {
-    background-color: color-mix(in srgb, #1976d2 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, #1976d2 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-cloud) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-cloud) 38%, transparent);
   }
 
   &--sngpc {
-    background-color: color-mix(in srgb, #9c27b0 10%, var(--painel-surface));
-    border-color: color-mix(in srgb, #9c27b0 38%, transparent);
+    background-color: color-mix(in srgb, var(--classificacao-premium) 10%, var(--painel-surface));
+    border-color: color-mix(in srgb, var(--classificacao-premium) 38%, transparent);
   }
 
   &--null {

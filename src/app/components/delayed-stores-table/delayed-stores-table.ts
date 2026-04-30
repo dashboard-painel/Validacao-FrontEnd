@@ -26,6 +26,13 @@ const EMPTY_SEARCH: Record<MultiFilterKey, string> = {
   cnpj: '',
 };
 
+const MIN_DELAY_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
+  { value: 0, label: '0h' },
+  { value: 24, label: '24h+' },
+  { value: 48, label: '48h+' },
+  { value: 72, label: '72h+' },
+];
+
 @Component({
   selector: 'app-delayed-stores-table',
   imports: [CnpjPipe, SitContratoBadge, ClassificacaoBadge],
@@ -41,10 +48,11 @@ export class DelayedStoresTable {
   filteredCount    = input<number>(0);
   hasMoreRows      = input<boolean>(false);
   hasActiveFilters = input<boolean>(false);
+  exportingFormat  = input<'excel' | 'pdf' | null>(null);
 
   // ── Filter-state inputs ──────────────────────────────────────
   filtersOpen               = input<boolean>(false);
-  activePreset              = input<string | null>(null);
+  minDelayHours             = input<number>(0);
   selectedMultiFilters      = input<Record<MultiFilterKey, string[]>>(EMPTY_MULTI);
   multiFilterSearch         = input<Record<MultiFilterKey, string>>(EMPTY_SEARCH);
   /** Covers both MultiFilterKey and table-specific filter keys (problemLayer, storeStatus, sitContratoLocal) */
@@ -105,12 +113,14 @@ export class DelayedStoresTable {
   readonly tableScroll              = output<void>();
   readonly clearFilters             = output<void>();
   readonly sortChange               = output<{ column: string; dir: 'asc' | 'desc' }>();
-  readonly presetChange             = output<string | null>();
+  readonly minDelayChange           = output<number>();
   readonly filtersToggle            = output<void>();
+  readonly exportRequest            = output<'excel' | 'pdf'>();
 
   // ── Display helpers ──────────────────────────────────────────
   /** Layers shown in the last-sale date columns (excludes 'Sem dados' — no timestamp available) */
   readonly LAYER_KEYS: ProblemLayer[] = ['Gold', 'Silver', 'Coletor'];
+  readonly MIN_DELAY_OPTIONS = MIN_DELAY_OPTIONS;
   readonly urgencyClass = urgencyClass;
   readonly formatDelay = formatDelay;
   readonly layerLastSale = layerLastSale;
@@ -200,16 +210,20 @@ export class DelayedStoresTable {
     this.clearFilters.emit();
   }
 
+  onMinDelaySelect(value: number): void {
+    this.minDelayChange.emit(value);
+  }
+
+  onExport(format: 'excel' | 'pdf'): void {
+    this.exportRequest.emit(format);
+  }
+
   sortBy(column: string): void {
     const currentDir = this.sortDir();
     const currentCol = this.sortColumn();
     const newDir: 'asc' | 'desc' =
       column === currentCol ? (currentDir === 'asc' ? 'desc' : 'asc') : 'desc';
     this.sortChange.emit({ column, dir: newDir });
-  }
-
-  applyPreset(preset: string | null): void {
-    this.presetChange.emit(preset);
   }
 
   toggleFilters(): void {

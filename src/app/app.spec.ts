@@ -2,12 +2,29 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from './app';
 import { routes } from './app.routes';
 
-describe('App shell', () => {
-  async function navigateAndRender(
+describe('Casca da aplicacao', () => {
+  function simularMatchMedia(): void {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+  }
+
+  async function navegarERenderizar(
     fixture: ComponentFixture<App>,
     router: Router,
     url: string,
@@ -26,27 +43,29 @@ describe('App shell', () => {
   }
 
   beforeEach(async () => {
+    simularMatchMedia();
+
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
   });
 
-  it('renders shell with navbar and main content area', async () => {
+  it('renderiza a estrutura principal com a sidebar e a area principal', async () => {
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);
-    const host = await navigateAndRender(fixture, router, '/dashboard');
+    const elemento = await navegarERenderizar(fixture, router, '/dashboard');
 
-    expect(host.querySelector('[data-testid="app-shell"]')).toBeTruthy();
-    expect(host.querySelector('app-sidebar')).toBeTruthy();
-    expect(host.querySelector('main[data-testid="app-main"]')).toBeTruthy();
+    expect(elemento.querySelector('[data-testid="app-shell"]')).toBeTruthy();
+    expect(elemento.querySelector('app-sidebar')).toBeTruthy();
+    expect(elemento.querySelector('main[data-testid="app-main"]')).toBeTruthy();
     expect(router.url).toBe('/dashboard');
   });
 
-  it('redirects unknown routes to /dashboard', async () => {
+  it('redireciona rotas desconhecidas para /dashboard', async () => {
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);
-    await navigateAndRender(fixture, router, '/rota-invalida');
+    await navegarERenderizar(fixture, router, '/rota-invalida');
 
     expect(router.url).toBe('/dashboard');
   });

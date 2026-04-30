@@ -47,14 +47,14 @@ src/
 │   ├── components/
 │   │   ├── causa-badge/          # Badge de causa do problema
 │   │   ├── classificacao-badge/  # Badge de classificação da farmácia
-│   │   ├── delayed-stores-table/ # Tabela de lojas com atraso
+│   │   ├── delayed-stores-table/ # Tabela de farmácias com atraso
 │   │   ├── gauge/                # Gauge circular de status
 │   │   ├── global-filter-bar/    # Barra de filtros global
 │   │   ├── kpi/                  # Cards de indicadores (KPI)
 │   │   ├── sidebar/              # Navegação lateral colapsável
 │   │   ├── sit-contrato-badge/   # Badge de situação de contrato
 │   │   ├── status-bar/           # Barra de status geral
-│   │   └── store-detail-modal/   # Modal de detalhes da loja
+│   │   └── store-detail-modal/   # Modal de detalhes da farmácia
 │   ├── data/
 │   │   └── coletor-schedule.data # Dados estáticos de agenda do coletor
 │   ├── models/
@@ -79,10 +79,10 @@ src/
 ### Dashboard — Validação de Histórico
 
 - **Atualização automática** — dados recarregados a cada 30 s sem intervenção do usuário
-- **KPIs** — total de lojas, lojas OK, divergentes e sem dados, com comparativo em relação à sessão anterior
-- **Gauge de status** — visualização circular da proporção de lojas em dia
-- **Tabela de lojas com atraso** — ordenada por associação, com coluna de atraso em horas/dias e camadas problemáticas destacadas (atrasos > 48 h exibidos em dias)
-- **Modal de detalhes** — informações completas de uma loja ao clicar na linha
+- **KPIs** — total de farmácias, farmácias OK, divergentes e sem dados, com comparativo em relação à sessão anterior
+- **Gauge de status** — visualização circular da proporção de farmácias em dia
+- **Tabela de farmácias com atraso** — ordenada por associação, com coluna de atraso em horas/dias e camadas problemáticas destacadas (atrasos > 48 h exibidos em dias)
+- **Modal de detalhes** — informações completas de uma farmácia ao clicar na linha
 - **Filtros avançados** — por associação, código Farma, CNPJ, nome, camada problemática e status
 - **Sidebar colapsável** — recolhe para ícones em telas grandes; exibe a data da última atualização do backend
 

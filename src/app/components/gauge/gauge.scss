@@ -7,7 +7,7 @@
   --gauge-card-top: var(--painel-surface);
   --gauge-card-bottom: var(--painel-surface-soft);
   --gauge-card-border: var(--painel-border);
-  --gauge-status-bg: rgb(31 79 134 / 14%);
+  --gauge-status-bg: var(--painel-primary-soft-strong);
   --gauge-status-color: var(--painel-primary-strong);
 
   border-radius: 0.95rem;
@@ -23,32 +23,32 @@
 .gauge-card--success {
   --gauge-card-top: var(--status-ok-soft);
   --gauge-card-bottom: var(--status-ok-soft);
-  --gauge-card-border: rgb(47 143 91 / 30%);
-  --gauge-status-bg: rgb(47 143 91 / 16%);
+  --gauge-card-border: var(--status-ok-border);
+  --gauge-status-bg: var(--status-ok-chip-bg);
   --gauge-status-color: var(--status-ok-strong);
 }
 
 .gauge-card--warning {
   --gauge-card-top: var(--status-warning-soft);
   --gauge-card-bottom: var(--status-warning-soft);
-  --gauge-card-border: rgb(199 145 26 / 30%);
-  --gauge-status-bg: rgb(199 145 26 / 18%);
+  --gauge-card-border: var(--status-warning-border);
+  --gauge-status-bg: var(--status-warning-chip-bg);
   --gauge-status-color: var(--status-warning-strong);
 }
 
 .gauge-card--danger {
   --gauge-card-top: var(--status-danger-soft);
   --gauge-card-bottom: var(--status-danger-soft);
-  --gauge-card-border: rgb(201 72 72 / 30%);
-  --gauge-status-bg: rgb(201 72 72 / 16%);
+  --gauge-card-border: var(--status-danger-border);
+  --gauge-status-bg: var(--status-danger-chip-bg);
   --gauge-status-color: var(--status-danger-strong);
 }
 
 .gauge-card--nodata {
   --gauge-card-top: var(--status-nodata-soft);
   --gauge-card-bottom: var(--status-nodata-soft);
-  --gauge-card-border: rgb(138 149 166 / 30%);
-  --gauge-status-bg: rgb(138 149 166 / 18%);
+  --gauge-card-border: var(--status-nodata-border);
+  --gauge-status-bg: var(--status-nodata-chip-bg);
   --gauge-status-color: var(--status-nodata-strong);
 }
 

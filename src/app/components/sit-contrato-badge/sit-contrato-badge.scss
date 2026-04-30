@@ -45,7 +45,7 @@
   }
 
   &--suspenso {
-    color: var(--status-warning-alt, #b98312);
+    color: var(--status-warning-alt);
     background-color: color-mix(in srgb, var(--status-warning) 9%, var(--painel-surface));
     border-color: color-mix(in srgb, var(--status-warning) 28%, transparent);
   }

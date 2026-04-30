@@ -28,7 +28,7 @@
   justify-content: center;
   border-radius: 999px;
   padding: 0.22rem 0.6rem;
-  background-color: rgb(31 79 134 / 14%);
+  background-color: var(--painel-primary-soft-strong);
   color: var(--painel-primary-strong);
   font-size: 0.72rem;
   line-height: 1;
@@ -42,7 +42,7 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.22rem 0.6rem;
-  background: rgb(255 255 255 / 8%);
+  background: var(--painel-surface-soft);
   border: 1px solid var(--painel-border);
   border-radius: 999px;
   font-size: 0.7rem;
@@ -111,13 +111,13 @@
   white-space: nowrap;
 
   &:hover:not(.vendas__preset-btn--active) {
-    background-color: rgb(255 255 255 / 55%);
+    background-color: var(--painel-surface);
     color: var(--painel-text-strong);
   }
 
   &--active {
     background-color: var(--painel-surface);
-    box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+    box-shadow: var(--painel-shadow-interactive);
     color: var(--painel-primary-strong);
   }
 
@@ -174,7 +174,7 @@
   z-index: 40;
   max-height: 15rem;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgb(16 32 55 / 12%);
+  box-shadow: var(--painel-shadow-popover);
   background-color: var(--painel-dropdown-bg);
   color: var(--painel-text);
   border-color: var(--painel-border) !important;
@@ -245,7 +245,7 @@
   }
 
   &:hover td {
-    background-color: rgb(31 79 134 / 4%);
+    background-color: var(--painel-primary-soft-subtle);
   }
 }
 
