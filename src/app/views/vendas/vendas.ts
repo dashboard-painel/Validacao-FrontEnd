@@ -16,6 +16,10 @@ import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.serv
 import { type VendaParceiro } from '../../models/shared/venda-parceiro.model';
 import { toggleInArray } from '../../utils/array-toggle';
 import { filterSummary } from '../../utils/filter-summary';
+import {
+  TableExportService,
+  type ExportTableConfig,
+} from '../../services/table-export.service';
 
 type SortColumn = 'associacao' | 'cod_farmacia' | 'nome_farmacia' | 'ultima_venda_parceiros';
 type FilterKey = 'associacao' | 'sitContrato';
@@ -34,6 +38,7 @@ export class Vendas {
 
   private readonly service = inject(VendasParceirosService);
   private readonly atualizacaoService = inject(UltimaAtualizacaoService);
+  private readonly exportService = inject(TableExportService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly stores = signal<VendaParceiro[]>([]);
@@ -41,6 +46,8 @@ export class Vendas {
   readonly loadError = signal<string | null>(null);
   readonly isRefreshing = signal(false);
   readonly refreshError = signal<string | null>(null);
+  readonly exportError = signal<string | null>(null);
+  readonly exportingFormat = signal<'excel' | 'pdf' | null>(null);
 
   readonly ultimaAtualizacao = this.atualizacaoService.ultimaAtualizacao;
 
@@ -225,6 +232,30 @@ export class Vendas {
       });
   }
 
+  async onExport(format: 'excel' | 'pdf'): Promise<void> {
+    const rows = this.filteredStores();
+    if (rows.length === 0) {
+      this.exportError.set('Nenhuma farmácia disponível para exportar com os filtros atuais.');
+      return;
+    }
+
+    this.exportError.set(null);
+    this.exportingFormat.set(format);
+
+    try {
+      const config = this.createExportConfig(rows);
+      if (format === 'excel') {
+        await this.exportService.exportToExcel(config);
+      } else {
+        await this.exportService.exportToPdf(config);
+      }
+    } catch (error) {
+      this.exportError.set(this.resolveExportError(error, format));
+    } finally {
+      this.exportingFormat.set(null);
+    }
+  }
+
   // ── Actions ───────────────────────────────────────────────
   sortBy(col: SortColumn): void {
     if (this.sortColumn() === col) {
@@ -327,5 +358,65 @@ export class Vendas {
     if (hours < 1) return 'Agora';
     if (hours < 24) return `${hours}h atrás`;
     return `${Math.floor(hours / 24)}d atrás`;
+  }
+
+  private createExportConfig(rows: readonly VendaParceiro[]): ExportTableConfig<VendaParceiro> {
+    return {
+      title: 'Vendas Parceiros — Farmácias',
+      subtitle: `${rows.length} farmácias conforme os filtros aplicados`,
+      fileNameBase: 'vendas-parceiros',
+      sheetName: 'Vendas parceiros',
+      rows,
+      summary: [
+        { label: 'Total exportado', value: rows.length },
+        {
+          label: 'Ativas',
+          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'ATIVO').length,
+        },
+        {
+          label: 'Inativas',
+          value: rows.filter((store) => store.sit_contrato?.toUpperCase().trim() === 'INATIVO').length,
+        },
+        {
+          label: 'Venda 24h',
+          value: rows.filter((store) => {
+            if (!store.ultima_venda_parceiros) return false;
+            return Date.now() - new Date(store.ultima_venda_parceiros).getTime() < this.HOURS_24_MS;
+          }).length,
+        },
+      ],
+      columns: [
+        { header: 'Associacao', value: (store) => store.associacao, align: 'center', width: 14 },
+        {
+          header: 'Assoc. parceiro',
+          value: (store) => store.associacao_parceiro ?? '—',
+          align: 'center',
+          width: 16,
+        },
+        { header: 'Cod. farmacia', value: (store) => store.cod_farmacia, align: 'center', width: 14 },
+        { header: 'Farmacia', value: (store) => store.farmacia ?? '—', align: 'center', width: 14 },
+        { header: 'Nome', value: (store) => store.nome_farmacia ?? '—', width: 26 },
+        { header: 'Sit. contrato', value: (store) => store.sit_contrato ?? '—', align: 'center', width: 16 },
+        {
+          header: 'Ultima venda',
+          value: (store) => this.formatDate(store.ultima_venda_parceiros),
+          align: 'center',
+          width: 18,
+        },
+        {
+          header: 'Recencia',
+          value: (store) => this.vendaRecenciaLabel(store.ultima_venda_parceiros),
+          align: 'center',
+          width: 14,
+        },
+      ],
+    };
+  }
+
+  private resolveExportError(error: unknown, format: 'excel' | 'pdf'): string {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    return `Não foi possível exportar o arquivo em ${format.toUpperCase()}.`;
   }
 }

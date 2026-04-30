@@ -33,7 +33,16 @@
             "styles": ["node_modules/bootstrap/dist/css/bootstrap.min.css", "src/styles.scss"],
             "stylePreprocessorOptions": {
               "includePaths": ["src/styles"]
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "core-js",
+              "exceljs",
+              "html2canvas",
+              "jspdf",
+              "raf",
+              "rgbcolor"
+            ]
           },
           "configurations": {
             "production": {

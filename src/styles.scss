@@ -202,6 +202,80 @@ body {
   --bs-table-color: var(--painel-text);
 }
 
+.painel-export-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.28rem;
+  border: 1px solid var(--painel-border);
+  border-radius: 0.85rem;
+  background: linear-gradient(180deg, var(--painel-surface) 0%, var(--painel-surface-soft) 100%);
+  box-shadow: var(--painel-shadow-interactive);
+}
+
+.painel-export-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 6rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: 0.65rem;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease,
+    opacity 0.15s ease;
+
+  .bi {
+    font-size: 0.85rem;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--painel-shadow-interactive);
+    filter: saturate(1.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--painel-input-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.painel-export-btn--excel {
+  color: var(--status-ok-strong);
+  border-color: var(--status-ok-border);
+  background: linear-gradient(
+    180deg,
+    var(--status-ok-soft) 0%,
+    color-mix(in srgb, var(--status-ok-soft) 72%, var(--painel-surface)) 100%
+  );
+}
+
+.painel-export-btn--pdf {
+  color: var(--status-danger-strong);
+  border-color: var(--status-danger-border);
+  background: linear-gradient(
+    180deg,
+    var(--status-danger-soft) 0%,
+    color-mix(in srgb, var(--status-danger-soft) 72%, var(--painel-surface)) 100%
+  );
+}
+
 ::selection {
   background: var(--painel-selection);
 }

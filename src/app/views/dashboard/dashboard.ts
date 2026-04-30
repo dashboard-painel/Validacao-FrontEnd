@@ -36,6 +36,12 @@ import {
   type StoreStatus,
 } from '../../models/shared/dashboard.model';
 import { DashboardFilterState } from './dashboard-filter.state';
+import { CnpjPipe } from '../../pipes/cnpj.pipe';
+import { formatDelay } from '../../utils/display-helpers';
+import {
+  TableExportService,
+  type ExportTableConfig,
+} from '../../services/table-export.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -49,8 +55,10 @@ export class Dashboard {
   private readonly historicoService = inject(HistoricoService);
   private readonly atualizacaoService = inject(UltimaAtualizacaoService);
   private readonly mapper = inject(DashboardMapperService);
+  private readonly exportService = inject(TableExportService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly kpisStorageKey = 'dashboard-kpis';
+  private readonly cnpjPipe = new CnpjPipe();
   private readonly historicoRequestInFlight = signal(false);
   private readonly hasLoadedHistoricoOnce = signal(false);
   private readonly appliedHistoricoTimestamp = signal<string | null>(null);
@@ -62,6 +70,8 @@ export class Dashboard {
   readonly loadError = signal<string | null>(null);
   readonly isComparing = signal(false);
   readonly compareError = signal<string | null>(null);
+  readonly exportError = signal<string | null>(null);
+  readonly exportingFormat = signal<'excel' | 'pdf' | null>(null);
   private readonly previousKpisStore = signal<DashboardData['kpis'] | null>(null);
 
   readonly selectedStore = signal<DelayedStoreRow | null>(null);
@@ -499,6 +509,30 @@ export class Dashboard {
   }
 
   // ── Private helpers ──────────────────────────────────────
+  async onExportDelayedStores(format: 'excel' | 'pdf'): Promise<void> {
+    const rows = this.filteredDelayedStoreRows();
+    if (rows.length === 0) {
+      this.exportError.set('Nenhuma farmácia disponível para exportar com os filtros atuais.');
+      return;
+    }
+
+    this.exportError.set(null);
+    this.exportingFormat.set(format);
+
+    try {
+      const config = this.createDelayedStoresExportConfig(rows);
+      if (format === 'excel') {
+        await this.exportService.exportToExcel(config);
+      } else {
+        await this.exportService.exportToPdf(config);
+      }
+    } catch (error) {
+      this.exportError.set(this.resolveExportError(error, format));
+    } finally {
+      this.exportingFormat.set(null);
+    }
+  }
+
   private compareByDelayPriority(
     a: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
     b: Pick<DelayedStoreRow, 'associationCode' | 'farmaCode' | 'cnpj' | 'delayHours' | 'problemLayers'>,
@@ -619,6 +653,56 @@ export class Dashboard {
 
     const millis = new Date(value).getTime();
     return Number.isNaN(millis) ? null : millis;
+  }
+
+  private createDelayedStoresExportConfig(
+    rows: readonly DelayedStoreRow[],
+  ): ExportTableConfig<DelayedStoreRow> {
+    return {
+      title: 'Dashboard — Farmácias monitoradas',
+      subtitle: `${rows.length} farmácias conforme os filtros aplicados`,
+      fileNameBase: 'dashboard-farmacias-monitoradas',
+      sheetName: 'Farmacias monitoradas',
+      rows,
+      summary: [
+        { label: 'Total exportado', value: rows.length },
+        { label: 'Com atraso', value: rows.filter((store) => store.status === 'Com atraso').length },
+        { label: 'Sem atraso', value: rows.filter((store) => store.status === 'Sem atraso').length },
+        { label: 'Sem dados', value: rows.filter((store) => store.status === 'Sem dados').length },
+      ],
+      columns: [
+        { header: 'Associacao', value: (store) => store.associationCode, align: 'center', width: 14 },
+        { header: 'Cod. Farma', value: (store) => store.farmaCode, align: 'center', width: 14 },
+        { header: 'Farmacia', value: (store) => store.pharmacyName, width: 26 },
+        { header: 'CNPJ', value: (store) => this.cnpjPipe.transform(store.cnpj), align: 'center', width: 20 },
+        { header: 'Status', value: (store) => store.status, align: 'center', width: 14 },
+        {
+          header: 'Atraso',
+          value: (store) => {
+            if (store.status === 'Sem dados') return 'Sem dados';
+            if (store.status === 'Sem atraso') return 'Sem atraso';
+            return formatDelay(store.delayHours);
+          },
+          align: 'center',
+          width: 15,
+        },
+        {
+          header: 'Camadas com atraso',
+          value: (store) => store.layerItems.map((item) => item.label).join(', '),
+          width: 22,
+        },
+        { header: 'Sit. Contrato', value: (store) => store.sitContrato ?? '—', align: 'center', width: 16 },
+        { header: 'Classificacao', value: (store) => store.classificacao ?? '—', align: 'center', width: 16 },
+        { header: 'Possivel causa', value: (store) => store.possivelCausa ?? '—', width: 28 },
+      ],
+    };
+  }
+
+  private resolveExportError(error: unknown, format: 'excel' | 'pdf'): string {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    return `Não foi possível exportar o arquivo em ${format.toUpperCase()}.`;
   }
 }
 

@@ -4,6 +4,7 @@ import { of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type VendaParceiro, type VendasParceirosResponse } from '../../models/shared/venda-parceiro.model';
+import { TableExportService } from '../../services/table-export.service';
 import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.service';
 import { VendasParceirosService } from '../../services/vendas-parceiros.service';
 import { Vendas } from './vendas';
@@ -75,6 +76,10 @@ describe('Vendas', () => {
     getHistorico: ReturnType<typeof vi.fn>;
     atualizar: ReturnType<typeof vi.fn>;
   };
+  let exportServiceMock: {
+    exportToExcel: ReturnType<typeof vi.fn>;
+    exportToPdf: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
     vi.useFakeTimers();
@@ -83,6 +88,10 @@ describe('Vendas', () => {
     vendasServiceMock = {
       getHistorico: vi.fn(() => of(RESPOSTA_INICIAL)),
       atualizar: vi.fn(() => of(RESPOSTA_ATUALIZADA)),
+    };
+    exportServiceMock = {
+      exportToExcel: vi.fn(() => Promise.resolve()),
+      exportToPdf: vi.fn(() => Promise.resolve()),
     };
 
     const atualizacaoServiceMock = {
@@ -93,6 +102,7 @@ describe('Vendas', () => {
       imports: [Vendas],
       providers: [
         { provide: VendasParceirosService, useValue: vendasServiceMock },
+        { provide: TableExportService, useValue: exportServiceMock },
         { provide: UltimaAtualizacaoService, useValue: atualizacaoServiceMock },
       ],
     }).compileComponents();
@@ -175,5 +185,27 @@ describe('Vendas', () => {
     expect(component.refreshError()).toBe('Erro ao atualizar dados do Redshift.');
     expect(component.isRefreshing()).toBe(false);
     expect(component.stores().map((store) => store.cod_farmacia)).toEqual(['001', '002', '003', '004']);
+  });
+
+  it('deve exportar para PDF usando as farmacias filtradas da view de vendas', async () => {
+    component.applyPreset('ativas');
+
+    await component.onExport('pdf');
+
+    expect(exportServiceMock.exportToPdf).toHaveBeenCalledTimes(1);
+    const [config] = exportServiceMock.exportToPdf.mock.calls[0] as [
+      { title: string; rows: Array<{ cod_farmacia: string }> },
+    ];
+    expect(config.title).toBe('Vendas Parceiros — Farmácias');
+    expect(config.rows.map((store) => store.cod_farmacia)).toEqual(['001', '002']);
+  });
+
+  it('deve expor a mensagem de erro da exportacao em vendas', async () => {
+    exportServiceMock.exportToExcel.mockRejectedValueOnce(new Error('Falha ao gerar Excel.'));
+
+    await component.onExport('excel');
+
+    expect(component.exportError()).toBe('Falha ao gerar Excel.');
+    expect(component.exportingFormat()).toBeNull();
   });
 });

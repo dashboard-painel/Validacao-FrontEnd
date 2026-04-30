@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type ComparacaoResultado, type FarmaciaHistorico } from '../../models/shared/farmacia.model';
 import { HistoricoService } from '../../services/historico.service';
+import { TableExportService } from '../../services/table-export.service';
 import { ThemeService, type Theme } from '../../services/theme.service';
 import { UltimaAtualizacaoService } from '../../services/ultima-atualizacao.service';
 import { Dashboard } from './dashboard';
@@ -99,6 +100,10 @@ describe('Dashboard', () => {
     getHistorico: ReturnType<typeof vi.fn>;
     comparar: ReturnType<typeof vi.fn>;
   };
+  let exportServiceMock: {
+    exportToExcel: ReturnType<typeof vi.fn>;
+    exportToPdf: ReturnType<typeof vi.fn>;
+  };
   let atualizacaoServiceMock: {
     ultimaAtualizacao: WritableSignal<string | null>;
     ultimaAtualizacaoPollSequence: WritableSignal<number>;
@@ -113,6 +118,10 @@ describe('Dashboard', () => {
     historicoServiceMock = {
       getHistorico: vi.fn(() => of(MOCK_API_STORES)),
       comparar: vi.fn(() => of(MOCK_COMPARE_RESULT)),
+    };
+    exportServiceMock = {
+      exportToExcel: vi.fn(() => Promise.resolve()),
+      exportToPdf: vi.fn(() => Promise.resolve()),
     };
 
     atualizacaoServiceMock = {
@@ -129,6 +138,7 @@ describe('Dashboard', () => {
       imports: [Dashboard],
       providers: [
         { provide: HistoricoService, useValue: historicoServiceMock },
+        { provide: TableExportService, useValue: exportServiceMock },
         { provide: UltimaAtualizacaoService, useValue: atualizacaoServiceMock },
         { provide: ThemeService, useValue: themeServiceMock },
       ],
@@ -250,5 +260,27 @@ describe('Dashboard', () => {
     expect(historicoServiceMock.getHistorico).toHaveBeenCalledTimes(1);
     expect(component.compareError()).toBe('Falha ao comparar. Verifique a conexão e tente novamente.');
     expect(component.isComparing()).toBe(false);
+  });
+
+  it('deve exportar para Excel usando as farmacias filtradas do dashboard', async () => {
+    component.onStoreStatusChange(['Com atraso']);
+
+    await component.onExportDelayedStores('excel');
+
+    expect(exportServiceMock.exportToExcel).toHaveBeenCalledTimes(1);
+    const [config] = exportServiceMock.exportToExcel.mock.calls[0] as [
+      { title: string; rows: Array<{ associationCode: string }> },
+    ];
+    expect(config.title).toBe('Dashboard — Farmácias monitoradas');
+    expect(config.rows.map((store) => store.associationCode)).toEqual(['ASS002', 'ASS001']);
+  });
+
+  it('deve expor a mensagem de erro da exportacao do dashboard', async () => {
+    exportServiceMock.exportToPdf.mockRejectedValueOnce(new Error('Falha ao gerar PDF.'));
+
+    await component.onExportDelayedStores('pdf');
+
+    expect(component.exportError()).toBe('Falha ao gerar PDF.');
+    expect(component.exportingFormat()).toBeNull();
   });
 });

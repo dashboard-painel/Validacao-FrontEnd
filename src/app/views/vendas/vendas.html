@@ -56,9 +56,9 @@
       <section class="col-12" aria-label="Lista de vendas parceiros">
         <article class="card vendas__card" role="group" aria-label="Lista de vendas parceiros">
           <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+            <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-3">
               <p class="vendas__title mb-0">Farmácias — Vendas Parceiros</p>
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                 @if (ultimaAtualizacao(); as ts) {
                   <span class="vendas__update-badge">
                     <i class="bi bi-arrow-clockwise"></i>
@@ -66,6 +66,38 @@
                   </span>
                 }
                 <span class="vendas__count">{{ filteredStores().length }} de {{ stores().length }} farmácias</span>
+                <div class="painel-export-group" role="group" aria-label="Exportar tabela de vendas">
+                  <button
+                    type="button"
+                    class="painel-export-btn painel-export-btn--excel"
+                    [disabled]="exportingFormat() !== null || filteredStores().length === 0"
+                    (click)="onExport('excel')"
+                    title="Exportar farmácias filtradas para Excel"
+                  >
+                    @if (exportingFormat() === 'excel') {
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      Excel...
+                    } @else {
+                      <i class="bi bi-file-earmark-excel"></i>
+                      Excel
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="painel-export-btn painel-export-btn--pdf"
+                    [disabled]="exportingFormat() !== null || filteredStores().length === 0"
+                    (click)="onExport('pdf')"
+                    title="Exportar farmácias filtradas para PDF"
+                  >
+                    @if (exportingFormat() === 'pdf') {
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                      PDF...
+                    } @else {
+                      <i class="bi bi-file-earmark-pdf"></i>
+                      PDF
+                    }
+                  </button>
+                </div>
                 <button
                   type="button"
                   class="btn btn-sm btn-primary"
@@ -86,6 +118,11 @@
             @if (refreshError()) {
               <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
                 <i class="bi bi-exclamation-triangle me-1"></i>{{ refreshError() }}
+              </div>
+            }
+            @if (exportError()) {
+              <div class="alert alert-danger alert-sm py-1 px-2 mb-2" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>{{ exportError() }}
               </div>
             }
 
