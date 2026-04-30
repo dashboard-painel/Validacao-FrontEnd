@@ -1,7 +1,7 @@
 @if (store(); as s) {
   <div class="modal-backdrop fade show"></div>
   <div
-    class="modal d-block"
+    class="modal d-block store-modal"
     role="dialog"
     aria-modal="true"
     aria-labelledby="store-modal-title"
@@ -10,175 +10,190 @@
     (click)="close()"
   >
     <div
-      class="modal-dialog modal-dialog-centered modal-dialog-scrollable store-modal__dialog"
+      class="modal-dialog modal-dialog-scrollable store-modal__dialog"
       (click)="$event.stopPropagation()"
     >
       <div class="modal-content store-modal__content">
-        <div class="modal-header">
+        <div class="modal-header store-modal__header">
           <h5 id="store-modal-title" class="modal-title fw-bold text-truncate">
             <i class="bi bi-shop me-2"></i>{{ s.pharmacyName }}
           </h5>
           <button type="button" class="btn-close" aria-label="Fechar" (click)="close()"></button>
         </div>
 
-        <div class="modal-body">
-          <!-- Identificação -->
-          <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
-            Identificação
-          </p>
-          <div class="row row-cols-2 g-2 mb-0">
-            <div class="col">
-              <span class="d-block small text-muted fw-semibold">Cód. Associação</span>
-              <span class="d-block fw-semibold">{{ s.associationCode }}</span>
-            </div>
-            <div class="col">
-              <span class="d-block small text-muted fw-semibold">Cód. Farma</span>
-              <span class="d-block fw-semibold">{{ s.farmaCode }}</span>
-            </div>
-            <div class="col">
-              <span class="d-block small text-muted fw-semibold">CNPJ</span>
-              <span class="d-block fw-semibold">{{ s.cnpj | cnpj }}</span>
-            </div>
-            @if (s.codigoRede) {
-              <div class="col">
-                <span class="d-block small text-muted fw-semibold">Cód. Rede</span>
-                <span class="d-block fw-semibold">{{ s.codigoRede }}</span>
-              </div>
-            }
-            <div class="col">
-              <span class="d-block small text-muted fw-semibold">Classificação</span>
-              <span class="d-block mt-1">
-                <app-classificacao-badge [value]="s.classificacao"></app-classificacao-badge>
-              </span>
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div class="mt-3 pt-3 border-top">
-            <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">Status</p>
-            <div class="row row-cols-2 g-2">
-              <div class="col">
-                <span class="d-block small text-muted fw-semibold">Status geral</span>
-                <span class="d-block mt-1">
-                  <span
-                    [class]="
-                      'delayed-stores__layer delayed-stores__layer--' +
-                      (s.status === 'Sem atraso'
-                        ? 'ok'
-                        : s.status === 'Sem dados'
-                          ? 'nodata'
-                          : 'api')
-                    "
-                    >{{ s.status }}</span
-                  >
-                </span>
-              </div>
-              <div class="col">
-                <span class="d-block small text-muted fw-semibold">Atraso</span>
-                <span class="d-block mt-1">
-                  @if (
-                    s.problemLayers.length > 0 &&
-                    !s.problemLayers.includes('Sem dados') &&
-                    s.delayHours > 0
-                  ) {
-                    <span
-                      [class]="
-                        'delayed-stores__delay-badge delayed-stores__delay-badge--' +
-                        urgencyClass(s.delayHours)
-                      "
-                      >{{ formatDelay(s.delayHours) }}</span
-                    >
-                  } @else {
-                    <span class="text-body-secondary">—</span>
+        <div class="modal-body store-modal__body">
+          <div class="row g-3 store-modal__grid">
+            <section class="col-12 col-md-6">
+              <div class="store-modal__section-card h-100">
+                <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
+                  Identificação
+                </p>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 mb-0">
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Cód. Associação</span>
+                    <span class="d-block fw-semibold">{{ s.associationCode }}</span>
+                  </div>
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Cód. Farma</span>
+                    <span class="d-block fw-semibold">{{ s.farmaCode }}</span>
+                  </div>
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">CNPJ</span>
+                    <span class="d-block fw-semibold">{{ s.cnpj | cnpj }}</span>
+                  </div>
+                  @if (s.codigoRede) {
+                    <div class="col">
+                      <span class="d-block small text-muted fw-semibold">Cód. Rede</span>
+                      <span class="d-block fw-semibold">{{ s.codigoRede }}</span>
+                    </div>
                   }
-                </span>
-              </div>
-              <div class="col">
-                <span class="d-block small text-muted fw-semibold">Sit. Contrato</span>
-                <span class="d-block mt-1">
-                  <app-sit-contrato-badge [value]="s.sitContrato"></app-sit-contrato-badge>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Camadas com atraso -->
-          <div class="mt-3 pt-3 border-top">
-            <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
-              Camadas com atraso
-            </p>
-            <div class="d-flex flex-wrap gap-1 mb-2">
-              @for (layer of s.layerItems; track layer.label) {
-                <span [class]="layer.className">{{ layer.label }}</span>
-              }
-            </div>
-            <div class="d-flex flex-column gap-2">
-              @for (entry of layerEntries; track entry) {
-                <div
-                  [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()"
-                >
-                  <span class="fw-bold small">{{ entry }}</span>
-                  <span class="small text-muted fw-semibold">{{ layerLastSale(s, entry) }}</span>
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Classificação</span>
+                    <span class="d-block mt-1">
+                      <app-classificacao-badge [value]="s.classificacao"></app-classificacao-badge>
+                    </span>
+                  </div>
                 </div>
-              }
-            </div>
-          </div>
+              </div>
+            </section>
 
-          <!-- Possível causa -->
-          @if (s.possivelCausa) {
-            <div class="mt-3 pt-3 border-top">
-              <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
-                Possível causa
-              </p>
-              <p class="small mb-0 lh-base">{{ s.possivelCausa }}</p>
-            </div>
-          }
-
-          <!-- Informações do Coletor -->
-          <div class="mt-3 pt-3 border-top">
-            <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
-              Informações do Coletor
-            </p>
-            <div class="card store-modal__coletor-card">
-              <div class="card-body py-2 px-3">
-                <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
-                  <span class="small text-muted fw-semibold text-nowrap">Versão instalada</span>
-                  <span class="small fw-semibold text-end">
-                    @if (s.numVersao) {
-                      <code class="fw-semibold">{{ s.numVersao }}</code>
-                    } @else {
-                      <span class="text-body-secondary">Não informado</span>
-                    }
-                  </span>
-                </div>
-                <div class="d-flex align-items-center justify-content-between gap-3">
-                  <span class="small text-muted fw-semibold text-nowrap">Horário de operação</span>
-                  <span class="small fw-semibold text-end">
-                    @if (coletorSchedule(s.numVersao); as schedule) {
-                      <span class="d-inline-flex align-items-center gap-2">
+            <section class="col-12 col-md-6">
+              <div class="store-modal__section-card h-100">
+                <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
+                  Status
+                </p>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Status geral</span>
+                    <span class="d-block mt-1">
+                      <span
+                        [class]="
+                          'delayed-stores__layer delayed-stores__layer--' +
+                          (s.status === 'Sem atraso'
+                            ? 'ok'
+                            : s.status === 'Sem dados'
+                              ? 'nodata'
+                              : 'api')
+                        "
+                        >{{ s.status }}</span
+                      >
+                    </span>
+                  </div>
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Atraso</span>
+                    <span class="d-block mt-1">
+                      @if (
+                        s.problemLayers.length > 0 &&
+                        !s.problemLayers.includes('Sem dados') &&
+                        s.delayHours > 0
+                      ) {
                         <span
                           [class]="
-                            'coletor-info-dot coletor-info-dot--' +
-                            (schedule === 'horário comercial' ? 'comercial' : 'fora')
+                            'delayed-stores__delay-badge delayed-stores__delay-badge--' +
+                            urgencyClass(s.delayHours)
                           "
-                        ></span>
-                        {{
-                          schedule === 'horário comercial'
-                            ? 'Horário comercial'
-                            : 'Fora do horário comercial'
-                        }}
-                      </span>
-                    } @else {
-                      <span class="text-body-secondary">Não informado</span>
-                    }
-                  </span>
+                          >{{ formatDelay(s.delayHours) }}</span
+                        >
+                      } @else {
+                        <span class="text-body-secondary">—</span>
+                      }
+                    </span>
+                  </div>
+                  <div class="col">
+                    <span class="d-block small text-muted fw-semibold">Sit. Contrato</span>
+                    <span class="d-block mt-1">
+                      <app-sit-contrato-badge [value]="s.sitContrato"></app-sit-contrato-badge>
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
+
+            <section class="col-12 col-md-6">
+              <div class="store-modal__section-card h-100">
+                <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
+                  Camadas com atraso
+                </p>
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  @for (layer of s.layerItems; track layer.label) {
+                    <span [class]="layer.className">{{ layer.label }}</span>
+                  }
+                </div>
+                <div class="d-flex flex-column gap-2">
+                  @for (entry of layerEntries; track entry) {
+                    <div
+                      [class]="'store-modal__layer-row store-modal__layer-row--' + entry.toLowerCase()"
+                    >
+                      <span class="fw-bold small">{{ entry }}</span>
+                      <span class="small text-muted fw-semibold">{{ layerLastSale(s, entry) }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </section>
+
+            <section class="col-12 col-md-6">
+              <div class="store-modal__section-card h-100">
+                <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
+                  Informações do Coletor
+                </p>
+                <div class="card store-modal__coletor-card">
+                  <div class="card-body py-2 px-3">
+                    <div class="store-modal__meta-row mb-2">
+                      <span class="store-modal__meta-label small text-muted fw-semibold">
+                        Versão instalada
+                      </span>
+                      <span class="store-modal__meta-value small fw-semibold">
+                        @if (s.numVersao) {
+                          <code class="fw-semibold">{{ s.numVersao }}</code>
+                        } @else {
+                          <span class="text-body-secondary">Não informado</span>
+                        }
+                      </span>
+                    </div>
+                    <div class="store-modal__meta-row">
+                      <span class="store-modal__meta-label small text-muted fw-semibold">
+                        Horário de operação
+                      </span>
+                      <span class="store-modal__meta-value small fw-semibold">
+                        @if (coletorSchedule(s.numVersao); as schedule) {
+                          <span class="d-inline-flex align-items-center gap-2">
+                            <span
+                              [class]="
+                                'coletor-info-dot coletor-info-dot--' +
+                                (schedule === 'horário comercial' ? 'comercial' : 'fora')
+                              "
+                            ></span>
+                            {{
+                              schedule === 'horário comercial'
+                                ? 'Horário comercial'
+                                : 'Fora do horário comercial'
+                            }}
+                          </span>
+                        } @else {
+                          <span class="text-body-secondary">Não informado</span>
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            @if (s.possivelCausa) {
+              <section class="col-12">
+                <div class="store-modal__section-card">
+                  <p class="store-modal__section-title text-uppercase fw-bold text-muted mb-2">
+                    Possível causa
+                  </p>
+                  <p class="small mb-0 lh-base">{{ s.possivelCausa }}</p>
+                </div>
+              </section>
+            }
           </div>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer store-modal__footer">
           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="close()">
             Fechar
           </button>

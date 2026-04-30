@@ -4,9 +4,22 @@
   display: contents;
 }
 
+.store-modal {
+  --store-modal-shell-padding: clamp(0.75rem, 2vh, 1.5rem);
+
+  overflow-y: auto;
+  padding: var(--store-modal-shell-padding);
+}
+
 // ── Dialog sizing & appearance ───────────────────────────────
 .store-modal__dialog {
-  max-width: min(92vw, 32rem);
+  --bs-modal-width: min(96vw, 60rem);
+  --bs-modal-margin: 0;
+
+  min-height: calc(100dvh - (var(--store-modal-shell-padding) * 2));
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
 }
 
 .store-modal__content {
@@ -27,6 +40,31 @@
   box-shadow: var(--painel-shadow);
   border-radius: 0.85rem;
   color: var(--painel-text);
+  max-height: calc(100dvh - (var(--store-modal-shell-padding) * 2));
+  width: 100%;
+}
+
+.store-modal__header,
+.store-modal__body,
+.store-modal__footer {
+  padding-inline: clamp(0.95rem, 2vw, 1.25rem);
+}
+
+.store-modal__header,
+.store-modal__footer {
+  padding-block: clamp(0.75rem, 1.8vh, 1rem);
+}
+
+.store-modal__body {
+  padding-block: clamp(0.85rem, 2vh, 1.1rem);
+}
+
+.store-modal__section-card {
+  height: 100%;
+  padding: clamp(0.75rem, 1.6vh, 0.9rem);
+  background-color: var(--painel-surface-soft);
+  border: 1px solid var(--painel-border);
+  border-radius: 0.75rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -47,6 +85,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
   padding: 0.35rem 0.55rem;
   border-radius: 0.45rem;
   background-color: var(--painel-surface-soft);
@@ -62,6 +102,22 @@
   &--coletor {
     border-left-color: var(--status-danger);
   }
+}
+
+.store-modal__meta-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.store-modal__meta-label,
+.store-modal__meta-value {
+  min-width: 0;
+}
+
+.store-modal__meta-value {
+  text-align: right;
 }
 
 // ── Coletor card ─────────────────────────────────────────────
@@ -89,6 +145,32 @@
   }
   &--fora {
     background-color: var(--painel-muted);
+  }
+}
+
+@media (max-height: 52rem) {
+  .store-modal {
+    --store-modal-shell-padding: 0.5rem;
+  }
+
+  .store-modal__section-card {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .store-modal {
+    --store-modal-shell-padding: 0.5rem;
+  }
+
+  .store-modal__layer-row,
+  .store-modal__meta-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .store-modal__meta-value {
+    text-align: left;
   }
 }
 
